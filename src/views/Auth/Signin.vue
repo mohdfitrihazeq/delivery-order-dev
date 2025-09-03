@@ -45,11 +45,6 @@
             </button>
           </form>
 
-          <!-- Sign up -->
-          <p class="mt-6 text-sm text-center text-gray-500">
-            Don't have an account?
-            <router-link to="/signup" class="text-teal-600 hover:underline">Sign Up</router-link>
-          </p>
         </div>
       </div>
     </div>
