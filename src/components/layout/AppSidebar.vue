@@ -168,28 +168,28 @@ const menuGroups = [
       {
         icon: GridIcon,
         name: "Dashboard",
-        subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+        subItems: [{ name: "Sample File", path: "/", pro: false }],
       },
       {
         icon: UserCircleIcon,
-        name: "User Profile",
+        name: "System Users",
         path: "/profile",
       },
 
-      {
-        name: "Forms",
-        icon: ListIcon,
-        subItems: [
-          { name: "Form Elements", path: "/form-elements", pro: false },
-        ],
-      },
-      {
-        name: "Pages",
-        icon: PageIcon,
-        subItems: [
-          { name: "404 Page", path: "/error-404", pro: false },
-        ],
-      },
+      // {
+      //   name: "Forms",
+      //   icon: ListIcon,
+      //   subItems: [
+      //     { name: "Form Elements", path: "/form-elements", pro: false },
+      //   ],
+      // },
+      // {
+      //   name: "Pages",
+      //   icon: PageIcon,
+      //   subItems: [
+      //     { name: "404 Page", path: "/error-404", pro: false },
+      //   ],
+      // },
     ],
   },
   // {
