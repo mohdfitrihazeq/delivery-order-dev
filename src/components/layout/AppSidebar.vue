@@ -18,14 +18,15 @@
         <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden rounded-2xl shadow-md"
           src="/images/logo/logo3.png" alt="Logo" width="40" height="40" />
         <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block rounded-2xl shadow-md"
-          src="/images/logo/logo-dark.svg" alt="Logo" width="40" height="40" />
-        <img v-else class="rounded-2xl shadow-md" src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+          src="/images/logo/logo3.png" alt="Logo" width="40" height="40" />
+        <img v-else class="rounded-2xl shadow-md" src="/images/logo/logo3.png" alt="Logo" width="32" height="32" />
 
         <!-- Delivery Order text -->
         <span v-if="isExpanded || isHovered || isMobileOpen"
-          class="text-xl font-bold bg-gradient-to-r from-green-900 via-green-600 to-green-400 bg-clip-text text-transparent">
+          class="text-xl font-bold bg-gradient-to-r from-green-900 via-green-600 to-green-400 bg-clip-text text-transparent delivery-text">
           Delivery Order
         </span>
+
       </router-link>
 
 
@@ -248,3 +249,11 @@ const endTransition = (el) => {
   el.style.height = "";
 };
 </script>
+<style scoped>
+.delivery-text {
+  -webkit-text-stroke: 0.1px white;
+  /* White border */
+  paint-order: stroke fill;
+  /* Make stroke visible */
+}
+</style>
