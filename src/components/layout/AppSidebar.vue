@@ -10,16 +10,25 @@
     },
   ]" @mouseenter="!isExpanded && (isHovered = true)" @mouseleave="isHovered = false">
     <div :class="[
-      'py-8 flex',
+      'py-4 flex',
       !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
     ]">
-      <router-link to="/">
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden" src="/images/logo/logo.svg" alt="Logo"
-          width="150" height="40" />
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo-dark.svg"
-          alt="Logo" width="150" height="40" />
-        <img v-else src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+      <router-link to="/" class="flex items-center space-x-2">
+        <!-- Logo image with rounded corners -->
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden rounded-2xl shadow-md"
+          src="/images/logo/logo3.png" alt="Logo" width="40" height="40" />
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block rounded-2xl shadow-md"
+          src="/images/logo/logo-dark.svg" alt="Logo" width="40" height="40" />
+        <img v-else class="rounded-2xl shadow-md" src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+
+        <!-- Delivery Order text -->
+        <span v-if="isExpanded || isHovered || isMobileOpen"
+          class="text-xl font-bold bg-gradient-to-r from-green-900 via-green-600 to-green-400 bg-clip-text text-transparent">
+          Delivery Order
+        </span>
       </router-link>
+
+
     </div>
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
       <nav class="mb-6">
@@ -144,7 +153,7 @@
 </template>
 
 <script setup>
-import {  computed } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 import {
