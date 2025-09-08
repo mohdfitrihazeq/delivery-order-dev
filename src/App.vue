@@ -1,12 +1,7 @@
+<script setup></script>
+
 <template>
-  <ThemeProvider>
-    <SidebarProvider>
-      <RouterView />
-    </SidebarProvider>
-  </ThemeProvider>
+    <router-view />
 </template>
 
-<script setup lang="ts">
-import ThemeProvider from './components/layout/ThemeProvider.vue'
-import SidebarProvider from './components/layout/SidebarProvider.vue'
-</script>
+<style scoped></style>

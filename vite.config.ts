@@ -1,20 +1,22 @@
-import { fileURLToPath, URL } from 'node:url'
+import vue from '@vitejs/plugin-vue';
+import Components from 'unplugin-vue-components/vite';
+import { defineConfig } from 'vite';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
+// 用动态 import 解决 ESM only
+export default defineConfig(async () => {
+    const { PrimeVueResolver } = await import('@primevue/auto-import-resolver');
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
-  },
-})
+    return {
+        plugins: [
+            vue(),
+            Components({
+                resolvers: [PrimeVueResolver()]
+            })
+        ],
+        resolve: {
+            alias: {
+                '@': new URL('./src', import.meta.url).pathname
+            }
+        }
+    };
+});
