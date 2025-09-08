@@ -19,5 +19,13 @@ module.exports = {
                 order: ['script', 'template', 'style']
             }
         ]
-    }
+    },
+    overrides: [
+        {
+            files: ['*.d.ts'],
+            rules: {
+                'prettier/prettier': 'off'
+            }
+        }
+    ]
 };
