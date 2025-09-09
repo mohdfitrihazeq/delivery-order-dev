@@ -1,11 +1,9 @@
 <script setup>
-import AppMenu from './AppMenu.vue';
+import Menu from './Menu/Menu.vue';
 </script>
 
 <template>
     <div class="layout-sidebar">
-        <app-menu></app-menu>
+        <Menu></Menu>
     </div>
 </template>
-
-<style lang="scss" scoped></style>
