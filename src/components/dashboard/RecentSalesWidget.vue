@@ -11,7 +11,7 @@ onMounted(() => {
 
 <template>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="glossy-card p-5 rounded-xl shadow-sm border border-gray-200">
+        <div class="glossy-card mb-0">
             <div class="flex items-start gap-3 mb-4">
                 <div class="flex items-center justify-center bg-gray-100 dark:bg-gray-400/10 rounded-full w-10 h-10">
                     <i class="pi pi-chart-bar text-gray-500 !text-xl"></i>
@@ -39,7 +39,7 @@ onMounted(() => {
 
             <div class="flex items-center justify-between">
                 <span class="px-3 py-1 text-xs border border-yellow-300 text-yellow-600 bg-yellow-50 rounded-md flex items-center gap-1"> <i class="pi pi-exclamation-triangle"></i> pending </span>
-                <button class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Manage Budget <i class="pi pi-arrow-right"></i></button>
+                <button class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Manage Budget <i class="pi pi-arrow-right"></i></button>
             </div>
         </div>
 
@@ -71,7 +71,7 @@ onMounted(() => {
 
             <div class="flex items-center justify-between">
                 <span class="px-3 py-1 text-xs border border-yellow-300 text-yellow-600 bg-yellow-50 rounded-md flex items-center gap-1"> <i class="pi pi-exclamation-triangle"></i> pending </span>
-                <button class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Create Request <i class="pi pi-arrow-right"></i></button>
+                <button class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Create Request <i class="pi pi-arrow-right"></i></button>
             </div>
         </div>
 
@@ -103,7 +103,7 @@ onMounted(() => {
 
             <div class="flex items-center justify-between">
                 <span class="px-3 py-1 text-xs border border-yellow-300 text-yellow-600 bg-yellow-50 rounded-md flex items-center gap-1"> <i class="pi pi-exclamation-triangle"></i> pending </span>
-                <button class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Record Delivery <i class="pi pi-arrow-right"></i></button>
+                <button class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg shadow-sm flex items-center gap-2 hover:bg-gray-50">Record Delivery <i class="pi pi-arrow-right"></i></button>
             </div>
         </div>
     </div>
