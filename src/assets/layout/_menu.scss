@@ -24,7 +24,7 @@
 
     .layout-root-menuitem {
         > .layout-menuitem-root-text {
-            font-size: 10.5px;
+            font-size: 13px;
             color: var(--text-color);
             margin:11px 0px 9px 0px; 
         }
@@ -65,7 +65,7 @@
             color: var(--text-color);
             cursor: pointer;
             padding: 6.8px;
-            font-size: 12.5px;
+            font-size: 14px;
             border-radius: var(--content-border-radius);
             transition:
                 background-color var(--element-transition-duration),
@@ -156,4 +156,10 @@
 .layout-submenu-enter-active {
     overflow: hidden;
     transition: max-height 1s ease-in-out;
+}
+
+.menu-separator {
+    border-bottom: 1px solid #ddd;
+    margin: 0.5rem 0;
+    list-style: none;
 }
