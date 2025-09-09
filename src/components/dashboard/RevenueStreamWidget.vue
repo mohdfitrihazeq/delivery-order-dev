@@ -89,7 +89,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="card">
+    <div class="card shadow">
         <div class="font-semibold text-xl mb-4">Revenue Stream</div>
         <Chart type="bar" :data="chartData" :options="chartOptions" class="h-80" />
     </div>
