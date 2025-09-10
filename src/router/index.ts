@@ -17,6 +17,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/request-orders/RequestOrders.vue')
             },
             {
+                path: '/budget',
+                name: 'budget',
+                component: () => import('@/views/budget/Budget.vue')
+            },
+            {
                 path: '/filter-frozen-table',
                 name: 'filterfrozentable',
                 component: () => import('@/components/table/FilterFrozenTable.vue')
