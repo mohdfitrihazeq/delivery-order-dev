@@ -12,6 +12,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/Dashboard.vue')
             },
             {
+                path: '/request-orders',
+                name: 'request-orders',
+                component: () => import('@/views/request-orders/RequestOrders.vue')
+            },
+            {
                 path: '/uikit/formlayout',
                 name: 'formlayout',
                 component: () => import('@/views/drafts/uikit/FormLayout.vue')
