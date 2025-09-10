@@ -17,6 +17,22 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/request-orders/RequestOrders.vue')
             },
             {
+                path: '/budget',
+                name: 'budget',
+                component: () => import('@/views/budget/Budget.vue')
+            },
+            {
+                path: '/filter-frozen-table',
+                name: 'filterfrozentable',
+                component: () => import('@/components/table/FilterFrozenTable.vue')
+            },
+            {
+                path: '/sample-call-table',
+                name: 'samplecalltable',
+                component: () => import('@/components/table/SampleCallTable.vue')
+            },
+            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
+            {
                 path: '/uikit/formlayout',
                 name: 'formlayout',
                 component: () => import('@/views/drafts/uikit/FormLayout.vue')

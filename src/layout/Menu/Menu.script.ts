@@ -9,8 +9,7 @@ export function useMenu() {
             label: 'Pocurement Workflow',
             items: [
                 { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                { label: 'Project', icon: 'pi pi-fw pi-receipt', to: '/project' },
-                { label: 'Budget Items', icon: 'pi pi-fw pi-list', to: '/budget-items' },
+                { label: 'Budget', icon: 'pi pi-fw pi-list', to: '/budget' },
                 { label: 'Request Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/request-orders' },
                 { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
             ]
