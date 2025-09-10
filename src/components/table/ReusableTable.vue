@@ -1,20 +1,10 @@
 <script setup lang="ts">
+import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
 import { ref } from 'vue';
-
-export interface TableColumn {
-    field?: string;
-    header?: string;
-    sortable?: boolean;
-    frozen?: boolean;
-    style?: string;
-    bodySlot?: string;
-    action?: boolean; // 是否是 Action 列
-    actions?: ('edit' | 'view' | 'delete')[]; // 可用按钮
-}
 
 const props = defineProps<{
     value: any[];

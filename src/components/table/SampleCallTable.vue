@@ -1,7 +1,9 @@
+<!-- TODO: WANT TO DELETE THIS WHEN WE UNDERSTAND HOW TO USE THE ReusableTable COMPONENTS -->
 <script setup lang="ts">
+import type { TableColumn } from '@/types/table.type';
 import Tag from 'primevue/tag';
 import { ref } from 'vue';
-import ReusableTable, { TableColumn } from './ReusableTable.vue';
+import ReusableTable from './ReusableTable.vue';
 
 const products = ref([
     { id: 1, name: 'Laptop', price: 1200, stock: 50, status: 'INSTOCK' },
@@ -13,7 +15,6 @@ const filters = ref({
     global: { value: null as string | null, matchMode: 'contains' }
 });
 
-// 定义表格列
 const columns: TableColumn[] = [
     { field: 'id', header: 'ID', sortable: true },
     { field: 'name', header: 'Name', sortable: true },
