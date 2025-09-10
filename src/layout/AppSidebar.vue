@@ -4,7 +4,7 @@ import MenuSeparator from './Menu/MenuSeparator.vue';
 </script>
 
 <template>
-    <div class="layout-sidebar">
+    <div class="layout-sidebar shadow-sm">
         <div class="flex items-center gap-3 mb-4 mt-3">
             <!-- Login Sidebar -->
             <div class="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">JD</div>

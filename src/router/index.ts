@@ -12,6 +12,11 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/Dashboard.vue')
             },
             {
+                path: '/request-orders',
+                name: 'request-orders',
+                component: () => import('@/views/request-orders/RequestOrders.vue')
+            },
+            {
                 path: '/filter-frozen-table',
                 name: 'filterfrozentable',
                 component: () => import('@/components/table/FilterFrozenTable.vue')
