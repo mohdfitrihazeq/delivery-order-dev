@@ -46,7 +46,5 @@ import MenuSeparator from './Menu/MenuSeparator.vue';
 
         <!-- Menu Sidebar -->
         <Menu></Menu>
-    <div class="layout-sidebar shadow">
-        <app-menu></app-menu>
     </div>
 </template>
