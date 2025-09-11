@@ -29,7 +29,6 @@ function handleSearch() {
 
 function handleExport() {
     props.onExport?.();
-
     if (!props.value || props.value.length === 0) return;
 
     const columns = props.columns.map((c) => c.header);
@@ -57,6 +56,7 @@ function handleExport() {
 </script>
 
 <template>
+    <!-- 搜索 + 按钮 -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <span class="p-input-icon-left w-full sm:max-w-sm">
             <InputText v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" />
@@ -68,6 +68,7 @@ function handleExport() {
         </div>
     </div>
 
+    <!-- 表格 -->
     <DataTable
         :value="props.value"
         :filters="props.filters"
@@ -79,12 +80,6 @@ function handleExport() {
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
         class="rounded-lg overflow-hidden border"
     >
-        <template #paginatorstart></template>
-
-        <template #paginatorend>
-            <Button type="button" icon="pi pi-download" text @click="handleExport" />
-        </template>
-
         <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
             <template v-if="col.bodySlot && !col.action" #body="slotProps">
                 <slot :name="col.bodySlot" :data="slotProps.data" />
@@ -103,5 +98,9 @@ function handleExport() {
                 </div>
             </template>
         </Column>
+
+        <template #paginatorend>
+            <Button type="button" icon="pi pi-download" text @click="handleExport" />
+        </template>
     </DataTable>
 </template>

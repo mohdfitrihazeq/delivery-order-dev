@@ -14,6 +14,7 @@ declare module 'vue' {
     Chart: typeof import('primevue/chart')['default']
     Deliveries: typeof import('./src/components/dashboard/Deliveries.vue')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
+    FileUpload: typeof import('primevue/fileupload')['default']
     FilterFrozenTable: typeof import('./src/components/table/FilterFrozenTable.vue')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     NotificationsWidget: typeof import('./src/components/dashboard/NotificationsWidget.vue')['default']

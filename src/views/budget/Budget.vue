@@ -10,6 +10,7 @@ import Tag from 'primevue/tag';
 import { defineComponent } from 'vue';
 import { useBudget } from './BudgetLogic';
 import Overview from './Overview.vue';
+import BudgetImportModal from './components/modal/BudgetImport.vue';
 
 export default defineComponent({
     name: 'BudgetManagement',
@@ -21,7 +22,8 @@ export default defineComponent({
         SelectButton,
         Tag,
         ReusableTable,
-        Overview
+        Overview,
+        BudgetImportModal
     },
     setup() {
         const logic = useBudget();
@@ -67,10 +69,12 @@ export default defineComponent({
                 <Overview class="col-span-12" />
             </div>
             <div v-else>
-                <ReusableTable :value="budgetItems" :columns="columns" :filters="filters" :onSearch="onSearchWrapper" :show-import-file="true">
+                <ReusableTable :value="budgetItems" :columns="columns" :filters="filters" :onSearch="onSearchWrapper" :show-import-file="true" :onImportFile="handleImportClick">
                     <template #rate="{ data }"> ${{ data.rate }} </template>
                     <template #amount="{ data }"> ${{ data.amount }} </template>
                 </ReusableTable>
+
+                <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />
             </div>
         </div>
     </Motion>

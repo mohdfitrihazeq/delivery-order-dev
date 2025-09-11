@@ -61,6 +61,10 @@ export function useBudget() {
         search.value = value;
         filters.value.global.value = value;
     }
+    const showImportModal = ref(false);
+    function handleImportClick() {
+        showImportModal.value = true;
+    }
 
     return {
         versions,
@@ -71,6 +75,8 @@ export function useBudget() {
         columns,
         filters,
         search,
-        onSearchWrapper: handleSearch
+        onSearchWrapper: handleSearch,
+        showImportModal,
+        handleImportClick
     };
 }
