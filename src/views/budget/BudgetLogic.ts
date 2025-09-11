@@ -11,7 +11,7 @@ export function useBudget() {
     const versions = ref<Version[]>([
         { label: 'Version 1.0', value: '1.0' },
         { label: 'Version 1.1', value: '1.1' },
-        { label: 'Version 2.0 1', value: '2.0', latest: true }
+        { label: 'Version 2.0', value: '2.0', latest: true }
     ]);
 
     const selectedVersion = ref(versions.value.find((v) => v.latest)?.value || '');
