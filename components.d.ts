@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Badge: typeof import('primevue/badge')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
     BestSellingWidget: typeof import('./src/components/dashboard/BestSellingWidget.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
@@ -14,11 +15,15 @@ declare module 'vue' {
     Chart: typeof import('primevue/chart')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
     Deliveries: typeof import('./src/components/dashboard/Deliveries.vue')['default']
+    Dropdown: typeof import('primevue/dropdown')['default']
+    FileUpload: typeof import('primevue/fileupload')['default']
+    FilterFrozenTable: typeof import('./src/components/table/FilterFrozenTable.vue')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     NotificationsWidget: typeof import('./src/components/dashboard/NotificationsWidget.vue')['default']
     QuickAction: typeof import('./src/components/dashboard/QuickAction.vue')['default']
     RecentSalesWidget: typeof import('./src/components/dashboard/RecentSalesWidget.vue')['default']
+    ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RevenueStreamWidget: typeof import('./src/components/dashboard/RevenueStreamWidget.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -26,6 +31,9 @@ declare module 'vue' {
     SelectButton: typeof import('primevue/selectbutton')['default']
     StatsWidget: typeof import('./src/components/dashboard/StatsWidget.vue')['default']
     Tag: typeof import('primevue/tag')['default']
+    SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
+    SelectButton: typeof import('primevue/selectbutton')['default']
+    StatsWidget: typeof import('./src/components/dashboard/StatsWidget.vue')['default']
     Toast: typeof import('primevue/toast')['default']
   }
   export interface ComponentCustomProperties {
