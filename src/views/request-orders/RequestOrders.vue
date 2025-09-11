@@ -9,7 +9,7 @@
                     <h1 class="text-2xl font-bold">Request Orders</h1>
                     <p class="text-gray-500">Manage purchase requests for project materials and services</p>
                 </div>
-                <button class="btn-cyan-gradient">+ New Request Order</button>
+                <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
             </div>
 
             <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />

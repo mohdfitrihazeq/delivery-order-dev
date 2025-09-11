@@ -29,7 +29,7 @@ export default defineComponent({
                 roDate: '2025-09-01',
                 deliveryDate: '2025-09-05',
                 totalAmount: '1200',
-                budgetType: 'Capex',
+                budgetType: 'Budget',
                 status: 'Approved',
                 requestedAt: '2025-08-30'
             },
@@ -40,7 +40,7 @@ export default defineComponent({
                 roDate: '2025-09-02',
                 deliveryDate: '2025-09-06',
                 totalAmount: '500',
-                budgetType: 'Opex',
+                budgetType: 'Unbudgeted',
                 status: 'Pending',
                 requestedAt: '2025-08-31'
             }

@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
+import Breadcrumb from 'primevue/breadcrumb';
 import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
+const route = useRoute();
 
-const outsideClickListener = ref(null);
+const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
 watch(isSidebarActive, (newVal) => {
     if (newVal) {
@@ -41,16 +44,16 @@ function bindOutsideClickListener() {
 
 function unbindOutsideClickListener() {
     if (outsideClickListener.value) {
-        document.removeEventListener('click', outsideClickListener);
+        document.removeEventListener('click', outsideClickListener.value);
         outsideClickListener.value = null;
     }
 }
 
-function isOutsideClicked(event) {
+function isOutsideClicked(event: Event) {
     const sidebarEl = document.querySelector('.layout-sidebar');
     const topbarEl = document.querySelector('.layout-menu-button');
 
-    return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
+    return !((sidebarEl && (sidebarEl.isSameNode(event.target as Node) || sidebarEl.contains(event.target as Node))) || (topbarEl && (topbarEl.isSameNode(event.target as Node) || topbarEl.contains(event.target as Node))));
 }
 </script>
 
@@ -58,11 +61,15 @@ function isOutsideClicked(event) {
     <div class="layout-wrapper" :class="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
+
         <div class="layout-main-container">
-            <div class="layout-main">
+            <div class="layout-main p-4">
+                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb" class="mb-4" />
+                <!-- Page Content -->
                 <router-view></router-view>
             </div>
         </div>
+
         <div class="layout-mask animate-fadein"></div>
     </div>
     <Toast />
