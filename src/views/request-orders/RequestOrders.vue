@@ -11,9 +11,39 @@ export default defineComponent({
         const activeTab = ref('0');
 
         const orders = ref([
-            { id: 1, roNumber: 'RO-001', requestedBy: 'John Doe', deliveryDate: '2025-09-15', totalAmount: '$1200', status: 'Approved', requestedAt: '2025-09-01' },
-            { id: 2, roNumber: 'RO-002', requestedBy: 'Jane Smith', deliveryDate: '2025-09-20', totalAmount: '$850', status: 'Rejected', requestedAt: '2025-09-05' },
-            { id: 3, roNumber: 'RO-003', requestedBy: 'Mike Chan', deliveryDate: '2025-09-25', totalAmount: '$640', status: 'Pending', requestedAt: '2025-09-07' }
+            {
+                id: 1,
+                roNumber: 'RO-001',
+                requestedBy: 'John Doe',
+                deliveryDate: '2025-09-15',
+                totalAmount: '$1200',
+                status: 'Approved',
+                requestedAt: '2025-09-01',
+                budgetType: 'Budget',
+                roDate: '2025-08-28'
+            },
+            {
+                id: 2,
+                roNumber: 'RO-002',
+                requestedBy: 'Jane Smith',
+                deliveryDate: '2025-09-20',
+                totalAmount: '$850',
+                status: 'Rejected',
+                requestedAt: '2025-09-05',
+                budgetType: 'Unbudget',
+                roDate: '2025-09-02'
+            },
+            {
+                id: 3,
+                roNumber: 'RO-003',
+                requestedBy: 'Mike Chan',
+                deliveryDate: '2025-09-25',
+                totalAmount: '$640',
+                status: 'Pending',
+                requestedAt: '2025-09-07',
+                budgetType: 'Budget',
+                roDate: '2025-09-03'
+            }
         ]);
 
         const filteredOrders = computed(() => {
@@ -84,22 +114,26 @@ export default defineComponent({
                                 <th class="py-2 px-4">#</th>
                                 <th class="py-2 px-4">RO Number</th>
                                 <th class="py-2 px-4">Requested By</th>
+                                <th class="py-2 px-4">RO Date</th>
                                 <th class="py-2 px-4">Delivery Date</th>
                                 <th class="py-2 px-4">Total Amount</th>
+                                <th class="py-2 px-4">Budget Type</th>
                                 <th class="py-2 px-4">Status</th>
                                 <th class="py-2 px-4">Requested At</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="filteredOrders.length === 0">
-                                <td colspan="7" class="text-center text-gray-500 py-6">No request orders found</td>
+                                <td colspan="9" class="text-center text-gray-500 py-6">No request orders found</td>
                             </tr>
                             <tr v-for="(order, index) in filteredOrders" :key="order.id" class="border-b">
                                 <td class="py-2 px-4">{{ index + 1 }}</td>
                                 <td class="py-2 px-4">{{ order.roNumber }}</td>
                                 <td class="py-2 px-4">{{ order.requestedBy }}</td>
+                                <td class="py-2 px-4">{{ order.roDate }}</td>
                                 <td class="py-2 px-4">{{ order.deliveryDate }}</td>
                                 <td class="py-2 px-4">{{ order.totalAmount }}</td>
+                                <td class="py-2 px-4">{{ order.budgetType }}</td>
                                 <td class="py-2 px-4">
                                     <Tag :value="order.status" :severity="getStatusSeverity(order.status)" />
                                 </td>
