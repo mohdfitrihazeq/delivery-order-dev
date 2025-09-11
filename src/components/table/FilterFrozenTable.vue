@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCustomerTableScript } from './FilterFrozenTable.script';
+import { useCustomerTableScript } from './FilterFrozenTable';
 
 const { customers, filters, loading, balanceFrozen, statuses, representatives, getSeverity, formatCurrency, formatDate, initFilters } = useCustomerTableScript();
 </script>

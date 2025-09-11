@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useMenu } from './Menu.script';
+import { useMenu } from './Menu';
 import MenuItem from './MenuItem.vue';
 import MenuSeparator from './MenuSeparator.vue';
 

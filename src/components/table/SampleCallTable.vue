@@ -44,10 +44,11 @@ function handleAction(type: 'edit' | 'view' | 'delete', row: any) {
 }
 
 const showCreate = ref(true);
+const showImportFile = ref(true);
 </script>
 
 <template>
-    <ReusableTable :value="products" :columns="columns" :filters="filters" :onSearch="handleSearch" :showCreate="showCreate" :onCreate="handleCreate" :onActionClick="handleAction">
+    <ReusableTable :value="products" :columns="columns" :filters="filters" :onSearch="handleSearch" :showImportFile="showImportFile" :showCreate="showCreate" :onCreate="handleCreate" :onActionClick="handleAction">
         <template #price="{ data }"> ${{ data.price }} </template>
 
         <template #status="{ data }">
