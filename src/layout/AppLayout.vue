@@ -64,7 +64,8 @@ function isOutsideClicked(event: Event) {
 
         <div class="layout-main-container">
             <div class="layout-main p-4">
-                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb" class="mb-4" />
+                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb" class="mb-2 py-1" />
+
                 <!-- Page Content -->
                 <router-view></router-view>
             </div>
