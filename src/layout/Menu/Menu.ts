@@ -25,6 +25,11 @@ export function useMenu() {
             label: 'Drafts File',
             items: [
                 {
+                    label: 'Sample Call Table',
+                    icon: 'pi pi-fw pi-ban',
+                    to: '/sample-call-table'
+                },
+                {
                     label: 'UI Drafts',
                     icon: 'pi pi-fw pi-ban',
                     items: [
