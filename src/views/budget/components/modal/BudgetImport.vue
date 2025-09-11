@@ -2,41 +2,13 @@
 import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
 import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
-import { defineEmits, defineProps, ref, watch } from 'vue';
+import { defineEmits, defineProps } from 'vue';
+import useImportBudgetDialogLogic from './BudgetImportLogic';
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{ (e: 'close'): void }>();
 
-const toast = useToast();
-
-// 内部可控状态
-const internalVisible = ref(props.visible);
-
-// 当父组件改变 visible 时同步内部状态
-watch(
-    () => props.visible,
-    (val) => {
-        internalVisible.value = val;
-    }
-);
-
-// Dialog 关闭时通知父组件
-function onHide() {
-    emit('close');
-    internalVisible.value = false;
-}
-
-function onAdvancedUpload(event: any) {
-    toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'File Uploaded',
-        life: 3000
-    });
-
-    event.options.clear();
-}
+const { internalVisible, onHide, onAdvancedUpload } = useImportBudgetDialogLogic(props, emit);
 </script>
 
 <template>
