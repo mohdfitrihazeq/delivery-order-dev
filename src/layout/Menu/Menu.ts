@@ -9,7 +9,7 @@ export function useMenu() {
             label: 'Pocurement Workflow',
             items: [
                 { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                { label: 'Budget', icon: 'pi pi-fw pi-list', to: '/budget' },
+                { label: 'Budget', icon: 'pi pi-fw pi-chart-bar', to: '/budget' },
                 { label: 'Request Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/request-orders' },
                 { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
             ]
@@ -24,6 +24,11 @@ export function useMenu() {
         {
             label: 'Drafts File',
             items: [
+                {
+                    label: 'Sample Call Table',
+                    icon: 'pi pi-fw pi-ban',
+                    to: '/sample-call-table'
+                },
                 {
                     label: 'UI Drafts',
                     icon: 'pi pi-fw pi-ban',
