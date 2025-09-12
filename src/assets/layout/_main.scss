@@ -54,7 +54,7 @@
     bottom: -4px;
     width: 0;
     height: 2px;
-    background-image: linear-gradient(to right, #14b8a6, #06b6d4); /* teal → cyan */
+    background-image: linear-gradient(to right, #3b82f6, #93c5fd);
     transition: all 0.3s ease;
 }
 
@@ -69,5 +69,6 @@
 }
 
 .custom-layout-gradient {
+    --layout-gradient: linear-gradient(to right, #3b82f6, #93c5fd);
     @apply bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg backdrop-blur-md;
 }
