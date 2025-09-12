@@ -1,8 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
 import { Motion } from '@motionone/vue';
+import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
+
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+const router = useRouter();
+
+const handleSignOut = () => {
+    // Clear any session / token (mock for now)
+    localStorage.removeItem('user'); // adjust later when you store user auth
+
+    // Redirect to login
+    router.push('/auth/login');
+};
 </script>
 
 <template>
@@ -25,7 +36,14 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
             </div>
             <div class="relative">
                 <button
-                    v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
+                    v-styleclass="{
+                        selector: '@next',
+                        enterFromClass: 'hidden',
+                        enterActiveClass: 'animate-scalein',
+                        leaveToClass: 'hidden',
+                        leaveActiveClass: 'animate-fadeout',
+                        hideOnOutsideClick: true
+                    }"
                     type="button"
                     class="layout-topbar-action layout-topbar-action-highlight"
                 >
@@ -53,7 +71,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
                         <i class="pi pi-bell"></i>
                         <span>Notification</span>
                     </button>
-                    <button type="button" class="layout-topbar-action text-white hover:opacity-80 transition">
+                    <button type="button" class="layout-topbar-action text-white hover:opacity-80 transition" @click="handleSignOut">
                         <i class="pi pi-sign-out"></i>
                         <span>Sign Out</span>
                     </button>
