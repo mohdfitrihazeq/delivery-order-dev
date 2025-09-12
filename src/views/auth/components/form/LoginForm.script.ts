@@ -28,7 +28,7 @@ export function useLoginForm() {
 
             // redirect after short delay so toast shows
             setTimeout(() => {
-                router.push('/');
+                router.push({ name: 'dashboard' });
             }, 500);
         } else {
             toast.add({

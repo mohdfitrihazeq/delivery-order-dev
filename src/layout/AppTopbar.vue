@@ -1,26 +1,37 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
+import { logout } from '@/views/auth/index.script';
 import { Motion } from '@motionone/vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
-
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
 
 const handleSignOut = () => {
-    // Clear any session / token (mock for now)
-    localStorage.removeItem('user'); // adjust later when you store user auth
-
-    // Redirect to login
+    logout();
     router.push('/auth/login');
 };
+
+const username = ref<string | null>(null);
+
+onMounted(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+        try {
+            username.value = JSON.parse(user).username;
+        } catch {
+            username.value = user;
+        }
+    }
+});
 </script>
 
 <template>
-    <Motion tag="div" class="layout-topbar custom-layout-gradient" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="layout-topbar custom-topbar-gradient" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <div class="layout-topbar-logo-container flex items-center gap-3">
             <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
-                <i class="pi pi-bars text-teal-700"></i>
+                <i class="pi pi-bars dark:text-white"></i>
             </button>
 
             <router-link to="/" class="layout-topbar-logo">
@@ -29,6 +40,7 @@ const handleSignOut = () => {
         </div>
 
         <div class="layout-topbar-actions flex items-center gap-3">
+            <span v-if="username" class="text-black font-medium">{{ username }}</span>
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
                     <i :class="['pi', { 'pi-moon text-white': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
