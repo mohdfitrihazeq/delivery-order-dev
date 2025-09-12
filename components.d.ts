@@ -7,15 +7,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Badge: typeof import('primevue/badge')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
     BestSellingWidget: typeof import('./src/components/dashboard/BestSellingWidget.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
     Button: typeof import('primevue/button')['default']
-    Chart: typeof import('primevue/chart')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
     Deliveries: typeof import('./src/components/dashboard/Deliveries.vue')['default']
-    Dropdown: typeof import('primevue/dropdown')['default']
     FilterFrozenTable: typeof import('./src/components/table/FilterFrozenTable.vue')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
