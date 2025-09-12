@@ -1,16 +1,49 @@
-<script setup>
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import Menu from './Menu/Menu.vue';
 import MenuSeparator from './Menu/MenuSeparator.vue';
+
+const username = ref<string | null>(null);
+const role = ref<string | null>(null);
+
+onMounted(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+        try {
+            const parsed = JSON.parse(user);
+            username.value = parsed.username;
+            role.value = parsed.role;
+        } catch {
+            username.value = user;
+            role.value = null;
+        }
+    }
+});
+
+const initials = (name: string | null) => {
+    if (!name) return '';
+    return name
+        .split(' ')
+        .map((n) => n[0]?.toUpperCase())
+        .join('')
+        .slice(0, 2);
+};
 </script>
 
 <template>
     <div class="layout-sidebar shadow-sm">
         <div class="flex items-center gap-3 mb-4 mt-3">
-            <!-- Login Sidebar -->
-            <div class="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">JD</div>
+            <!-- Avatar Circle -->
+            <div class="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg">
+                {{ initials(username) }}
+            </div>
             <div class="flex-1">
-                <div class="font-semibold text-gray-900 leading-tight dark:text-white">Jane Doe</div>
-                <div class="text-xs text-gray-500 dark:text-white">Project Manager</div>
+                <div class="font-semibold text-gray-900 leading-tight dark:text-white">
+                    {{ username || 'Guest' }}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-white">
+                    {{ role || 'No Role' }}
+                </div>
             </div>
         </div>
         <menu-separator></menu-separator>

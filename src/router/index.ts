@@ -1,10 +1,11 @@
 import AppLayout from '@/layout/AppLayout.vue';
+import { isAuthenticated } from '@/views/auth/index.script';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
         component: AppLayout,
+        meta: { requiresAuth: true },
         children: [
             {
                 path: '/',
@@ -27,10 +28,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'create-request-orders',
                 component: () => import('@/views/request-orders/components/page/CreateRequestOrders.vue'),
                 meta: {
-                    breadcrumb: [
-                        { label: 'Request Orders', to: '/request-orders' },
-                        { label: 'Create' } // last one not clickable
-                    ]
+                    breadcrumb: [{ label: 'Request Orders', to: '/request-orders' }, { label: 'Create' }]
                 }
             },
             {
@@ -176,23 +174,23 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     breadcrumb: [{ label: 'Crud' }]
                 }
+            },
+            {
+                path: '/pages/notfound',
+                name: 'notfound',
+                component: () => import('@/views/drafts/pages/NotFound.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Not Found' }]
+                }
             }
         ]
-    },
-    {
-        path: '/pages/notfound',
-        name: 'notfound',
-        component: () => import('@/views/drafts/pages/NotFound.vue'),
-        meta: {
-            breadcrumb: [{ label: 'Not Found' }]
-        }
     },
     {
         path: '/auth/login',
         name: 'login',
         component: () => import('@/views/auth/index.vue'),
         meta: {
-            breadcrumb: [{ label: 'Login' }]
+            breadcrumb: [{ label: 'Login', public: true }]
         }
     }
 ];
@@ -200,6 +198,16 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth && !isAuthenticated.value) {
+        next({ name: 'login' });
+    } else if (to.name === 'login' && isAuthenticated.value) {
+        next({ name: 'dashboard' });
+    } else {
+        next();
+    }
 });
 
 export default router;
