@@ -6,7 +6,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 </script>
 
 <template>
-    <Motion tag="div" class="layout-topbar bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg backdrop-blur-md" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="layout-topbar custom-layout-gradient" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <div class="layout-topbar-logo-container flex items-center gap-3">
             <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
                 <i class="pi pi-bars text-teal-700"></i>

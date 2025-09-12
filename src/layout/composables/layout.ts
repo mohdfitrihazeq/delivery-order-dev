@@ -1,6 +1,31 @@
+// src/layout/composables/layout.ts
 import { computed, reactive } from 'vue';
 
-const layoutConfig = reactive({
+/* -----------------------------
+   Types
+----------------------------- */
+interface LayoutConfig {
+    preset: string;
+    primary: string;
+    surface: string | null;
+    darkTheme: boolean;
+    menuMode: 'static' | 'overlay';
+}
+
+interface LayoutState {
+    staticMenuDesktopInactive: boolean;
+    overlayMenuActive: boolean;
+    profileSidebarVisible: boolean;
+    configSidebarVisible: boolean;
+    staticMenuMobileActive: boolean;
+    menuHoverActive: boolean;
+    activeMenuItem: unknown; // change to a stricter type if you know the shape
+}
+
+/* -----------------------------
+   Reactives
+----------------------------- */
+const layoutConfig = reactive<LayoutConfig>({
     preset: 'Aura',
     primary: 'emerald',
     surface: null,
@@ -8,7 +33,7 @@ const layoutConfig = reactive({
     menuMode: 'static'
 });
 
-const layoutState = reactive({
+const layoutState = reactive<LayoutState>({
     staticMenuDesktopInactive: false,
     overlayMenuActive: false,
     profileSidebarVisible: false,
@@ -18,18 +43,20 @@ const layoutState = reactive({
     activeMenuItem: null
 });
 
+/* -----------------------------
+   Composable
+----------------------------- */
 export function useLayout() {
-    const setActiveMenuItem = (item) => {
-        layoutState.activeMenuItem = item.value || item;
+    const setActiveMenuItem = (item: { value?: unknown } | unknown) => {
+        layoutState.activeMenuItem = (item as { value?: unknown }).value ?? item;
     };
 
     const toggleDarkMode = () => {
-        if (!document.startViewTransition) {
+        if (!(document as any).startViewTransition) {
             executeDarkModeToggle();
             return;
         }
-
-        document.startViewTransition(() => executeDarkModeToggle());
+        (document as any).startViewTransition(() => executeDarkModeToggle());
     };
 
     const executeDarkModeToggle = () => {

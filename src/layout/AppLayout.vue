@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
 import Breadcrumb from 'primevue/breadcrumb';
+import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppSidebar from './AppSidebar.vue';
@@ -64,7 +65,7 @@ function isOutsideClicked(event: Event) {
 
         <div class="layout-main-container">
             <div class="layout-main p-4">
-                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb" class="mb-2 py-1" />
+                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb as MenuItem[]" class="mb-2 py-1" />
 
                 <!-- Page Content -->
                 <router-view></router-view>

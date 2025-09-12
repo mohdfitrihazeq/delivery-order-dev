@@ -67,3 +67,7 @@
     width: 100%;
     height: 4px;
 }
+
+.custom-layout-gradient {
+    @apply bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg backdrop-blur-md;
+}
