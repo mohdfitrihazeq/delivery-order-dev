@@ -70,5 +70,11 @@
 
 .custom-layout-gradient {
     --layout-gradient: linear-gradient(to right, #3b82f6, #93c5fd);
-    @apply bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg backdrop-blur-md;
+    @apply bg-gradient-to-r from-blue-800 to-blue-300 shadow-lg backdrop-blur-md;
+}
+
+.custom-text-gradient {
+    background-image: linear-gradient(to right, #3b82f6, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }

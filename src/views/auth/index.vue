@@ -24,23 +24,23 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-gradient-to-l from-teal-800 via-teal-700 to-cyan-400">
+    <div class="flex items-center justify-center min-h-screen p-4 custom-layout-gradient shadow-lg">
         <!-- Card -->
-        <div ref="loginCard" class="login-card flex w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden border border-white">
+        <div ref="loginCard" class="login-card flex w-full max-w-4xl rounded-lg shadow-lg overflow-hidden border border-white">
             <!-- Left Section -->
-            <div class="hidden lg:block w-1/2">
-                <img src="/images/logo/illustration-truck-new.png" alt="Delivery Illustration" class="object-cover w-full h-full" />
+            <div class="hidden lg:flex w-1/2 bg-blue-100 items-center justify-center">
+                <img src="/images/logo/illustration-truck.png" alt="Delivery Illustration" class="object-contain w-3/4 h-auto" />
             </div>
 
             <!-- Right Section -->
-            <div class="flex flex-col justify-center w-full lg:w-1/2 p-10">
+            <div class="flex flex-col justify-center w-full lg:w-1/2 p-10 bg-white">
                 <!-- Logo -->
                 <div class="flex justify-center mb-6">
                     <img src="/images/logo/prosync-logo.png" alt="Prosync Logo" class="h-10" />
                 </div>
 
                 <!-- Title -->
-                <h1 class="text-2xl font-bold text-center mb-1 bg-gradient-to-r from-teal-800 to-teal-400 bg-clip-text text-transparent">DO SYSTEM</h1>
+                <h1 class="text-2xl font-bold text-center mb-1 custom-text-gradient bg-clip-text">DO SYSTEM</h1>
 
                 <p class="text-center text-gray-500 mb-6">Delivery order management system</p>
 
@@ -51,5 +51,5 @@ onMounted(() => {
     </div>
 
     <!-- Footer -->
-    <footer class="absolute bottom-4 w-full text-center text-gray-200 text-sm">© 2025 Prosync Construction Solutions.</footer>
+    <footer class="absolute bottom-4 w-full text-center text-white text-sm">© 2025 Prosync Construction Solutions.</footer>
 </template>

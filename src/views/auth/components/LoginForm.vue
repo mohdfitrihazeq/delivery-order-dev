@@ -53,9 +53,9 @@ const handleSubmit = () => {
         </div>
 
         <div class="flex justify-between text-sm">
-            <router-link to="/reset-password" class="text-teal-600 hover:underline"> Forgot password? </router-link>
+            <router-link to="/reset-password" class="text-info hover:underline"> Forgot password? </router-link>
         </div>
 
-        <button type="submit" class="w-full py-2 text-white bg-cyan-500 rounded-md hover:bg-cyan-600 transition">Login</button>
+        <Button label="Login" class="w-full" severity="info" />
     </form>
 </template>
