@@ -17,11 +17,11 @@ const handleSubmit = () => {
 <template>
     <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-            <input v-model="username" type="text" placeholder="Username" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none" />
+            <input v-model="username" type="text" placeholder="Username" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-sky-400 focus:outline-none" />
         </div>
 
         <div class="relative">
-            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-teal-400 focus:outline-none pr-10" />
+            <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-sky-400 focus:outline-none pr-10" />
             <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500" @click="togglePasswordVisibility">
                 <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
