@@ -1,15 +1,37 @@
-<script setup>
+<script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
+import { logout } from '@/views/auth/index.script';
 import { Motion } from '@motionone/vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+const router = useRouter();
+
+const handleSignOut = () => {
+    logout();
+    router.push('/auth/login');
+};
+
+const username = ref<string | null>(null);
+
+onMounted(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+        try {
+            username.value = JSON.parse(user).username;
+        } catch {
+            username.value = user;
+        }
+    }
+});
 </script>
 
 <template>
-    <Motion tag="div" class="layout-topbar bg-gradient-to-r from-teal-500 to-cyan-300 shadow-lg backdrop-blur-md" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+    <Motion tag="div" class="layout-topbar custom-topbar-gradient" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
         <div class="layout-topbar-logo-container flex items-center gap-3">
             <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
-                <i class="pi pi-bars text-teal-700"></i>
+                <i class="pi pi-bars dark:text-white"></i>
             </button>
 
             <router-link to="/" class="layout-topbar-logo">
@@ -18,6 +40,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
         </div>
 
         <div class="layout-topbar-actions flex items-center gap-3">
+            <span v-if="username" class="text-black font-medium">{{ username }}</span>
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
                     <i :class="['pi', { 'pi-moon text-white': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
@@ -25,7 +48,14 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
             </div>
             <div class="relative">
                 <button
-                    v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
+                    v-styleclass="{
+                        selector: '@next',
+                        enterFromClass: 'hidden',
+                        enterActiveClass: 'animate-scalein',
+                        leaveToClass: 'hidden',
+                        leaveActiveClass: 'animate-fadeout',
+                        hideOnOutsideClick: true
+                    }"
                     type="button"
                     class="layout-topbar-action layout-topbar-action-highlight"
                 >
@@ -53,7 +83,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
                         <i class="pi pi-bell"></i>
                         <span>Notification</span>
                     </button>
-                    <button type="button" class="layout-topbar-action text-white hover:opacity-80 transition">
+                    <button type="button" class="layout-topbar-action text-white hover:opacity-80 transition" @click="handleSignOut">
                         <i class="pi pi-sign-out"></i>
                         <span>Sign Out</span>
                     </button>

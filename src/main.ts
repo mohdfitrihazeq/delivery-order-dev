@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 
 import '@/assets/styles.scss';
+
 import Aura from '@primeuix/themes/aura';
 import HighchartsVue from 'highcharts-vue';
 import PrimeVue from 'primevue/config';
@@ -23,4 +24,5 @@ app.use(PrimeVue, {
 app.use(ToastService);
 app.use(ConfirmationService);
 app.use(HighchartsVue);
+
 app.mount('#app');
