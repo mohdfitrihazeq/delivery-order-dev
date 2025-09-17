@@ -22,16 +22,22 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/budget/Budget.vue')
             },
             {
+                path: '/deliveries',
+                name: 'deliveries',
+                component: () => import('@/views/delivery/Deliveries.vue')
+            },
+            {
                 path: '/filter-frozen-table',
                 name: 'filterfrozentable',
                 component: () => import('@/components/table/FilterFrozenTable.vue')
             },
+
+            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
                 path: '/sample-call-table',
                 name: 'samplecalltable',
                 component: () => import('@/components/table/SampleCallTable.vue')
             },
-            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
                 path: '/uikit/formlayout',
                 name: 'formlayout',

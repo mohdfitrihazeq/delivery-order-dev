@@ -14,7 +14,6 @@ declare module 'vue' {
     Chart: typeof import('primevue/chart')['default']
     Deliveries: typeof import('./src/components/dashboard/Deliveries.vue')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
-    FileUpload: typeof import('primevue/fileupload')['default']
     FilterFrozenTable: typeof import('./src/components/table/FilterFrozenTable.vue')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     NotificationsWidget: typeof import('./src/components/dashboard/NotificationsWidget.vue')['default']
@@ -27,6 +26,7 @@ declare module 'vue' {
     SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
     SelectButton: typeof import('primevue/selectbutton')['default']
     StatsWidget: typeof import('./src/components/dashboard/StatsWidget.vue')['default']
+    Tag: typeof import('primevue/tag')['default']
     Toast: typeof import('primevue/toast')['default']
   }
   export interface ComponentCustomProperties {
