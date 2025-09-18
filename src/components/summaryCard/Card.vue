@@ -2,7 +2,7 @@
 
 <template>
     <div v-for="item in cardItems" :key="item.title" class="col-span-12 lg:col-span-6" :class="cardColClass">
-        <div class="glossy-card border-grey-400 p-4">
+        <div class="glossy-card border-grey-400 p-4" style="border-color: lightgrey !important">
             <div class="flex justify-between mb-4">
                 <div>
                     <span class="block text-muted-color font-bold mb-4">{{ item.title }}</span>

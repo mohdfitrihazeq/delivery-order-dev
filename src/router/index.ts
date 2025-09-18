@@ -47,6 +47,14 @@ const routes: RouteRecordRaw[] = [
                     breadcrumb: [{ label: 'Deliveries', to: '/deliveries' }]
                 }
             },
+            {
+                path: '/deliveries/createDelivery',
+                name: 'deliveries-create',
+                component: () => import('@/views/delivery/components/pages/createDelivery.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Deliveries', to: '/deliveries/createDelivery' }, { label: 'Create' }]
+                }
+            },
 
             // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {

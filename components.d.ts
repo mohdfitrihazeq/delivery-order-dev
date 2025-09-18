@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
     BestSellingWidget: typeof import('./src/components/dashboard/BestSellingWidget.vue')['default']
-    Breadcrumb: typeof import('primevue/breadcrumb')['default']
     BreadCrumb: typeof import('./src/components/navigation/BreadCrumb.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('./src/components/summaryCard/Card.vue')['default']
@@ -22,8 +21,6 @@ declare module 'vue' {
     Dialog: typeof import('primevue/dialog')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
-    InputText: typeof import('primevue/inputtext')['default']
-    Menu: typeof import('primevue/menu')['default']
     NotificationsWidget: typeof import('./src/components/dashboard/NotificationsWidget.vue')['default']
     QuickAction: typeof import('./src/components/dashboard/QuickAction.vue')['default']
     RecentSalesWidget: typeof import('./src/components/dashboard/RecentSalesWidget.vue')['default']
@@ -32,12 +29,10 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
-    Select: typeof import('primevue/select')['default']
     SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     StatsWidget: typeof import('./src/components/dashboard/StatsWidget.vue')['default']
     Tag: typeof import('primevue/tag')['default']
-    Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
   }
   export interface ComponentCustomProperties {

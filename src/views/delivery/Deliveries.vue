@@ -9,7 +9,7 @@
                     <h1 class="text-2xl font-bold">Delivery Verification</h1>
                     <p class="text-gray-500">Compare received materials with purchase orders and record discrepancies</p>
                 </div>
-                <button class="btn-cyan-gradient">+ New Delivery Verification</button>
+                <button class="btn-cyan-gradient" @click="$router.push('/deliveries/createDelivery')">+ New Delivery Verification</button>
             </div>
 
             <div class="grid grid-cols-12 gap-4 mb-3">
