@@ -34,17 +34,18 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/budget',
                 name: 'budget',
-                component: () => import('@/views/budget/Budget.vue')
+                component: () => import('@/views/budget/Budget.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Budget', to: '/budget' }]
+                }
             },
             {
                 path: '/deliveries',
                 name: 'deliveries',
-                component: () => import('@/views/delivery/Deliveries.vue')
-            },
-            {
-                path: '/filter-frozen-table',
-                name: 'filterfrozentable',
-                component: () => import('@/components/table/FilterFrozenTable.vue')
+                component: () => import('@/views/delivery/Deliveries.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Deliveries', to: '/deliveries' }]
+                }
             },
 
             // TODO: REMOVE THE DRAFTS FILES BELOW LATER
