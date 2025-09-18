@@ -1,10 +1,11 @@
 import { Motion } from '@motionone/vue';
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion },
+    components: { Motion, BudgetInfoCard },
     setup() {
         const router = useRouter();
         const calendarValue = ref(null);
