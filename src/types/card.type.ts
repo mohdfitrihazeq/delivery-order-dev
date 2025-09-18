@@ -1,6 +1,6 @@
 export interface CardItem {
     title: string;
-    value: number;
+    value: string;
     description: string;
     icon: string;
     color: string;

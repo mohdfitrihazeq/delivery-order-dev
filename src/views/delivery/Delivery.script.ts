@@ -45,10 +45,10 @@ export default defineComponent({
         ]);
 
         const deliverySummaryData: CardItem[] = [
-            { title: 'Pending POs', value: 1, description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
-            { title: 'Partially Delivered', value: 1, description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
-            { title: 'Completed', value: 1, description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
-            { title: 'Total DOs', value: 1, description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
+            { title: 'Pending POs', value: '1', description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
+            { title: 'Partially Delivered', value: '1', description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
+            { title: 'Completed', value: '1', description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
+            { title: 'Total DOs', value: '1', description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
         ];
 
         // ---------------------------
@@ -73,10 +73,10 @@ export default defineComponent({
         // ---------------------------
         const pendingListColumn: TableColumn[] = [
             { field: 'poNumber', header: 'PO Number', sortable: true },
-            { field: 'supplier', header: 'Supplier', sortable: true },
+            { field: 'supplier', header: 'Supplier', sortable: false },
             { field: 'date', header: 'Date', sortable: true },
             { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
-            { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
+            { field: 'status', header: 'Status', sortable: false, bodySlot: 'status' }
         ];
 
         const partiallyListColumn: TableColumn[] = [

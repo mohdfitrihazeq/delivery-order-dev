@@ -1,18 +1,21 @@
+import BudgetSummaryData from '@/components/summaryCard/Card.vue';
 import type { CardItem } from '@/types/card.type';
 import Highcharts from 'highcharts';
 import { computed, defineComponent, onMounted, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'Overview',
+    components: {
+        BudgetSummaryData
+    },
     setup() {
         // ---------------------------
         // 1. DATA (constants, refs)
         // ---------------------------
         const BudgetSummaryData: CardItem[] = [
-            { title: 'Pending POs', value: 1, description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
-            { title: 'Partially Delivered', value: 1, description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
-            { title: 'Completed', value: 1, description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
-            { title: 'Total DOs', value: 1, description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
+            { title: 'Total Budget', value: '$1800000', description: '', icon: 'pi pi-dollar', color: 'orange' },
+            { title: 'Total Items', value: '14', description: '', icon: 'pi pi-database', color: 'green' },
+            { title: 'Location', value: '4', description: '', icon: 'pi pi-building', color: 'blue' }
         ];
 
         const pieData = ref<any>(null);
