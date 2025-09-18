@@ -71,12 +71,6 @@ const initials = (name: string | null) => {
 
             <div class="text-gray-500 text-xs text-center dark:text-white">{{ ((4500 / 10000) * 100).toFixed(1) }}% utilized</div>
         </div>
-        <div class="flex mt-2 pt-2 gap-2 mb-4">
-            <button v-for="tab in ['Budget', 'Orders']" :key="tab" class="dark:text-white dark:bg-black flex-1 px-2 py-1 text-sm font-medium bg-gray-100 rounded hover:bg-gray-200">
-                {{ tab }}
-            </button>
-        </div>
-
         <!-- Menu Sidebar -->
         <Menu></Menu>
     </div>

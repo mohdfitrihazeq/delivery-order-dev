@@ -11,3 +11,5 @@ All script files (e.g., composables like `@/src/views/budget/Overview.script.ts`
 
 ➡️ Please follow this order when writing new code.  
 ➡️ Reviewers should check script files against this structure.
+
+
