@@ -6,20 +6,7 @@ import { defineComponent, ref } from 'vue';
 import DeliveriesSummaryData from '@/components/summaryCard/Card.vue';
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
-
-export interface Version {
-    label: string;
-    value: string;
-    latest?: boolean;
-}
-
-export interface CardItem {
-    title: string;
-    value: number;
-    description: string;
-    icon: string;
-    color: string;
-}
+import type { CardItem } from '@/types/card.type';
 
 export default defineComponent({
     name: 'Deliveries',
@@ -31,7 +18,9 @@ export default defineComponent({
         ReusableTable
     },
     setup() {
-        // ---------- DATA ----------
+        // ---------------------------
+        // 1. DATA (constants, refs)
+        // ---------------------------
         const pendingList = ref([
             {
                 poNumber: 'PO2024090102',
@@ -62,18 +51,26 @@ export default defineComponent({
             { title: 'Total DOs', value: 1, description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
         ];
 
-        // ---------- FUNCTION ----------
+        // ---------------------------
+        // 2. STATE (filters, search)
+        // ---------------------------
         const filters = ref({
             global: { value: null as string | null, matchMode: 'contains' }
         });
 
         const search = ref('');
+
+        // ---------------------------
+        // 3. FUNCTIONS (handlers)
+        // ---------------------------
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global.value = value;
         }
 
-        // ---------- DATA TABLE LIST TITLE ----------
+        // ---------------------------
+        // 4. TABLE CONFIG
+        // ---------------------------
         const pendingListColumn: TableColumn[] = [
             { field: 'poNumber', header: 'PO Number', sortable: true },
             { field: 'supplier', header: 'Supplier', sortable: true },
@@ -98,7 +95,9 @@ export default defineComponent({
             { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
         ];
 
-        // ---------- TAB ----------
+        // ---------------------------
+        // 5. TAB
+        // ---------------------------
         const tabItems = [
             { value: '0', label: 'Pending', icon: 'pi pi-clock' },
             { value: '1', label: 'Partial Delivery', icon: 'pi pi-exclamation-triangle' },
@@ -107,22 +106,20 @@ export default defineComponent({
 
         const activeTab = ref('0');
 
-        // ---------- RETURN ----------
+        // ---------------------------
+        // 6. RETURN
+        // ---------------------------
         return {
-            // DATA
             pendingList,
             partiallyList,
             completedList,
             deliverySummaryData,
-            // DATA TABLE LIST TITLE
-            pendingListColumn,
-            partiallyListColumn,
-            completedListColumn,
-            // FUNCTION
             filters,
             search,
             onSearchWrapper: handleSearch,
-            // TAB
+            pendingListColumn,
+            partiallyListColumn,
+            completedListColumn,
             activeTab,
             tabItems
         };

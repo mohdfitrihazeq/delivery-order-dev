@@ -1,62 +1,9 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-import useOverviewLogic from './OverviewLogic';
-
-export default defineComponent({
-    name: 'Overview',
-    setup() {
-        return useOverviewLogic();
-    }
-});
-</script>
+<script lang="ts" src="./Overview.script.ts"></script>
 
 <template>
     <!--HEADER-->
     <div class="grid grid-cols-12 gap-4 mb-3">
-        <!-- Card 1 -->
-        <div class="col-span-12 lg:col-span-4">
-            <div class="glossy-card mb-0 p-4 rounded-lg border border-gray-300">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center">
-                        <i class="pi pi-chart-line text-blue-500 !text-xl"></i>
-                    </div>
-                    <div>
-                        <span class="block text-muted-color font-medium">Total Budget</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">$1,800,000</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="col-span-12 lg:col-span-4">
-            <div class="glossy-card mb-0 p-4 rounded-lg border border-gray-300">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center">
-                        <i class="pi pi-eject text-green-500 !text-xl"></i>
-                    </div>
-                    <div>
-                        <span class="block text-muted-color font-medium">Total Items</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">14</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="col-span-12 lg:col-span-4">
-            <div class="glossy-card mb-0 p-4 rounded-lg border border-gray-300">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center">
-                        <i class="pi pi-building text-orange-500 !text-xl"></i>
-                    </div>
-                    <div>
-                        <span class="block text-muted-color font-medium">Locations</span>
-                        <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">4</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <DeliveriesSummaryData :cardItems="BudgetSummaryData" :cardCol="3" />
     </div>
 
     <!-- BODY CHART -->
