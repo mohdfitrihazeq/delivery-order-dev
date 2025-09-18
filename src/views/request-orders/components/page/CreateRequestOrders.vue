@@ -14,7 +14,7 @@
             </div>
 
             <!-- Request Order Details -->
-            <div class="card p-4 mb-6">
+            <div class="card p-4 mb-6 shadow">
                 <h2 class="text-lg font-semibold mb-4">Request Order Details</h2>
                 <div class="grid grid-cols-3 gap-4">
                     <div>
@@ -31,9 +31,10 @@
                     </div>
                 </div>
             </div>
+            <BudgetInfoCard class="my-4" />
 
             <!-- Order Items -->
-            <div class="card p-4 mb-6">
+            <div class="card p-4 mb-6 shadow">
                 <h2 class="text-lg font-semibold mb-4">Order Items</h2>
                 <div class="flex justify-center items-center py-10 text-gray-500">
                     <div class="text-center">
@@ -46,8 +47,8 @@
 
             <!-- Footer -->
             <div class="flex justify-end gap-3">
-                <button class="btn-secondary" @click="$router.push('/request-orders')">Cancel</button>
-                <button class="btn-secondary" disabled>Save as Draft</button>
+                <Button label="Cancel" @click="$router.push('/request-orders')" outlined />
+                <Button label="Save as Draft" severity="secondary" outlined />
                 <Button label="Submit Request Order" />
             </div>
         </div>

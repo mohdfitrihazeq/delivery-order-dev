@@ -1,4 +1,4 @@
-<script lang="ts" src="./RequestOrders.script.ts"></script>
+<script lang="ts" src="./RequestOrders.script"></script>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
@@ -13,7 +13,6 @@
             </div>
 
             <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />
-
             <!-- Card -->
             <div class="card">
                 <!-- Tabs -->
