@@ -17,7 +17,7 @@
                 <div class="grid grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">RO Number</label>
-                        <InputText v-model="roNumber" type="text" class="w-full" :disabled="true" />
+                        <InputText v-model="roNumber" type="text" class="w-full" />
                     </div>
                     <div>
                         <label for="budgetType" class="block font-medium mb-1">Budget Type</label>
