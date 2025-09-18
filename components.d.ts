@@ -17,9 +17,7 @@ declare module 'vue' {
     Chart: typeof import('primevue/chart')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
     Deliveries: typeof import('./src/components/dashboard/Deliveries.vue')['default']
-    Dialog: typeof import('primevue/dialog')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
-    FileUpload: typeof import('primevue/fileupload')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
@@ -35,8 +33,8 @@ declare module 'vue' {
     SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     StatsWidget: typeof import('./src/components/dashboard/StatsWidget.vue')['default']
-    Textarea: typeof import('primevue/textarea')['default']
     Tag: typeof import('primevue/tag')['default']
+    Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
   }
   export interface ComponentCustomProperties {
