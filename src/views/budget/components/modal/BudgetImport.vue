@@ -3,7 +3,7 @@ import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
 import Toast from 'primevue/toast';
 import { defineEmits, defineProps } from 'vue';
-import useImportBudgetDialogLogic from './BudgetImportLogic';
+import useImportBudgetDialogLogic from './BudgetImport.script';
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{ (e: 'close'): void }>();

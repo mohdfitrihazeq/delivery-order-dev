@@ -1,37 +1,4 @@
-<script lang="ts">
-import BaseTab from '@/components/tab/BaseTab.vue';
-import ReusableTable from '@/components/table/ReusableTable.vue';
-import { Motion } from '@motionone/vue';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import Dropdown from 'primevue/dropdown';
-import SelectButton from 'primevue/selectbutton';
-import Tag from 'primevue/tag';
-import { defineComponent } from 'vue';
-import { useBudget } from './BudgetLogic';
-import Overview from './Overview.vue';
-import BudgetImportModal from './components/modal/BudgetImport.vue';
-
-export default defineComponent({
-    name: 'BudgetManagement',
-    components: {
-        BaseTab,
-        Motion,
-        Badge,
-        Button,
-        SelectButton,
-        Tag,
-        ReusableTable,
-        Overview,
-        BudgetImportModal
-    },
-    setup() {
-        const logic = useBudget();
-
-        return { ...logic };
-    }
-});
-</script>
+<script lang="ts" src="./BudgetLogic.ts"></script>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">

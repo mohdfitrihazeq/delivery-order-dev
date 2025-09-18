@@ -19,6 +19,7 @@ const props = defineProps<{
     onRefresh?: () => void;
     onExport?: () => void;
     onActionClick?: (type: 'edit' | 'view' | 'delete', rowData: any) => void;
+    emptyTitle?: string;
 }>();
 
 const search = ref('');
@@ -42,7 +43,6 @@ function handleExport() {
     );
 
     const csvContent = [columns.join(','), ...rows].join('\n');
-
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
@@ -56,7 +56,7 @@ function handleExport() {
 </script>
 
 <template>
-    <!-- 搜索 + 按钮 -->
+    <!-- Search + Button -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <span class="p-input-icon-left w-full sm:max-w-sm">
             <InputText v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" />
@@ -68,11 +68,11 @@ function handleExport() {
         </div>
     </div>
 
-    <!-- 表格 -->
+    <!-- Table Content -->
     <DataTable
         :value="props.value"
         :filters="props.filters"
-        paginator
+        :paginator="props.value?.length > 0"
         :rows="10"
         :rowsPerPageOptions="[5, 10, 20, 50]"
         tableStyle="min-width: 50rem"
@@ -100,6 +100,14 @@ function handleExport() {
                 </div>
             </template>
         </Column>
+
+        <!-- When Empty Data -->
+        <template #empty>
+            <div class="flex items-center justify-center py-3 text-gray-500 gap-2">
+                <Motion as="i" class="pi pi-ban text-2xl" />
+                <Motion as="span" class="text-lg font-medium"> {{ props.emptyTitle ?? 'No List Found' }} ! </Motion>
+            </div>
+        </template>
 
         <template #paginatorend>
             <Button type="button" icon="pi pi-download" text @click="handleExport" />
