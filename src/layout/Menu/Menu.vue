@@ -1,8 +1,8 @@
 <script lang="ts">
+import MenuSeparator from '@/components/SeparatorLine.vue';
 import { defineComponent } from 'vue';
 import { useMenu } from './Menu';
 import MenuItem from './MenuItem.vue';
-import MenuSeparator from './MenuSeparator.vue';
 
 export default defineComponent({
     components: {

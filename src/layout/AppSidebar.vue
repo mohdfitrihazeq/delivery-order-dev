@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import MenuSeparator from '@/components/SeparatorLine.vue';
 import { onMounted, ref } from 'vue';
 import Menu from './Menu/Menu.vue';
-import MenuSeparator from './Menu/MenuSeparator.vue';
 
 const username = ref<string | null>(null);
 const role = ref<string | null>(null);
