@@ -12,7 +12,7 @@ type MenuInstance = ComponentPublicInstance & {
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion, BudgetInfoCard, Menu },
+    components: { Motion, BudgetInfoCard, Menu, Motion },
     setup() {
         const router = useRouter();
         const calendarValue = ref<Date | null>(null);
