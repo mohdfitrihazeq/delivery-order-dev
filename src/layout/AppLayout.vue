@@ -64,7 +64,7 @@ function isOutsideClicked(event: Event) {
         <app-sidebar></app-sidebar>
 
         <div class="layout-main-container">
-            <div class="layout-main p-4">
+            <div class="layout-main">
                 <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb as MenuItem[]" class="mb-2 py-1" />
 
                 <!-- Page Content -->
