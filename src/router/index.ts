@@ -34,19 +34,26 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/budget',
                 name: 'budget',
-                component: () => import('@/views/budget/Budget.vue')
+                component: () => import('@/views/budget/Budget.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Budget', to: '/budget' }]
+                }
             },
             {
-                path: '/filter-frozen-table',
-                name: 'filterfrozentable',
-                component: () => import('@/components/table/FilterFrozenTable.vue')
+                path: '/deliveries',
+                name: 'deliveries',
+                component: () => import('@/views/delivery/Deliveries.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Deliveries', to: '/deliveries' }]
+                }
             },
+
+            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
                 path: '/sample-call-table',
                 name: 'samplecalltable',
                 component: () => import('@/components/table/SampleCallTable.vue')
             },
-            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
                 path: '/uikit/formlayout',
                 name: 'formlayout',

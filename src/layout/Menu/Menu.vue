@@ -1,20 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { useMenu } from './Menu';
-import MenuItem from './MenuItem.vue';
-import MenuSeparator from './MenuSeparator.vue';
-
-export default defineComponent({
-    components: {
-        MenuItem,
-        MenuSeparator
-    },
-    setup() {
-        const { model } = useMenu();
-        return { model };
-    }
-});
-</script>
+<script lang="ts" src="./Menu.script.ts"></script>
 
 <template>
     <ul class="layout-menu">
@@ -24,5 +8,3 @@ export default defineComponent({
         </template>
     </ul>
 </template>
-
-<style scoped lang="scss"></style>
