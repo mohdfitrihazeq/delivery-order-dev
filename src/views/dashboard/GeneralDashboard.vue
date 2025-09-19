@@ -1,6 +1,4 @@
-<script setup>
-import { Motion } from '@motionone/vue';
-
+<script setup lang="ts">
 import Deliveries from '@/components/dashboard/Deliveries.vue';
 import QuickAction from '@/components/dashboard/QuickAction.vue';
 import RecentSalesWidget from '@/components/dashboard/RecentSalesWidget.vue';
@@ -9,7 +7,7 @@ import StatsWidget from '@/components/dashboard/StatsWidget.vue';
 </script>
 
 <template>
-    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }" class="grid grid-cols-12 gap-8">
+    <div class="grid grid-cols-12 gap-8">
         <StatsWidget class="col-span-12" />
 
         <div class="col-span-12">
@@ -24,5 +22,5 @@ import StatsWidget from '@/components/dashboard/StatsWidget.vue';
             <QuickAction />
             <Deliveries />
         </div>
-    </Motion>
+    </div>
 </template>
