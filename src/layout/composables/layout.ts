@@ -19,7 +19,7 @@ interface LayoutState {
     configSidebarVisible: boolean;
     staticMenuMobileActive: boolean;
     menuHoverActive: boolean;
-    activeMenuItem: unknown; // change to a stricter type if you know the shape
+    activeMenuItem: unknown;
 }
 
 /* -----------------------------
