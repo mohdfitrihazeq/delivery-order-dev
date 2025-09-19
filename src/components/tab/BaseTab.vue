@@ -25,7 +25,7 @@ export default defineComponent({
 
 <template>
     <div class="custom-tabs mt-5">
-        <button v-for="tab in tabs" :key="tab.value" :class="['custom-tab', { active: modelValue === tab.value }]" @click="$emit('update:modelValue', tab.value)">
+        <button v-for="tab in tabs" :key="tab.value" :class="['custom-tab dark:text-white', { active: modelValue === tab.value }]" @click="$emit('update:modelValue', tab.value)">
             <i v-if="tab.icon" :class="[tab.icon, 'mr-2']"></i>
             {{ tab.label }}
         </button>

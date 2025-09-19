@@ -27,7 +27,7 @@ defineProps<{
         <div class="overflow-x-auto mt-4">
             <table class="min-w-full text-sm text-left">
                 <thead>
-                    <tr class="text-gray-600 border-b">
+                    <tr class="dark:text-white text-gray-600 border-b">
                         <th class="py-2 px-4">#</th>
                         <th class="py-2 px-4">RO Number</th>
                         <th class="py-2 px-4">Requested By</th>
