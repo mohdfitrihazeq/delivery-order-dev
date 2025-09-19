@@ -76,19 +76,21 @@ onMounted(() => {
         </div>
 
         <div class="layout-topbar-actions flex items-center gap-3">
-            <span v-if="username" class="text-black font-medium">{{ username }}</span>
+            <span v-if="username" class="dark:text-white font-medium">{{ username }}</span>
 
-            <div class="cursor-pointer border border-gray-300 dark:bg-gray-800 flex flex-col px-3 py-1 rounded hover:bg-gray-100 transition text-right bg-gray-50" @click="showProjectDialog = true">
+            <div class="shadow-sm cursor-pointer border border-gray-300 dark:bg-gray-800 px-3 py-1 rounded hover:bg-gray-100 bg-gray-50" @click="showProjectDialog = true">
                 <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-2">
-                        <i class="pi pi-briefcase text-xs dark:text-gray-400"></i>
-                        <span class="dark:text-white font-semibold text-[13px] leading-tight">
+                        <i class="pi pi-briefcase text-xs text-gray-500 dark:text-white"></i>
+                        <span class="text-gray-500 dark:text-white font-semibold text-[13px]">
                             {{ selectedProject?.name || 'Select Project' }}
                         </span>
                     </div>
-                    <i class="pi pi-chevron-down text-sm dark:text-gray-100 ml-3"></i>
+                    <i class="pi pi-chevron-down text-sm text-gray-500 dark:text-gray-100 ml-3"></i>
                 </div>
             </div>
+
+            <!-- <Select v-model="selectedCity" variant="filled" :options="cities" optionLabel="name" placeholder="Select Project" class="w-full md:w-56" /> -->
 
             <Dialog v-model:visible="showProjectDialog" header="Select Project" modal class="w-[500px]">
                 <div v-for="group in companyProjects" :key="group.company" class="mb-4">
