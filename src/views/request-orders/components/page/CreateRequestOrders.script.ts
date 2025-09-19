@@ -1,20 +1,22 @@
 import { Motion } from '@motionone/vue';
 import Menu from 'primevue/menu';
+import { useToast } from 'primevue/usetoast';
 import { ComponentPublicInstance, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
+import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
+import CreateROModal from '../modal/create-ro.vue';
 
-// Type for Menu component instance
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
 };
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion, BudgetInfoCard, Menu, Motion },
+    components: { Motion, BudgetInfoCard, Menu, CreateROModal },
     setup() {
         const router = useRouter();
+        const toast = useToast();
         const calendarValue = ref<Date | null>(null);
 
         const roNumber = ref('RO2025208757');
@@ -33,7 +35,8 @@ export default defineComponent({
             { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
         ]);
 
-        // Properly typed menu refs
+        const showBulkItemModal = ref(false);
+
         const menuRefs = ref<(MenuInstance | null)[]>([]);
 
         const addItem = () => {
@@ -76,7 +79,6 @@ export default defineComponent({
                 icon: 'pi pi-trash',
                 command: () => {
                     items.value.splice(index, 1);
-                    // Also remove the corresponding menu ref
                     menuRefs.value.splice(index, 1);
                 }
             },
@@ -102,6 +104,47 @@ export default defineComponent({
             }
         };
 
+        const openBulkItemModal = () => {
+            if (budgetType.value === 'Budgeted Item') {
+                showBulkItemModal.value = true;
+            }
+        };
+
+        const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
+            const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
+                itemCode: budgetItem.itemCode,
+                description: budgetItem.description,
+                uom: budgetItem.uom,
+                quantity: budgetItem.quantity.toString(),
+                deliveryDate: null,
+                notes: '',
+                remark: '',
+                showNotes: false,
+                showRemark: false
+            }));
+
+            items.value.push(...newItems);
+
+            selectedBudgetItems.forEach((budgetItem) => {
+                const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
+                if (!existingOption) {
+                    itemOptions.value.push({
+                        label: budgetItem.itemCode,
+                        value: budgetItem.itemCode,
+                        description: budgetItem.description,
+                        uom: budgetItem.uom
+                    });
+                }
+            });
+
+            toast.add({
+                severity: 'success',
+                summary: 'Items Added Successfully',
+                detail: `${selectedBudgetItems.length} ${selectedBudgetItems.length === 1 ? 'item has' : 'items have'} been added from budget`,
+                life: 3000
+            });
+        };
+
         return {
             roNumber,
             budgetType,
@@ -117,7 +160,11 @@ export default defineComponent({
             toggleMenu,
             getActionItems,
             menuRefs,
-            setMenuRef
+            setMenuRef,
+            // Modal functionality
+            showBulkItemModal,
+            openBulkItemModal,
+            handleSelectedItems
         };
     }
 });
