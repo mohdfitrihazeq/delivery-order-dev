@@ -5,4 +5,5 @@ export interface MenuItemType {
     items?: MenuItemType[];
     class?: string;
     separator?: boolean;
+    visible?: boolean;
 }

@@ -2,7 +2,7 @@
 import { useLayout } from '@/layout/composables/layout';
 import { logout } from '@/views/auth/index.script';
 import { Motion } from '@motionone/vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import AppConfigurator from './AppConfigurator.vue';
 
@@ -17,10 +17,7 @@ const handleSignOut = () => {
 const username = ref<string | null>(null);
 
 const showProjectDialog = ref(false);
-const selectedProject = ref<{ company: string; name: string } | null>({
-    company: 'Alunan Asas',
-    name: 'MKT'
-});
+const selectedProject = ref<{ company: string; name: string } | null>(null);
 
 interface Project {
     name: string;
@@ -51,6 +48,43 @@ const companyProjects = ref<CompanyGroup[]>([
     }
 ]);
 
+const saveProjectToStorage = (project: { company: string; name: string } | null) => {
+    try {
+        if (project) {
+            localStorage.setItem('selectedProject', JSON.stringify(project));
+        } else {
+            localStorage.removeItem('selectedProject');
+        }
+    } catch (error) {
+        console.error('Error saving project to localStorage:', error);
+    }
+};
+
+const loadProjectFromStorage = (): { company: string; name: string } | null => {
+    try {
+        const stored = localStorage.getItem('selectedProject');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error loading project from localStorage:', error);
+    }
+    return null;
+};
+
+const selectProject = (company: string, name: string) => {
+    selectedProject.value = { company, name };
+    showProjectDialog.value = false;
+};
+
+watch(
+    selectedProject,
+    (newProject) => {
+        saveProjectToStorage(newProject);
+    },
+    { deep: true }
+);
+
 onMounted(() => {
     const user = localStorage.getItem('user');
     if (user) {
@@ -59,6 +93,19 @@ onMounted(() => {
         } catch {
             username.value = user;
         }
+    }
+
+    const storedProject = loadProjectFromStorage();
+    if (storedProject) {
+        const projectExists = companyProjects.value.some((company) => company.company === storedProject.company && company.projects.some((project) => project.name === storedProject.name));
+
+        if (projectExists) {
+            selectedProject.value = storedProject;
+        } else {
+            selectedProject.value = { company: 'Alunan Asas', name: 'MKT' };
+        }
+    } else {
+        selectedProject.value = { company: 'Alunan Asas', name: 'MKT' };
     }
 });
 </script>
@@ -76,8 +123,6 @@ onMounted(() => {
         </div>
 
         <div class="layout-topbar-actions flex items-center gap-3">
-            <span v-if="username" class="dark:text-white font-medium">{{ username }}</span>
-
             <div class="shadow-sm cursor-pointer border border-gray-300 dark:bg-gray-800 px-3 py-1 rounded hover:bg-gray-100 bg-gray-50" @click="showProjectDialog = true">
                 <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-2">
@@ -88,9 +133,10 @@ onMounted(() => {
                     </div>
                     <i class="pi pi-chevron-down text-sm text-gray-500 dark:text-gray-100 ml-3"></i>
                 </div>
+                <div v-if="selectedProject?.company" class="text-xs text-gray-400 dark:text-gray-300 mt-0.5">
+                    {{ selectedProject.company }}
+                </div>
             </div>
-
-            <!-- <Select v-model="selectedCity" variant="filled" :options="cities" optionLabel="name" placeholder="Select Project" class="w-full md:w-56" /> -->
 
             <Dialog v-model:visible="showProjectDialog" header="Select Project" modal class="w-[500px]">
                 <div v-for="group in companyProjects" :key="group.company" class="mb-4">
@@ -100,11 +146,11 @@ onMounted(() => {
                         <div
                             v-for="project in group.projects"
                             :key="`${group.company}-${project.name}`"
-                            @click="
-                                selectedProject = { company: group.company, name: project.name };
-                                showProjectDialog = false;
-                            "
+                            @click="selectProject(group.company, project.name)"
                             class="cursor-pointer border rounded-lg p-3 hover:bg-gray-100 transition"
+                            :class="{
+                                'bg-blue-50 border-blue-300': selectedProject?.name === project.name && selectedProject?.company === group.company
+                            }"
                         >
                             <div class="flex justify-between items-center">
                                 <span class="text-lg font-bold">{{ project.name }}</span>
@@ -168,7 +214,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Gradient line under topbar -->
         <div class="h-1 bg-gradient-to-r from-cyan-400 to-blue-600"></div>
     </Motion>
 </template>
