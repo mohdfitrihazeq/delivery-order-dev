@@ -24,14 +24,14 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="custom-tabs">
+    <div class="custom-tabs mt-5">
         <button v-for="tab in tabs" :key="tab.value" :class="['custom-tab', { active: modelValue === tab.value }]" @click="$emit('update:modelValue', tab.value)">
             <i v-if="tab.icon" :class="[tab.icon, 'mr-2']"></i>
             {{ tab.label }}
         </button>
     </div>
 
-    <div class="tab-content mt-4">
+    <div class="tab-content mt-6">
         <slot :activeTab="modelValue" />
     </div>
 </template>
