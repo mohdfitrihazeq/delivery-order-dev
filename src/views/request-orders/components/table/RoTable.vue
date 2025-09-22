@@ -1,63 +1,152 @@
 <script setup lang="ts">
-import { Motion } from '@motionone/vue';
-import Tag from 'primevue/tag';
+import { Order } from '@/types/request-order.type';
+import type { ComponentPublicInstance } from 'vue';
+import { computed, ref } from 'vue';
 
-interface Order {
-    id: number;
-    roNumber: string;
-    requestedBy: string;
-    roDate: string;
-    deliveryDate: string;
-    totalAmount: string;
-    budgetType: string;
-    status: string;
-    requestedAt: string;
-}
+type MenuInstance = ComponentPublicInstance & {
+    toggle: (event: Event) => void;
+};
 
-// Props
-defineProps<{
+const props = defineProps<{
     orders: Order[];
     getStatusSeverity: (status: string) => string;
     activeTab: string;
+    isPurchasingRole: boolean;
 }>();
+
+const emit = defineEmits<{
+    (e: 'view', order: Order): void;
+    (e: 'approve', order: Order): void;
+    (e: 'reject', order: Order): void;
+}>();
+
+const menu = ref<MenuInstance | null>(null);
+const selectedOrder = ref<Order | null>(null);
+
+function openMenu(event: Event, order: Order): void {
+    selectedOrder.value = order;
+    menu.value?.toggle(event);
+}
+
+const menuItems = computed(() => {
+    const base = [
+        {
+            label: 'View',
+            icon: 'pi pi-eye',
+            command: () => {
+                if (selectedOrder.value) {
+                    emit('view', selectedOrder.value);
+                }
+            }
+        }
+    ];
+
+    if (props.isPurchasingRole && selectedOrder.value?.status === 'Pending') {
+        base.push(
+            {
+                label: 'Approve',
+                icon: 'pi pi-check',
+                command: () => {
+                    if (selectedOrder.value) {
+                        emit('approve', selectedOrder.value);
+                    }
+                }
+            },
+            {
+                label: 'Reject',
+                icon: 'pi pi-times',
+                command: () => {
+                    if (selectedOrder.value) {
+                        emit('reject', selectedOrder.value);
+                    }
+                }
+            }
+        );
+    }
+
+    return base;
+});
 </script>
 
 <template>
-    <Motion :key="`table-${activeTab}`" :initial="{ opacity: 0, y: 20 }" :animate="{ opacity: 1, y: 0 }" :exit="{ opacity: 0, y: -20 }" :transition="{ duration: 0.8 }">
-        <div class="overflow-x-auto mt-4">
-            <table class="min-w-full text-sm text-left">
-                <thead>
-                    <tr class="dark:text-white text-gray-600 border-b">
-                        <th class="py-2 px-4">#</th>
-                        <th class="py-2 px-4">RO Number</th>
-                        <th class="py-2 px-4">Requested By</th>
-                        <th class="py-2 px-4">RO Date</th>
-                        <th class="py-2 px-4">Delivery Date</th>
-                        <th class="py-2 px-4">Total Amount</th>
-                        <th class="py-2 px-4">Budget Type</th>
-                        <th class="py-2 px-4">Status</th>
-                        <th class="py-2 px-4">Requested At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="orders.length === 0">
-                        <td colspan="9" class="text-center text-gray-500 py-6">No request orders found</td>
-                    </tr>
-                    <tr v-for="(order, index) in orders" :key="order.id" class="border-b">
-                        <td class="py-2 px-4">{{ index + 1 }}</td>
-                        <td class="py-2 px-4">{{ order.roNumber }}</td>
-                        <td class="py-2 px-4">{{ order.requestedBy }}</td>
-                        <td class="py-2 px-4">{{ order.roDate }}</td>
-                        <td class="py-2 px-4">{{ order.deliveryDate }}</td>
-                        <td class="py-2 px-4">{{ order.totalAmount }}</td>
-                        <td class="py-2 px-4">{{ order.budgetType }}</td>
-                        <td class="py-2 px-4">
-                            <Tag :value="order.status" :severity="getStatusSeverity(order.status)" />
-                        </td>
-                        <td class="py-2 px-4">{{ order.requestedAt }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </Motion>
+    <DataTable :value="orders" class="custom-table" responsiveLayout="scroll">
+        <template #empty>
+            <div class="text-center text-gray-500 py-6">No request orders found</div>
+        </template>
+
+        <Column header="#" style="width: 50px">
+            <template #body="slotProps">
+                {{ slotProps.index + 1 }}
+            </template>
+        </Column>
+
+        <Column field="roNumber" header="RO Number"></Column>
+        <Column field="requestedBy" header="Requested By"></Column>
+        <Column field="roDate" header="RO Date"></Column>
+        <Column field="deliveryDate" header="Delivery Date"></Column>
+        <Column field="totalAmount" header="Total Amount"></Column>
+        <Column field="budgetType" header="Budget Type"></Column>
+        <Column field="status" header="Status">
+            <template #body="{ data }: { data: Order }">
+                <Tag :value="data.status" :severity="getStatusSeverity(data.status)" />
+            </template>
+        </Column>
+        <Column field="requestedAt" header="Requested At"></Column>
+
+        <Column header="Action" style="width: 80px">
+            <template #body="{ data }: { data: Order }">
+                <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, data)" />
+            </template>
+        </Column>
+    </DataTable>
+
+    <Menu ref="menu" :model="menuItems" popup />
 </template>
+
+<style scoped>
+.custom-table :deep(.p-datatable-table) {
+    min-width: 100%;
+    font-size: 0.875rem;
+    text-align: left;
+}
+
+.custom-table :deep(.p-datatable-thead > tr > th) {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    background: transparent;
+    font-weight: normal;
+    color: #6b7280;
+}
+
+.custom-table :deep(.p-datatable-tbody > tr > td) {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.custom-table :deep(.p-datatable-tbody > tr) {
+    border: none;
+}
+
+.custom-table :deep(.p-datatable-tbody > tr:hover) {
+    background-color: #f9fafb;
+}
+
+.custom-table :deep(.p-datatable-tbody > tr:last-child > td) {
+    border-bottom: none;
+}
+
+:global(.dark) .custom-table :deep(.p-datatable-thead > tr > th) {
+    color: white;
+    border-bottom-color: #374151;
+}
+
+:global(.dark) .custom-table :deep(.p-datatable-tbody > tr > td) {
+    border-bottom-color: #374151;
+}
+
+:global(.dark) .custom-table :deep(.p-datatable-tbody > tr:hover) {
+    background-color: #1f2937;
+}
+</style>
