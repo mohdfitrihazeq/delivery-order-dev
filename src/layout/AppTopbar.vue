@@ -168,38 +168,6 @@ onMounted(() => {
                 </button>
             </div>
 
-            <div class="relative">
-                <button
-                    v-styleclass="{
-                        selector: '@next',
-                        enterFromClass: 'hidden',
-                        enterActiveClass: 'animate-scalein',
-                        leaveToClass: 'hidden',
-                        leaveActiveClass: 'animate-fadeout',
-                        hideOnOutsideClick: true
-                    }"
-                    type="button"
-                    class="layout-topbar-action layout-topbar-action-highlight"
-                >
-                    <i class="pi pi-palette"></i>
-                </button>
-                <AppConfigurator />
-            </div>
-
-            <button
-                class="layout-topbar-menu-button layout-topbar-action"
-                v-styleclass="{
-                    selector: '@next',
-                    enterFromClass: 'hidden',
-                    enterActiveClass: 'animate-scalein',
-                    leaveToClass: 'hidden',
-                    leaveActiveClass: 'animate-fadeout',
-                    hideOnOutsideClick: true
-                }"
-            >
-                <i class="pi pi-ellipsis-v text-white"></i>
-            </button>
-
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content flex gap-2">
                     <button type="button" class="layout-topbar-action text-white hover:opacity-80 transition">
