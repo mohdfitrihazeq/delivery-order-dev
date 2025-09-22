@@ -1,26 +1,21 @@
 <script setup lang="ts">
-import Deliveries from '@/components/dashboard/Deliveries.vue';
-import QuickAction from '@/components/dashboard/QuickAction.vue';
-import RecentSalesWidget from '@/components/dashboard/RecentSalesWidget.vue';
-import RevenueStreamWidget from '@/components/dashboard/RevenueStreamWidget.vue';
-import StatsWidget from '@/components/dashboard/StatsWidget.vue';
+import type { CardItem } from '@/types/card.type';
+import RevenueStreamWidget from './components/chart/RevenueStreamWidget.vue';
+
+const BudgetSummaryData: CardItem[] = [
+    { title: 'Total Budget', value: '$1,800,000', description: '24 new since last visit', icon: 'pi pi-dollar', color: 'orange' },
+    { title: 'Total Spent', value: '52%', description: '+52% since last week', icon: 'pi pi-chart-line', color: 'blue' },
+    { title: 'Budget Items', value: '14', description: '5 Delivered', icon: 'pi pi-database', color: 'green' },
+    { title: 'Project Days', value: '669', description: 'Since project start', icon: 'pi pi-calendar', color: 'purple' }
+];
 </script>
 
 <template>
     <div class="grid grid-cols-12 gap-8">
-        <StatsWidget class="col-span-12" />
+        <Card :cardItems="BudgetSummaryData" :cardCol="4" />
 
-        <div class="col-span-12">
-            <RecentSalesWidget />
-        </div>
-
-        <div class="col-span-12 xl">
+        <div class="col-span-12 xl:col-span-12">
             <RevenueStreamWidget />
-        </div>
-
-        <div class="col-span-12 xl">
-            <QuickAction />
-            <Deliveries />
         </div>
     </div>
 </template>
