@@ -6,4 +6,5 @@ export interface MenuItemType {
     class?: string;
     separator?: boolean;
     visible?: boolean;
+    badge?: number | string;
 }

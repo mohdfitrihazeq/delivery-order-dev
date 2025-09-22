@@ -15,13 +15,13 @@
                         <template #option="slotProps">
                             <div class="flex items-center">
                                 <span>{{ slotProps.option.label }}</span>
-                                <Badge v-if="slotProps.option.latest" value="Latest" severity="success" class="ml-2" />
+                                <Badge v-if="slotProps.option.latest" value="Latest" severity="primary" class="ml-2" />
                             </div>
                         </template>
                         <template #value="slotProps">
                             <div class="flex items-center" v-if="slotProps.value">
                                 <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
-                                <Badge v-if="versions.find((v) => v.value === slotProps.value)?.latest" value="Latest" severity="success" class="ml-2" />
+                                <Badge v-if="versions.find((v) => v.value === slotProps.value)?.latest" value="Latest" severity="primary" class="ml-2" />
                             </div>
                             <span v-else class="text-gray-400">Select Version</span>
                         </template>

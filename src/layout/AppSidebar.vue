@@ -50,7 +50,7 @@ const initials = (name: string | null) => {
         <!-- Project Sidebar -->
         <div class="flex items-center justify-between mb-2 mt-4 dark:bg-black">
             <span class="font-medium text-gray-600 dark:text-white">Project A</span>
-            <span class="bg-purple-600 text-white dark:text-white text-xs px-2 py-0.5 rounded-full">
+            <span class="bg-green-500 text-white dark:text-white text-xs px-2 py-0.5 rounded-full">
                 {{ { name: 'Project A', status: 'Active', budget: 10000, spent: 4500 }.status }}
             </span>
         </div>
