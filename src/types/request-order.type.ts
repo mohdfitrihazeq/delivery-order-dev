@@ -46,3 +46,25 @@ export interface FilterOption {
     label: string;
     value: string;
 }
+
+export interface OrderItem {
+    code: string;
+    description: string;
+    uom: string;
+    qty: number;
+    deliveryDate: string;
+    note: string;
+}
+
+export interface Order {
+    id: number;
+    roNumber: string;
+    requestedBy: string;
+    roDate: string;
+    deliveryDate: string;
+    totalAmount: string;
+    budgetType: string;
+    status: 'Approved' | 'Pending' | 'Rejected';
+    requestedAt: string;
+    items: OrderItem[];
+}
