@@ -74,11 +74,11 @@ function handleExport() {
         :filters="props.filters"
         :paginator="props.value?.length > 0"
         :rows="10"
-        :rowsPerPageOptions="[5, 10, 20, 50]"
+        :rowsPerPageOptions="[10]"
         tableStyle="min-width: 50rem"
-        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+        paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        class="rounded-lg overflow-hidden border"
+        class="overflow-hidden"
     >
         <template #paginatorstart> </template>
 
