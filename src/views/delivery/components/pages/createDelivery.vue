@@ -4,8 +4,6 @@
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-6 card glossy-card mb-0">
             <div class="p-6 max-w-3xl mx-auto">
-                <h2 class="text-lg font-semibold mb-6">Steps</h2>
-
                 <!-- 步骤条 -->
                 <div class="flex items-center justify-between mb-8">
                     <div v-for="(step, index) in steps" :key="index" class="flex items-center w-full">
