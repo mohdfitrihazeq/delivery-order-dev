@@ -30,6 +30,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: '/purchase-orders',
+                name: 'purchaseorders',
+                component: () => import('@/views/budget/Budget.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Purchase Order', route: '/purchase-orders' }]
+                }
+            },
+            {
                 path: '/budget',
                 name: 'budget',
                 component: () => import('@/views/budget/Budget.vue'),

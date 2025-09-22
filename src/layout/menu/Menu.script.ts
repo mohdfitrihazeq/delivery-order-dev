@@ -17,15 +17,16 @@ export default defineComponent({
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
                     { label: 'Budget', icon: 'pi pi-fw pi-chart-bar', to: '/budget' },
                     { label: 'Request Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/request-orders' },
-                    { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries', badge: 2 }
+                    { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '', badge: 3 },
+                    { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
                 ]
             }
         ];
 
         const rolePermissions = {
-            purchasing: ['Dashboard', 'Request Orders'],
-            site: ['Dashboard', 'Budget', 'Request Orders', 'Deliveries', 'Administration', 'Drafts File'],
-            pm: ['Dashboard', 'Budget', 'Request Orders', 'Deliveries']
+            purchasing: ['Dashboard', 'Request Orders', 'Purchase Orders'],
+            site: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries', 'Administration', 'Drafts File'],
+            pm: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries']
         };
 
         const filterMenuByRole = (menuItems: MenuItemType[], allowedItems: string[]): MenuItemType[] => {
