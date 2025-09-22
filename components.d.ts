@@ -13,6 +13,7 @@ declare module 'vue' {
     BaseTabUnderLine: typeof import('./src/components/tab/BaseTabUnderLine.vue')['default']
     BestSellingWidget: typeof import('./src/components/dashboard/BestSellingWidget.vue')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
+    BreadCrumb: typeof import('./src/components/navigation/BreadCrumb.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('./src/components/summaryCard/Card.vue')['default']
     Chart: typeof import('primevue/chart')['default']
