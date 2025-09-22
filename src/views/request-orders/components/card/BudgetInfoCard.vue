@@ -33,12 +33,10 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="flex items-start gap-3 border rounded-xl p-4 shadow-sm hover:shadow-md transition dark:bg-white relative">
-        <!-- Dynamic strip -->
+    <div class="dark:bg-gray-800 flex items-start gap-3 border-gray-200 dark:border-gray-700 border rounded-xl p-4 shadow-sm transition relative">
         <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl" :class="stripColor"></div>
 
-        <!-- Dynamic icon -->
-        <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md relative z-10" :class="[iconBgColor, iconTextColor]">
+        <div class="dark:bg-gray-700 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-md relative z-10" :class="[iconBgColor, iconTextColor]">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                     stroke-linecap="round"
@@ -51,10 +49,9 @@ export default defineComponent({
             </svg>
         </div>
 
-        <!-- Content -->
         <div class="relative z-10">
-            <p class="font-semibold text-gray-800">{{ titleText }}</p>
-            <p class="text-gray-500 text-sm">{{ descText }}</p>
+            <p class="dark:text-white font-semibold text-gray-800">{{ titleText }}</p>
+            <p class="dark:text-gray-200 text-sm">{{ descText }}</p>
         </div>
     </div>
 </template>

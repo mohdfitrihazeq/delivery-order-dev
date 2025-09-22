@@ -7,7 +7,7 @@
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h1 class="text-2xl font-bold">Request Orders</h1>
-                    <p class="text-gray-500">Manage purchase requests for project materials and services</p>
+                    <p class="dark:text-gray-200 text-gray-500">Manage purchase requests for project materials and services</p>
                 </div>
                 <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
             </div>
