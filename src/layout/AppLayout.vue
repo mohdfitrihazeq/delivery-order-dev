@@ -9,13 +9,11 @@ import AppTopbar from './AppTopbar.vue';
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 const route = useRoute();
 
-// ✅ 定义 home
 const home: MenuItem = {
     icon: 'pi pi-home',
-    route: '/' // ⚠️ 用 route，不要用 to
+    route: '/'
 };
 
-// ✅ 从 meta 拿 items
 const items = computed<MenuItem[]>(() => {
     return (route.meta.breadcrumb ?? []) as MenuItem[];
 });

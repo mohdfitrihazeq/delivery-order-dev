@@ -17,7 +17,7 @@
             </div>
 
             <!-- Body -->
-            <BaseTabPills v-model="activeTab" :tabs="tabItems">
+            <BaseTabUnderLine v-model="activeTab" :tabs="tabItems">
                 <template #0>
                     <ReusableTable :value="pendingList" emptyTitle="Pending Delivery" :columns="pendingListColumn" :filters="filters" :onSearch="onSearchWrapper">
                         <template #totalAmount="{ data }"> ${{ data.totalAmount }} </template>
@@ -41,7 +41,7 @@
                         </template>
                     </ReusableTable>
                 </template>
-            </BaseTabPills>
+            </BaseTabUnderLine>
         </div>
     </Motion>
 </template>

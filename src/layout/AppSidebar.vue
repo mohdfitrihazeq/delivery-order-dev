@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MenuSeparator from '@/components/SeparatorLine.vue';
 import { onMounted, ref } from 'vue';
 import Menu from './menu/Menu.vue';
 

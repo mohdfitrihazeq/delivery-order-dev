@@ -1,12 +1,10 @@
-import MenuSeparator from '@/components/SeparatorLine.vue';
 import type { MenuItemType } from '@/types/sidebar.type';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
 
 export default defineComponent({
     components: {
-        MenuItem,
-        MenuSeparator
+        MenuItem
     },
     setup() {
         const userRole = ref<string | null>(null);

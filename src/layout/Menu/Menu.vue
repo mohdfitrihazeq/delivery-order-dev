@@ -4,7 +4,7 @@
     <ul class="layout-menu">
         <template v-for="(item, i) in model" :key="i">
             <menu-item v-if="!item.separator" :item="item" :index="i" />
-            <menu-separator v-else />
+            <SeparatorLine v-else />
         </template>
     </ul>
 </template>
