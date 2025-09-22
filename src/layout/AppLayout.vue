@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
-import Breadcrumb from 'primevue/breadcrumb';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -9,6 +8,17 @@ import AppTopbar from './AppTopbar.vue';
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 const route = useRoute();
+
+// ✅ 定义 home
+const home: MenuItem = {
+    icon: 'pi pi-home',
+    route: '/' // ⚠️ 用 route，不要用 to
+};
+
+// ✅ 从 meta 拿 items
+const items = computed<MenuItem[]>(() => {
+    return (route.meta.breadcrumb ?? []) as MenuItem[];
+});
 
 const outsideClickListener = ref<((event: Event) => void) | null>(null);
 
@@ -65,7 +75,19 @@ function isOutsideClicked(event: Event) {
 
         <div class="layout-main-container">
             <div class="layout-main">
-                <Breadcrumb v-if="route.meta?.breadcrumb" :home="{ icon: 'pi pi-home', to: '/' }" :model="route.meta.breadcrumb as MenuItem[]" class="mb-2 py-1" />
+                <Breadcrumb v-if="items.length > 0" :home="home" :model="items" class="mb-2 py-1">
+                    <template #item="{ item, props }">
+                        <!-- ✅ 用 item.route，不要用 item.to -->
+                        <router-link v-if="item.route" v-bind="props.action" :to="item.route">
+                            <i v-if="item.icon" :class="item.icon" class="mr-1"></i>
+                            {{ item.label }}
+                        </router-link>
+                        <span v-else>
+                            <i v-if="item.icon" :class="item.icon" class="mr-1"></i>
+                            {{ item.label }}
+                        </span>
+                    </template>
+                </Breadcrumb>
 
                 <!-- Page Content -->
                 <router-view></router-view>

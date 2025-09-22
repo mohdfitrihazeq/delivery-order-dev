@@ -1,6 +1,7 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import { isAuthenticated } from '@/views/auth/index.script';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -10,17 +11,14 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/',
                 name: 'dashboard',
-                component: () => import('@/views/Dashboard.vue'),
-                meta: {
-                    breadcrumb: [{ label: 'Dashboard', to: '/' }]
-                }
+                component: () => import('@/views/Dashboard.vue')
             },
             {
                 path: '/request-orders',
                 name: 'request-orders',
                 component: () => import('@/views/request-orders/RequestOrders.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Request Orders', to: '/request-orders' }]
+                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }]
                 }
             },
             {
@@ -28,7 +26,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'create-request-orders',
                 component: () => import('@/views/request-orders/components/page/CreateRequestOrders.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Request Orders', to: '/request-orders' }, { label: 'Create' }]
+                    breadcrumb: [{ label: 'Request Orders', route: '/request-orders' }, { label: 'Create' }]
                 }
             },
             {
@@ -36,7 +34,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'budget',
                 component: () => import('@/views/budget/Budget.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Budget', to: '/budget' }]
+                    breadcrumb: [{ label: 'Budget', route: '/budget' }]
                 }
             },
             {
@@ -44,7 +42,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'deliveries',
                 component: () => import('@/views/delivery/Deliveries.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Deliveries', to: '/deliveries' }]
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }]
                 }
             },
             {
@@ -52,7 +50,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'deliveries-create',
                 component: () => import('@/views/delivery/components/pages/createDelivery.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Deliveries', to: '/deliveries/createDelivery' }, { label: 'Create' }]
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'Create' }]
                 }
             },
 

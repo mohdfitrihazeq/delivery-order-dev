@@ -1,21 +1,19 @@
 import type { TableColumn } from '@/types/table.type';
-import { Motion } from '@motionone/vue';
 import Tag from 'primevue/tag';
 import { defineComponent, ref } from 'vue';
 
 import DeliveriesSummaryData from '@/components/summaryCard/Card.vue';
-import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { CardItem } from '@/types/card.type';
+import Button from 'primevue/button';
 
 export default defineComponent({
     name: 'Deliveries',
     components: {
-        BaseTab,
-        Motion,
         Tag,
         DeliveriesSummaryData,
-        ReusableTable
+        ReusableTable,
+        Button
     },
     setup() {
         // ---------------------------
@@ -100,7 +98,7 @@ export default defineComponent({
         // ---------------------------
         const tabItems = [
             { value: '0', label: 'Pending', icon: 'pi pi-clock' },
-            { value: '1', label: 'Partial Delivery', icon: 'pi pi-exclamation-triangle' },
+            { value: '1', label: 'Partial Delivery', icon: 'pi pi-exclamation-triangle', badge: 1 },
             { value: '2', label: 'Completed', icon: 'pi pi-check-circle' }
         ];
 
