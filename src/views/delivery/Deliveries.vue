@@ -12,36 +12,18 @@
                 <Button @click="$router.push('/deliveries/createDelivery')">+ New Delivery Verification</Button>
             </div>
 
-            <div class="grid grid-cols-12 gap-4 mb-3">
-                <DeliveriesSummaryData :cardItems="deliverySummaryData" :cardCol="4" />
+            <div class="grid grid-cols-12 gap-4 mb-4">
+                <DeliveriesSummaryData :cardItems="deliverySummaryData" :cardCol="3" />
             </div>
 
-            <!-- Body -->
-            <BaseTabUnderLine v-model="activeTab" :tabs="tabItems">
-                <template #0>
-                    <ReusableTable :value="pendingList" emptyTitle="Pending Delivery" :columns="pendingListColumn" :filters="filters" :onSearch="onSearchWrapper">
-                        <template #totalAmount="{ data }"> ${{ data.totalAmount }} </template>
-                        <template #status="{ data }">
-                            <Tag :value="data.status" :severity="data.status === 'active' ? 'success' : data.status === 'partially delivered' ? 'warn' : 'danger'" />
-                        </template>
-                    </ReusableTable>
-                </template>
-
-                <template #1>
-                    <ReusableTable :value="partiallyList" emptyTitle="Partially Delivery" :columns="partiallyListColumn" :filters="filters" :onSearch="onSearchWrapper" />
-                </template>
-
-                <template #2>
-                    <ReusableTable :value="completedList" emptyTitle="Completed Delivery" :columns="completedListColumn" :filters="filters" :onSearch="onSearchWrapper">
-                        <template #discrepancyType="{ data }">
-                            <Tag :value="data.discrepancyType" :severity="data.discrepancyType === 'Partial Delivery' ? 'warn' : 'danger'" />
-                        </template>
-                        <template #status="{ data }">
-                            <Tag :value="data.status" :severity="data.status === 'completed' ? 'success' : 'danger'" />
-                        </template>
-                    </ReusableTable>
-                </template>
-            </BaseTabUnderLine>
+            <div class="p-6 card glossy-card mb-0 mt-3">
+                <ReusableTable :value="filteredDeliveryList" emptyTitle="Delivery List Data" :columns="deliveryListColumn" :onSearch="onSearchWrapper" :onActionClick="handleAction" :extraFilters="extraFilters" :onFilterChange="handleFilter">
+                    <template #totalAmount="{ data }"> ${{ data.totalAmount }} </template>
+                    <template #status="{ data }">
+                        <Tag :value="data.status" :severity="data.status === 'incompleted' ? 'warn' : 'success'" />
+                    </template>
+                </ReusableTable>
+            </div>
         </div>
     </Motion>
 </template>

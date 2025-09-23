@@ -1,4 +1,4 @@
-export interface TableColumn {
+export type TableColumn = {
     field?: string;
     header?: string;
     sortable?: boolean;
@@ -7,4 +7,4 @@ export interface TableColumn {
     bodySlot?: string;
     action?: boolean;
     actions?: ('edit' | 'view' | 'delete')[];
-}
+};
