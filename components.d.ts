@@ -8,6 +8,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Badge: typeof import('primevue/badge')['default']
+    BaseResultNotFound: typeof import('./src/components/resulNotFound/BaseResultNotFound.vue')['default']
+    BaseSpinner: typeof import('./src/components/spinner/BaseSpinner.vue')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
     BaseTabPills: typeof import('./src/components/tab/BaseTabPills.vue')['default']
     BaseTabUnderLine: typeof import('./src/components/tab/BaseTabUnderLine.vue')['default']
@@ -24,6 +26,8 @@ declare module 'vue' {
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
+    ProgressSpinner: typeof import('primevue/progressspinner')['default']
+    ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

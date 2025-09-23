@@ -31,10 +31,18 @@ const routes: RouteRecordRaw[] = [
             },
             {
                 path: '/purchase-orders',
-                name: 'purchaseorders',
-                component: () => import('@/views/budget/Budget.vue'),
+                name: 'purchase-orders',
+                component: () => import('@/views/purchase-orders/PurchaseOrders.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Purchase Order', route: '/purchase-orders' }]
+                    breadcrumb: [{ label: 'Purchase Orders', route: '/purchase-orders' }]
+                }
+            },
+            {
+                path: '/purchase-orders/view/:poNumber',
+                name: 'ViewDetailsPO',
+                component: () => import('@/views/purchase-orders/components/ViewDetailsPO.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Purchase Orders', route: '/purchase-orders' }, { label: 'View' }]
                 }
             },
             {
