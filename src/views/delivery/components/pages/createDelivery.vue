@@ -1,69 +1,104 @@
-<script lang="ts" src="./createDelivery.script.ts"></script>
-
 <template>
-    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card glossy-card mb-0">
-            <div class="p-6 max-w-3xl mx-auto">
-                <!-- 步骤条 -->
-                <div class="flex items-center justify-between mb-8">
-                    <div v-for="(step, index) in steps" :key="index" class="flex items-center w-full">
-                        <!-- Step Circle -->
-                        <div class="flex items-center">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-full border" :class="[currentStep === index + 1 ? 'border-green-500 text-green-500 font-bold' : 'border-gray-300 text-gray-400']">
-                                {{ index + 1 }}
-                            </div>
-                            <span class="ml-2" :class="currentStep === index + 1 ? 'text-green-500 font-semibold' : 'text-gray-500'">
-                                {{ step }}
-                            </span>
-                        </div>
-
-                        <!-- Line -->
-                        <div v-if="index < steps.length - 1" class="flex-1 border-t-2 mx-2" :class="currentStep > index + 1 ? 'border-green-500' : 'border-gray-200'"></div>
+    <div class="card flex justify-center">
+        <Stepper v-model:value="activeStep" class="w-full max-w-6xl mt-4">
+            <StepList class="flex justify-between">
+                <!-- Step 1 -->
+                <Step :value="1">
+                    <div class="flex flex-col items-center gap-2">
+                        <span
+                            :class="[
+                                'rounded-full border-2 w-8 h-8 flex items-center justify-center',
+                                {
+                                    'bg-primary text-primary-contrast border-primary': 1 <= activeStep,
+                                    'border-surface-200 dark:border-surface-700': 1 > activeStep
+                                }
+                            ]"
+                        >
+                            <i class="pi pi-truck" />
+                        </span>
+                        <span class="text-sm font-medium" :class="{ 'text-primary': 1 <= activeStep }"> Delivery Info </span>
                     </div>
-                </div>
+                </Step>
 
-                <!-- 步骤内容 -->
-                <div v-if="currentStep === 1">
-                    <h3 class="text-lg font-medium mb-4">Step 1: Header I</h3>
-                    <form class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium">Name</label>
-                            <input type="text" class="border rounded p-2 w-full" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Email</label>
-                            <input type="email" class="border rounded p-2 w-full" />
-                        </div>
-                    </form>
-                </div>
+                <!-- Step 2 -->
+                <Step :value="2">
+                    <div class="flex flex-col items-center gap-2">
+                        <span
+                            :class="[
+                                'rounded-full border-2 w-8 h-8 flex items-center justify-center',
+                                {
+                                    'bg-primary text-primary-contrast border-primary': 2 <= activeStep,
+                                    'border-surface-200 dark:border-surface-700': 2 > activeStep
+                                }
+                            ]"
+                        >
+                            <i class="pi pi-box" />
+                        </span>
+                        <span class="text-sm font-medium" :class="{ 'text-primary': 2 <= activeStep }"> Select PO </span>
+                    </div>
+                </Step>
 
-                <div v-if="currentStep === 2">
-                    <h3 class="text-lg font-medium mb-4">Step 2: Header II</h3>
-                    <form class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium">Address</label>
-                            <input type="text" class="border rounded p-2 w-full" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">City</label>
-                            <input type="text" class="border rounded p-2 w-full" />
-                        </div>
-                    </form>
-                </div>
+                <!-- Step 3 -->
+                <Step :value="3">
+                    <div class="flex flex-col items-center gap-2">
+                        <span
+                            :class="[
+                                'rounded-full border-2 w-8 h-8 flex items-center justify-center',
+                                {
+                                    'bg-primary text-primary-contrast border-primary': 3 <= activeStep,
+                                    'border-surface-200 dark:border-surface-700': 3 > activeStep
+                                }
+                            ]"
+                        >
+                            <i class="pi pi-check" />
+                        </span>
+                        <span class="text-sm font-medium" :class="{ 'text-primary': 3 <= activeStep }"> Verify Items </span>
+                    </div>
+                </Step>
 
-                <div v-if="currentStep === 3">
-                    <h3 class="text-lg font-medium mb-4">Step 3: Header III</h3>
-                    <p class="text-gray-600">Review your information before submitting.</p>
-                    <!-- 可以在这里显示 summary -->
-                </div>
+                <!-- Step 4 -->
+                <Step :value="4">
+                    <div class="flex flex-col items-center gap-2">
+                        <span
+                            :class="[
+                                'rounded-full border-2 w-8 h-8 flex items-center justify-center',
+                                {
+                                    'bg-primary text-primary-contrast border-primary': 4 <= activeStep,
+                                    'border-surface-200 dark:border-surface-700': 4 > activeStep
+                                }
+                            ]"
+                        >
+                            <i class="pi pi-file" />
+                        </span>
+                        <span class="text-sm font-medium" :class="{ 'text-primary': 4 <= activeStep }"> Review </span>
+                    </div>
+                </Step>
+            </StepList>
 
-                <!-- 按钮 -->
-                <div class="flex justify-between mt-6">
-                    <button class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" :disabled="currentStep === 1" @click="prevStep">Previous</button>
-                    <button v-if="currentStep < steps.length" class="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600" @click="nextStep">Next</button>
-                    <button v-else class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600" @click="submitForm">Submit</button>
-                </div>
-            </div>
-        </div>
-    </Motion>
+            <!-- Panels -->
+            <StepPanels>
+                <StepPanel :value="1">
+                    <div class="p-4">Step 1 content: Delivery Info</div>
+                    <Button label="Next" @click="activeStep = 2" />
+                </StepPanel>
+                <StepPanel :value="2">
+                    <div class="p-4">Step 2 content: Select PO</div>
+                    <Button label="Back" @click="activeStep = 1" />
+                    <Button label="Next" @click="activeStep = 3" />
+                </StepPanel>
+                <StepPanel :value="3">
+                    <div class="p-4">Step 3 content: Verify Items</div>
+                    <Button label="Back" @click="activeStep = 2" />
+                    <Button label="Next" @click="activeStep = 4" />
+                </StepPanel>
+                <StepPanel :value="4">
+                    <div class="p-4">Step 4 content: Review</div>
+                    <Button label="Back" @click="activeStep = 3" />
+                    <Button label="Submit" />
+                </StepPanel>
+            </StepPanels>
+        </Stepper>
+    </div>
 </template>
+
+<script lang="ts" src="./createDelivery.script"></script>

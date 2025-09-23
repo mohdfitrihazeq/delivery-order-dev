@@ -7,31 +7,10 @@ export default defineComponent({
         Motion
     },
     setup() {
-        const steps = ['Header I', 'Header II', 'Header III'];
-        const currentStep = ref(1);
-
-        function nextStep() {
-            if (currentStep.value < steps.length) {
-                currentStep.value++;
-            }
-        }
-
-        function prevStep() {
-            if (currentStep.value > 1) {
-                currentStep.value--;
-            }
-        }
-
-        function submitForm() {
-            alert('Form submitted!');
-        }
+        const activeStep = ref(1);
 
         return {
-            steps,
-            currentStep,
-            nextStep,
-            prevStep,
-            submitForm
+            activeStep
         };
     }
 });
