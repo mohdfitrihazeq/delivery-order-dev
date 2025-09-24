@@ -54,7 +54,7 @@
     bottom: -4px;
     width: 0;
     height: 2px;
-    background-image: linear-gradient(to right, #93e4fd, #3b82f6);
+    background-image: linear-gradient(to right, #6bdbfd, #3b82f6);
     transition: all 0.3s ease;
 }
 
@@ -69,17 +69,17 @@
 }
 
 .custom-layout-gradient {
-    --layout-gradient: linear-gradient(to right, #3b82f6, #93c5fd);
+    --layout-gradient: linear-gradient(to right, #3b82f6, #6bdbfd);
     @apply bg-gradient-to-r from-cyan-300 to-blue-600 shadow-lg backdrop-blur-md;
 }
 
 .custom-topbar-gradient {
-    --layout-gradient: linear-gradient(to right, #3b82f6, #93c5fd);
+    --layout-gradient: linear-gradient(to right, #3b82f6, #6bdbfd);
     @apply bg-gradient-to-r from-blue-600 to-cyan-300 shadow-lg backdrop-blur-md;
 }
 
 .custom-text-gradient {
-    background-image: linear-gradient(to right, #3b82f6, #93c5fd);
+    background-image: linear-gradient(to right, #3b82f6, #6bdbfd);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
