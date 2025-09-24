@@ -64,9 +64,17 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/deliveries/createDelivery',
                 name: 'deliveries-create',
-                component: () => import('@/views/delivery/components/pages/createDelivery.vue'),
+                component: () => import('@/views/delivery/components/pages/createDelivery/createDelivery.vue'),
                 meta: {
-                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'Create' }]
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'Create Delivery' }]
+                }
+            },
+            {
+                path: '/deliveries/viewDelivery/:doNumber',
+                name: 'deliveries-view',
+                component: () => import('@/views/delivery/components/pages/viewDelivery/ViewDelivery.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'View Delivery' }]
                 }
             },
 

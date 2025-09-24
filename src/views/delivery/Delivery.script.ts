@@ -88,7 +88,7 @@ export default defineComponent({
 
         function handleAction(type: 'view', row: any) {
             if (type === 'view') {
-                router.push(`/budget`);
+                router.push(`/deliveries/viewDelivery/${row.doNumber}`);
             }
         }
 
