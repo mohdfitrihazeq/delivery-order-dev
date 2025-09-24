@@ -89,9 +89,8 @@
                     <VerifyItem @update="handleStep3Update" @next-step="goStep(4)" :selected-po="deliveryData.selectPO" @prev-step="goStep(2)" />
                 </StepPanel>
                 <StepPanel :value="4">
-                    <div class="p-4">Step 4 content: Review</div>
-                    <Button label="Back" @click="activeStep = 3" />
-                    <Button label="Submit" />
+                    <div v-if="canPassToReview"><Review @update="handleStep4Update" :deliveryData="deliveryData" /></div>
+                    <div v-else class="text-gray-500">Please complete all previous steps before reviewing.</div>
                 </StepPanel>
             </StepPanels>
         </Stepper>

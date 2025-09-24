@@ -1,10 +1,11 @@
 import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step1DeliveryInfo/deliveryInfo.vue';
 import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step2SelectPO/selectPO.vue';
 import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step3VerifyItem/verifyItem.vue';
-import { defineComponent, ref } from 'vue';
+import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    components: { DeliveryInfo, SelectPO, VerifyItem },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review },
     setup() {
         const activeStep = ref(1);
 
@@ -32,9 +33,27 @@ export default defineComponent({
             deliveryData.value.verifyItem = data;
             activeStep.value = 4;
         };
+
+        const handleStep4Update = (data: any) => {
+            console.log('Step 4 data received in update', data);
+            deliveryData.value.review = data;
+        };
         const goStep = (step: number) => {
             activeStep.value = step;
         };
-        return { activeStep, deliveryData, handleStep1Update, handleStep2Update, handleStep3Update, goStep };
+
+        const canPassToReview = computed(() => {
+            return (
+                deliveryData.value.deliveryInfo &&
+                Object.keys(deliveryData.value.deliveryInfo).length > 0 &&
+                deliveryData.value.selectPO &&
+                Object.keys(deliveryData.value.selectPO).length > 0 &&
+                deliveryData.value.verifyItem &&
+                Array.isArray(deliveryData.value.verifyItem) &&
+                deliveryData.value.verifyItem.length > 0
+            );
+        });
+
+        return { activeStep, deliveryData, handleStep1Update, handleStep2Update, handleStep3Update, handleStep4Update, canPassToReview, goStep };
     }
 });

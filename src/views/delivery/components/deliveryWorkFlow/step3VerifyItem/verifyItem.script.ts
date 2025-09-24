@@ -105,23 +105,31 @@ export default defineComponent({
 
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             if (event.valid) {
-                // if (selectedCard.value) {
-                //     emit('update', selectedCard.value);
-                //     emit('next-step');
-                //     toast.add({
-                //         severity: 'success',
-                //         summary: 'Form submitted',
-                //         detail: `Selected PO: ${selectedCard.value.id}`,
-                //         life: 3000
-                //     });
-                // } else {
-                //     toast.add({
-                //         severity: 'warn',
-                //         summary: 'No PO selected',
-                //         detail: 'Please select a Purchase Order before continuing.',
-                //         life: 3000
-                //     });
-                // }
+                if (itemList.value.length > 0) {
+                    emit('update', itemList.value);
+                    emit('next-step');
+
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Form submitted',
+                        detail: `PO ${poNumber.value} with ${itemList.value.length} items submitted.`,
+                        life: 3000
+                    });
+                } else {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'No Items',
+                        detail: 'No items found for this PO. Please select a valid Purchase Order.',
+                        life: 3000
+                    });
+                }
+            } else {
+                toast.add({
+                    severity: 'error',
+                    summary: 'Form Invalid',
+                    detail: 'Please fix the errors in the form before submitting.',
+                    life: 3000
+                });
             }
         };
 
