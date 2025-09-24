@@ -11,6 +11,7 @@ export default defineComponent({
         const route = useRoute();
         const doNumber = ref(route.params.doNumber || '');
 
+        // 模拟所有 delivery 数据
         const deliveryDetailsData = ref([
             {
                 doNumber: 'DO2024091501',
@@ -38,6 +39,7 @@ export default defineComponent({
             }
         ]);
 
+        // 找到当前 doNumber 的 deliveryDetail
         const deliveryDetail = computed(() => {
             return (
                 deliveryDetailsData.value.find((d) => d.doNumber === doNumber.value) || {
@@ -51,9 +53,22 @@ export default defineComponent({
             );
         });
 
-        const items = computed(() => {
-            return deliveryDetail.value.items.map((item, i) => ({ ...item, no: i + 1 }));
-        });
+        // items 动态显示
+        const allItems = computed(() => deliveryDetail.value.items.map((item, i) => ({ ...item, no: i + 1 })));
+
+        // ------------------- 搜索逻辑 -------------------
+        const search = ref('');
+        const items = ref(allItems.value); // 默认显示全部
+
+        function handleSearch(value: string) {
+            search.value = value;
+            if (!value) {
+                items.value = allItems.value;
+                return;
+            }
+            const lower = value.toLowerCase();
+            items.value = allItems.value.filter((item) => item.code.toLowerCase().includes(lower) || item.description.toLowerCase().includes(lower));
+        }
 
         const itemsColumns = ref([
             { field: 'no', header: 'No', bodySlot: 'no' },
@@ -65,11 +80,8 @@ export default defineComponent({
             { field: 'unitPrice', header: 'Unit Price' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
-        const search = ref('');
+
         const status = computed(() => deliveryDetail.value.status || '');
-        function handleSearch(value: string) {
-            search.value = value;
-        }
 
         return {
             doNumber,

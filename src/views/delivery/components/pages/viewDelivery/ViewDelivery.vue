@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <p class="font-semibold">Status</p>
-                        <p><Tag :value="status" :severity="status === 'pending' ? 'success' : 'danger'" /></p>
+                        <p><Tag :value="status" :severity="status === 'pending' ? 'danger' : 'success'" /></p>
                     </div>
                 </div>
             </div>
