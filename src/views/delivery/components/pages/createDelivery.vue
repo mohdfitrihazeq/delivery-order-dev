@@ -83,9 +83,7 @@
                     <DeliveryInfo @update="handleStep1Update" />
                 </StepPanel>
                 <StepPanel :value="2">
-                    <SelectPO @update="handleStep2Update" />
-                    <Button label="Back" @click="activeStep = 1" />
-                    <Button label="Next" @click="activeStep = 3" />
+                    <SelectPO @update="handleStep2Update" @next-step="goStep(3)" @prev-step="goStep(1)" />
                 </StepPanel>
                 <StepPanel :value="3">
                     <div class="p-4">Step 3 content: Verify Items</div>

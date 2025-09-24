@@ -1,5 +1,5 @@
-import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/deliveryInfo.vue';
-import SelectPO from '@/views/delivery/components/deliveryWorkFlow/selectPO.vue';
+import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step1DeliveryInfo/deliveryInfo.vue';
+import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step2SelectPO/selectPO.vue';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -25,6 +25,9 @@ export default defineComponent({
             deliveryData.value.po = data;
             activeStep.value = 3;
         };
-        return { activeStep, deliveryData, handleStep1Update, handleStep2Update };
+        const goStep = (step: number) => {
+            activeStep.value = step;
+        };
+        return { activeStep, deliveryData, handleStep1Update, handleStep2Update, goStep };
     }
 });
