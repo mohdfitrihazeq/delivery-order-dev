@@ -1,3 +1,5 @@
+<script lang="ts" src="./createDelivery.script"></script>
+
 <template>
     <div class="card flex justify-center">
         <Stepper v-model:value="activeStep" class="w-full max-w-6xl mt-4">
@@ -78,11 +80,10 @@
             <!-- Panels -->
             <StepPanels>
                 <StepPanel :value="1">
-                    <div class="p-4">Step 1 content: Delivery Info</div>
-                    <Button label="Next" @click="activeStep = 2" />
+                    <DeliveryInfo @update="handleStep1Update" />
                 </StepPanel>
                 <StepPanel :value="2">
-                    <div class="p-4">Step 2 content: Select PO</div>
+                    <SelectPO @update="handleStep2Update" />
                     <Button label="Back" @click="activeStep = 1" />
                     <Button label="Next" @click="activeStep = 3" />
                 </StepPanel>
@@ -100,5 +101,3 @@
         </Stepper>
     </div>
 </template>
-
-<script lang="ts" src="./createDelivery.script"></script>
