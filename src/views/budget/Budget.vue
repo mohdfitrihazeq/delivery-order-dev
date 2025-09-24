@@ -36,7 +36,7 @@
                 <Overview class="col-span-12" />
             </div>
             <div v-else>
-                <ReusableTable :value="budgetItems" :columns="columns" :filters="filters" :onSearch="onSearchWrapper" :show-import-file="true" :onImportFile="handleImportClick">
+                <ReusableTable :value="budgetItems" :columns="columns" emptyTitle="Budget List Data" :onSearch="onSearchWrapper" :show-import-file="true" :onImportFile="handleImportClick" :onActionClick="handleAction">
                     <template #rate="{ data }"> ${{ data.rate }} </template>
                     <template #amount="{ data }"> ${{ data.amount }} </template>
                 </ReusableTable>

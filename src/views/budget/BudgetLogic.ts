@@ -80,7 +80,8 @@ export default defineComponent({
             { field: 'uom', header: 'UOM', sortable: true },
             { field: 'quantity', header: 'Qty', sortable: true },
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
-            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
+            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' },
+            { header: 'Action', action: true, actions: ['edit', 'delete'] }
         ];
 
         // ---------------------------
@@ -90,11 +91,7 @@ export default defineComponent({
         const viewMode = ref<'overview' | 'detail'>('overview');
         const search = ref('');
         const showImportModal = ref(false);
-
-        const filters = ref({
-            global: { value: null as string | null, matchMode: 'contains' }
-        });
-
+        const filters = ref<Record<string, any>>({});
         // ---------------------------
         // 3. FUNCTIONS (handlers)
         // ---------------------------
@@ -105,6 +102,13 @@ export default defineComponent({
 
         function handleImportClick() {
             showImportModal.value = true;
+        }
+        function handleAction(type: 'delete' | 'edit', row: any) {
+            if (type === 'delete') {
+                console.log('Deleting:', row);
+            } else if (type === 'edit') {
+                console.log('Editing:', row);
+            }
         }
 
         // ---------------------------
@@ -119,7 +123,7 @@ export default defineComponent({
             viewMode,
             search,
             showImportModal,
-            filters,
+            handleAction,
             onSearchWrapper: handleSearch,
             handleImportClick
         };
