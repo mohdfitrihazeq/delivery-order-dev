@@ -99,13 +99,7 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <!-- Left: Search -->
         <span class="p-input-icon-left w-full sm:max-w-sm">
-            <InputText
-                v-if="props.onSearch"
-                v-model="search"
-                placeholder="Search..."
-                @input="handleSearch"
-                class="w-full"
-            />
+            <InputText v-if="props.onSearch" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" />
         </span>
 
         <!-- Right: Filters + Buttons -->
@@ -113,12 +107,7 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
             <!-- Dynamic Filters -->
             <template v-for="(f, i) in props.extraFilters" :key="i">
                 <!-- text -->
-                <InputText
-                    v-if="f.type === 'text'"
-                    :placeholder="f.placeholder"
-                    v-model="activeFilters[f.field]"
-                    @input="handleFilterChange(f.field, activeFilters[f.field])"
-                />
+                <InputText v-if="f.type === 'text'" :placeholder="f.placeholder" v-model="activeFilters[f.field]" @input="handleFilterChange(f.field, activeFilters[f.field])" />
 
                 <!-- select -->
                 <Dropdown
@@ -133,14 +122,7 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
                 />
 
                 <!-- date -->
-                <Calendar
-                    v-else-if="f.type === 'date'"
-                    :placeholder="f.placeholder"
-                    v-model="activeFilters[f.field]"
-                    @input="handleFilterChange(f.field, activeFilters[f.field])"
-                    dateFormat="yy-mm-dd"
-                    class="min-w-[10rem]"
-                />
+                <Calendar v-else-if="f.type === 'date'" :placeholder="f.placeholder" v-model="activeFilters[f.field]" @input="handleFilterChange(f.field, activeFilters[f.field])" dateFormat="yy-mm-dd" class="min-w-[10rem]" />
             </template>
 
             <!-- Buttons -->
@@ -169,19 +151,11 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
         tableStyle="min-width: 50rem"
         paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        class="overflow-hidden"
+        class="overflow-hidden dark:text-white"
     >
         <template #paginatorstart> </template>
 
-        <Column
-            v-for="(col, idx) in props.columns"
-            :key="idx"
-            :field="col.field"
-            :header="col.header"
-            :sortable="col.sortable"
-            :frozen="col.frozen"
-            :style="col.style"
-        >
+        <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
             <template v-if="col.bodySlot && !col.action" #body="slotProps">
                 <slot :name="col.bodySlot" :data="slotProps.data" />
             </template>
