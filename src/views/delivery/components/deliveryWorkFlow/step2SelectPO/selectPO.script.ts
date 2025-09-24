@@ -57,23 +57,26 @@ export default defineComponent({
 
         const cards = ref([
             {
-                id: 'P02024090101',
+                id: '1',
                 title: 'P02024090101',
-                content: '1 items • DiggRight Contractors',
+                content: '2 items • DiggRight Contractors',
+                item: '1',
                 badges: ['Excavation work'],
                 icon: 'pi-box'
             },
             {
-                id: 'P02024090102',
+                id: '2',
                 title: 'P02024090102',
                 content: '2 items • MetalWorks Inc.',
+                item: '2',
                 badges: ['Steel reinforcement', 'Ready mix'],
                 icon: 'pi-box'
             },
             {
-                id: 'P02024090103',
+                id: '3',
                 title: 'P02024090103',
                 content: '1 items • ClearView Glass',
+                item: '1',
                 badges: ['Double glazed'],
                 icon: 'pi-box'
             }

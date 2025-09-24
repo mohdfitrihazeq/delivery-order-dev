@@ -2,7 +2,7 @@ import type { TableColumn } from '@/types/table.type';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 
-import POSummaryData from '@/components/summaryCard/Card.vue';
+import POSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import BaseTabUnderLine from '@/components/tab/BaseTabUnderLine.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import router from '@/router';

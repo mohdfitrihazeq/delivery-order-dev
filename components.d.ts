@@ -7,6 +7,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Accordion: typeof import('primevue/accordion')['default']
+    AccordionTab: typeof import('primevue/accordiontab')['default']
     Badge: typeof import('primevue/badge')['default']
     BaseSpinner: typeof import('./src/components/spinner/BaseSpinner.vue')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
@@ -16,6 +18,7 @@ declare module 'vue' {
     Button: typeof import('primevue/button')['default']
     Calendar: typeof import('primevue/calendar')['default']
     Card: typeof import('primevue/card')['default']
+    Chart: typeof import('primevue/chart')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
@@ -38,6 +41,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
     Select: typeof import('primevue/select')['default']
+    SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     Step: typeof import('primevue/step')['default']
     StepList: typeof import('primevue/steplist')['default']

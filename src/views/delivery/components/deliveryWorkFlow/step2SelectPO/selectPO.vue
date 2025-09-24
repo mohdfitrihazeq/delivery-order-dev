@@ -1,4 +1,4 @@
-<script lang="ts" src="./selectPO"></script>
+<script lang="ts" src="./selectPO.script"></script>
 
 <template>
     <div class="p-mb-5 mt-5">
