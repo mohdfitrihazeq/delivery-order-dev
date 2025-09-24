@@ -82,7 +82,7 @@ export default defineComponent({
             isLoading.value = true;
             try {
                 // Simulate API delay
-                await new Promise((resolve) => setTimeout(resolve, 9500));
+                await new Promise((resolve) => setTimeout(resolve, 3500));
 
                 // use api later in here
                 // const response = await fetchPurchaseOrders();

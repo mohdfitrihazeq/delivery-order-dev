@@ -181,6 +181,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="h-1 bg-gradient-to-r from-cyan-400 to-blue-600"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-600"></div>
     </Motion>
 </template>

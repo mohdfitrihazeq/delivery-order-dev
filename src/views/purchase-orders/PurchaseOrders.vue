@@ -9,7 +9,6 @@
                     <h1 class="text-2xl font-bold">Purchase Orders</h1>
                     <p class="text-gray-500">Manage and monitor purchase orders while keeping track of received items and discrepancies.</p>
                 </div>
-                <Button @click="$router.push('/deliveries/createDelivery')">+ New Purchase Order</Button>
             </div>
 
             <div class="grid grid-cols-12 gap-4 mb-3">

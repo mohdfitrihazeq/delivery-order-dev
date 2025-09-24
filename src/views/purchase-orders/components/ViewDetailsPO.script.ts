@@ -1,12 +1,13 @@
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { Motion } from '@motionone/vue';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
     name: 'ViewDetailsPO',
-    components: { Tag, BaseTab, ReusableTable },
+    components: { Tag, BaseTab, ReusableTable, Motion },
     setup() {
         const route = useRoute();
 
