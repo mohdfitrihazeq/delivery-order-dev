@@ -29,7 +29,7 @@
                                         <Tag :value="data.status" :severity="data.status === 'active' ? 'success' : data.status === 'partially delivered' ? 'warn' : 'danger'" />
                                     </template>
                                     <template #action="{ data }">
-                                        <Button icon="pi pi-eye" class="p-button-text p-button-sm" @click="viewPO(data)" />
+                                        <Button icon="pi pi-eye" class="p-button-text p-button-sm" @click="viewPO(data)" v-tooltip="'View PO'" />
                                     </template>
                                 </ReusableTable>
                             </template>
