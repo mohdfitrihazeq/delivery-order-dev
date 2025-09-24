@@ -31,19 +31,10 @@ watch(activeTab, (val) => emit('update:modelValue', val));
 <template>
     <Tabs v-model:value="activeTab">
         <!-- Tab Headers -->
-        <TabList>
-            <Tab
-                v-for="tab in tabs"
-                :key="tab.value"
-                :value="tab.value"
-                as="div"
-                class="flex items-center gap-2 cursor-pointer px-3 py-2 transition border-b-2"
-                :class="[activeTab === tab.value ? 'border-blue-500 text-blue-600 font-semibold' : 'border-transparent text-gray-500 hover:text-blue-500']"
-            >
-                <!-- icon -->
+        <TabList class="custom-tabs">
+            <Tab v-for="tab in tabs" :key="tab.value" :value="tab.value" as="button" :class="['custom-tab', { active: activeTab === tab.value }]">
                 <i v-if="tab.icon" :class="['pi', tab.icon]"></i>
                 <span class="whitespace-nowrap">{{ tab.label }}</span>
-                <!-- badge -->
                 <Badge v-if="tab.badge" :value="tab.badge" />
             </Tab>
         </TabList>

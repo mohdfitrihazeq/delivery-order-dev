@@ -17,7 +17,7 @@ export default defineComponent({
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
                     { label: 'Budget', icon: 'pi pi-fw pi-chart-bar', to: '/budget' },
                     { label: 'Request Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/request-orders' },
-                    { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '', badge: 3 },
+                    { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '/purchase-orders', badge: 1 },
                     { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
                 ]
             }

@@ -4,7 +4,6 @@ import { logout } from '@/views/auth/index.script';
 import { Motion } from '@motionone/vue';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import AppConfigurator from './AppConfigurator.vue';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
