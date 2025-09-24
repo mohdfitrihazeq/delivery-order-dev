@@ -1,4 +1,4 @@
-<script lang="ts" src="./Card.script.ts"></script>
+<script lang="ts" src="./SummaryCard.script.ts"></script>
 
 <template>
     <div v-for="item in cardItems" :key="item.title" class="col-span-12 lg:col-span-6" :class="cardColClass">

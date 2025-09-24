@@ -1,4 +1,4 @@
-import DeliveriesSummaryData from '@/components/summaryCard/Card.vue';
+import DeliveriesSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';

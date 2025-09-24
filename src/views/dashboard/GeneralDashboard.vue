@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import SummaryCard from '@/components/summaryCard/SummaryCard.vue';
 import type { CardItem } from '@/types/card.type';
 import RevenueStreamWidget from './components/chart/RevenueStreamWidget.vue';
 
+// ---------------------------
+// 1. DATA (constants, refs)
+// ---------------------------
 const BudgetSummaryData: CardItem[] = [
     { title: 'Total Budget', value: '$1,800,000', description: '24 new since last visit', icon: 'pi pi-dollar', color: 'orange' },
     { title: 'Total Spent', value: '52%', description: '+52% since last week', icon: 'pi pi-chart-line', color: 'blue' },
@@ -12,7 +16,7 @@ const BudgetSummaryData: CardItem[] = [
 
 <template>
     <div class="grid grid-cols-12 gap-8">
-        <Card :cardItems="BudgetSummaryData" :cardCol="4" />
+        <SummaryCard :cardItems="BudgetSummaryData" :cardCol="4" />
 
         <div class="col-span-12 xl:col-span-12">
             <RevenueStreamWidget />

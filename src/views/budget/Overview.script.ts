@@ -1,4 +1,4 @@
-import BudgetSummaryData from '@/components/summaryCard/Card.vue';
+import BudgetSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import type { CardItem } from '@/types/card.type';
 import Highcharts from 'highcharts';
 import { computed, defineComponent, onMounted, reactive, ref } from 'vue';

@@ -1,37 +1,59 @@
-import { Motion } from '@motionone/vue';
-import { defineComponent, ref } from 'vue';
+import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step1DeliveryInfo/deliveryInfo.vue';
+import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step2SelectPO/selectPO.vue';
+import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step3VerifyItem/verifyItem.vue';
+import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    name: 'Deliveries',
-    components: {
-        Motion
-    },
+    components: { DeliveryInfo, SelectPO, VerifyItem, Review },
     setup() {
-        const steps = ['Header I', 'Header II', 'Header III'];
-        const currentStep = ref(1);
+        const activeStep = ref(1);
 
-        function nextStep() {
-            if (currentStep.value < steps.length) {
-                currentStep.value++;
-            }
-        }
+        const deliveryData = ref({
+            deliveryInfo: {},
+            selectPO: {},
+            verifyItem: {},
+            review: {}
+        });
 
-        function prevStep() {
-            if (currentStep.value > 1) {
-                currentStep.value--;
-            }
-        }
-
-        function submitForm() {
-            alert('Form submitted!');
-        }
-
-        return {
-            steps,
-            currentStep,
-            nextStep,
-            prevStep,
-            submitForm
+        const handleStep1Update = (data: any) => {
+            console.log('Step 1 data received in update', data);
+            deliveryData.value.deliveryInfo = data;
+            activeStep.value = 2;
         };
+
+        const handleStep2Update = (data: any) => {
+            console.log('Step 2 data received in update', data);
+            deliveryData.value.selectPO = data;
+            activeStep.value = 3;
+        };
+
+        const handleStep3Update = (data: any) => {
+            console.log('Step 3 data received in update', data);
+            deliveryData.value.verifyItem = data;
+            activeStep.value = 4;
+        };
+
+        const handleStep4Update = (data: any) => {
+            console.log('Step 4 data received in update', data);
+            deliveryData.value.review = data;
+        };
+        const goStep = (step: number) => {
+            activeStep.value = step;
+        };
+
+        const canPassToReview = computed(() => {
+            return (
+                deliveryData.value.deliveryInfo &&
+                Object.keys(deliveryData.value.deliveryInfo).length > 0 &&
+                deliveryData.value.selectPO &&
+                Object.keys(deliveryData.value.selectPO).length > 0 &&
+                deliveryData.value.verifyItem &&
+                Array.isArray(deliveryData.value.verifyItem) &&
+                deliveryData.value.verifyItem.length > 0
+            );
+        });
+
+        return { activeStep, deliveryData, handleStep1Update, handleStep2Update, handleStep3Update, handleStep4Update, canPassToReview, goStep };
     }
 });

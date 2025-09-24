@@ -11,6 +11,7 @@
         "@motionone/dom": "^10.18.0",
         "@motionone/vue": "^10.16.4",
         "@primeuix/themes": "^1.0.0",
+        "@primevue/forms": "^4.3.9",
         "@primevue/themes": "^4.3.9",
         "chart.js": "^3.9.1",
         "highcharts": "^12.4.0",
@@ -18,11 +19,12 @@
         "lucide-vue-next": "^0.543.0",
         "motion": "^12.23.12",
         "primeicons": "^7.0.0",
-        "primevue": "^4.3.1",
+        "primevue": "^4.3.9",
         "tailwindcss-primeui": "^0.5.0",
         "vue": "^3.4.34",
         "vue-chartjs": "^4.1.2",
-        "vue-router": "^4.4.0"
+        "vue-router": "^4.4.0",
+        "yup": "^1.7.1"
     },
     "devDependencies": {
         "@primevue/auto-import-resolver": "^4.3.1",
