@@ -9,6 +9,9 @@ import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
 import { ref } from 'vue';
 
+import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
+import BaseSpinner from '@/components/spinner/BaseSpinner.vue';
+
 type FilterOption = {
     type: 'select' | 'text' | 'date';
     field: string;
@@ -96,7 +99,7 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <!-- Left: Search -->
         <span class="p-input-icon-left w-full sm:max-w-sm">
-            <InputText v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" v-if="props.onSearch" />
+            <InputText v-if="props.onSearch" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" />
         </span>
 
         <!-- Right: Filters + Buttons -->
@@ -128,8 +131,19 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
         </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="props.loading" class="flex justify-center py-10">
+        <BaseSpinner />
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!props.loading && (!props.value || props.value.length === 0)" class="flex justify-center py-10">
+        <ResultNotFound :message="props.emptyTitle ?? 'No List Found'" />
+    </div>
+
     <!-- Table Content -->
     <DataTable
+        v-else
         :value="props.value"
         :paginator="props.value?.length > 0"
         :rows="10"
@@ -137,27 +151,22 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
         tableStyle="min-width: 50rem"
         paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        class="overflow-hidden"
+        class="overflow-hidden dark:text-white"
     >
         <template #paginatorstart> </template>
+
         <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
             <template v-if="col.bodySlot && !col.action" #body="slotProps">
                 <slot :name="col.bodySlot" :data="slotProps.data" />
             </template>
 
+            <!-- Action buttons -->
             <template v-if="col.action" #body="slotProps">
                 <div class="flex gap-2">
                     <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, slotProps.data, col.actions)" />
                 </div>
             </template>
         </Column>
-
-        <template #empty>
-            <div class="flex items-center justify-center py-3 text-gray-500 gap-2">
-                <i class="pi pi-ban text-2xl" />
-                <span class="text-lg font-medium"> {{ props.emptyTitle ?? 'No List Found' }} ! </span>
-            </div>
-        </template>
 
         <template #paginatorend>
             <Button type="button" icon="pi pi-download" text @click="handleExport" />
