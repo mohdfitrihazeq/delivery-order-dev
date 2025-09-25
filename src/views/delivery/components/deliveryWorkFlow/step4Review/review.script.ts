@@ -22,7 +22,19 @@ interface DeliveryItem {
 
 export default defineComponent({
     name: 'Review',
-    components: { Card, InputText, Button, Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, Badge },
+    components: {
+        Card,
+        InputText,
+        Button,
+        Message,
+        Toast,
+        Form,
+        Calendar,
+        Textarea,
+        FileUpload,
+        ProgressBar,
+        Badge
+    },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
         deliveryData: {
@@ -31,29 +43,29 @@ export default defineComponent({
         }
     },
     setup(props, { emit }) {
-        const deliveryInfo = ref<any>(props.deliveryData.deliveryInfo ?? null);
-        const selectPO = ref<any>(props.deliveryData.selectPO ?? null);
-        const verifyItem = ref<any[]>(props.deliveryData.verifyItem ?? []);
+        // ---------------------------
+        // 1. DATA (constants, refs)
+        // ---------------------------
+        const deliveryInfo = ref<DeliveryItem['deliveryInfo'] | null>(props.deliveryData.deliveryInfo ?? null);
+        const selectPO = ref<DeliveryItem['selectPO'] | null>(props.deliveryData.selectPO ?? null);
+        const verifyItem = ref<DeliveryItem['verifyItem']>(props.deliveryData.verifyItem ?? []);
+
+        const toastRef = ref<InstanceType<typeof Toast> | null>(null);
         const router = useRouter();
         const toast = useToast();
-        const toastRef = ref<InstanceType<typeof Toast> | null>(null);
 
-        watch(
-            () => props.deliveryData,
-            (newData) => {
-                deliveryInfo.value = newData.deliveryInfo ?? null;
-                selectPO.value = newData.selectPO ?? null;
-                verifyItem.value = newData.verifyItem ?? [];
-                console.log('deliveryInfo:', deliveryInfo.value);
-                console.log('selectPO:', selectPO.value);
-                console.log('verifyItem:', verifyItem.value);
-            },
-            { immediate: true, deep: true }
-        );
+        // ---------------------------
+        // 2. COMPUTED PROPERTIES
+        // ---------------------------
+        // 暂无额外 computed
+
+        // ---------------------------
+        // 3. FUNCTIONS (handlers, business logic)
+        // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             // if (event.valid) {
-            //     if (finalDeliveryResult.value.length > 0) {
-            //         emit('update', finalDeliveryResult.value);
+            //     if (verifyItem.value.length > 0) {
+            //         emit('update', verifyItem.value);
             //         emit('next-step');
             //         toast.add({
             //             severity: 'success',
@@ -76,6 +88,25 @@ export default defineComponent({
             router.push('/deliveries');
         };
 
+        // ---------------------------
+        // 4. LIFECYCLE HOOKS
+        // ---------------------------
+        watch(
+            () => props.deliveryData,
+            (newData) => {
+                deliveryInfo.value = newData.deliveryInfo ?? null;
+                selectPO.value = newData.selectPO ?? null;
+                verifyItem.value = newData.verifyItem ?? [];
+                console.log('deliveryInfo:', deliveryInfo.value);
+                console.log('selectPO:', selectPO.value);
+                console.log('verifyItem:', verifyItem.value);
+            },
+            { immediate: true, deep: true }
+        );
+
+        // ---------------------------
+        // 5. RETURN (expose to template)
+        // ---------------------------
         return {
             deliveryInfo,
             selectPO,

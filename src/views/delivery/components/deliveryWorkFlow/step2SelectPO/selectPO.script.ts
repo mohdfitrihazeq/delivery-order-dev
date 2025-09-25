@@ -12,23 +12,79 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref } from 'vue';
 
+interface PurchaseOrderCard {
+    id: string;
+    title: string;
+    content: string;
+    item: string;
+    badges: string[];
+    icon: string;
+}
+
 export default defineComponent({
     name: 'SelectPO',
-    components: { Card, InputText, Button, Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, Badge },
+    components: {
+        Card,
+        InputText,
+        Button,
+        Message,
+        Toast,
+        Form,
+        Calendar,
+        Textarea,
+        FileUpload,
+        ProgressBar,
+        Badge
+    },
     emits: ['update', 'next-step', 'prev-step'],
     setup(_, { emit }) {
+        // ---------------------------
+        // 1. STATE
+        // ---------------------------
         const toast = useToast();
         const toastRef = ref<InstanceType<typeof Toast> | null>(null);
         const searchTerm = ref('');
+        const selectedCard = ref<PurchaseOrderCard | null>(null);
 
+        const cards = ref<PurchaseOrderCard[]>([
+            {
+                id: '1',
+                title: 'P02024090101',
+                content: '2 items • DiggRight Contractors',
+                item: '1',
+                badges: ['Excavation work'],
+                icon: 'pi-box'
+            },
+            {
+                id: '2',
+                title: 'P02024090102',
+                content: '2 items • MetalWorks Inc.',
+                item: '2',
+                badges: ['Steel reinforcement', 'Ready mix'],
+                icon: 'pi-box'
+            },
+            {
+                id: '3',
+                title: 'P02024090103',
+                content: '1 items • ClearView Glass',
+                item: '1',
+                badges: ['Double glazed'],
+                icon: 'pi-box'
+            }
+        ]);
+
+        // ---------------------------
+        // 2. COMPUTED
+        // ---------------------------
         const filteredCards = computed(() => {
             if (!searchTerm.value) return cards.value;
             const term = searchTerm.value.toLowerCase();
             return cards.value.filter((c) => c.id.toLowerCase().includes(term) || c.title.toLowerCase().includes(term) || c.content.toLowerCase().includes(term) || c.badges.some((b) => b.toLowerCase().includes(term)));
         });
 
-        const selectedCard = ref<any | null>(null);
-
+        // ---------------------------
+        // 3. METHODS
+        // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             if (event.valid) {
                 if (selectedCard.value) {
@@ -55,58 +111,38 @@ export default defineComponent({
             emit('prev-step');
         };
 
-        const cards = ref([
-            {
-                id: '1',
-                title: 'P02024090101',
-                content: '2 items • DiggRight Contractors',
-                item: '1',
-                badges: ['Excavation work'],
-                icon: 'pi-box'
-            },
-            {
-                id: '2',
-                title: 'P02024090102',
-                content: '2 items • MetalWorks Inc.',
-                item: '2',
-                badges: ['Steel reinforcement', 'Ready mix'],
-                icon: 'pi-box'
-            },
-            {
-                id: '3',
-                title: 'P02024090103',
-                content: '1 items • ClearView Glass',
-                item: '1',
-                badges: ['Double glazed'],
-                icon: 'pi-box'
-            }
-        ]);
-        const toggleSelect = (card: any) => {
+        const toggleSelect = (card: PurchaseOrderCard) => {
             if (selectedCard.value && selectedCard.value.id === card.id) {
                 selectedCard.value = null;
             } else {
                 selectedCard.value = card;
             }
         };
-        const removeCard = (card: any) => {
+
+        const removeCard = (card: PurchaseOrderCard) => {
             if (selectedCard.value && selectedCard.value.id === card.id) {
                 selectedCard.value = null;
             }
         };
 
-        const isSelected = (card: any) => {
+        const isSelected = (card: PurchaseOrderCard) => {
             return selectedCard.value?.id === card.id;
         };
+
+        // ---------------------------
+        // 4. RETURN (expose to template)
+        // ---------------------------
         return {
-            onFormSubmit,
             toastRef,
             cards,
+            searchTerm,
+            selectedCard,
+            filteredCards,
+            onFormSubmit,
+            goBack,
             toggleSelect,
             removeCard,
-            isSelected,
-            goBack,
-            filteredCards,
-            searchTerm
+            isSelected
         };
     }
 });

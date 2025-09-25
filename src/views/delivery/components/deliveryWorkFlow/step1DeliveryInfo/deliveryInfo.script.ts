@@ -11,6 +11,7 @@ import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 interface FormValues {
     driverPlate: string;
@@ -22,15 +23,32 @@ interface UploadFile {
     size: number;
     type?: string;
     [key: string]: any;
+    objectURL?: string;
 }
 
 export default defineComponent({
     name: 'DeliveryFormCard',
-    components: { Card, InputText, Button, Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, Badge },
+    components: {
+        Card,
+        InputText,
+        Button,
+        Message,
+        Toast,
+        Form,
+        Calendar,
+        Textarea,
+        FileUpload,
+        ProgressBar,
+        Badge
+    },
     emits: ['update', 'next-step'],
     setup(_, { emit }) {
+        // ---------------------------
+        // 1. STATE
+        // ---------------------------
         const toast = useToast();
         const toastRef = ref<InstanceType<typeof Toast> | null>(null);
+        const router = useRouter();
 
         const initialValues = reactive<FormValues>({
             driverPlate: '',
@@ -39,6 +57,26 @@ export default defineComponent({
 
         const errors = reactive<{ driverPlate?: string; deliveryDate?: string }>({});
 
+        const files = ref<UploadFile[]>([]);
+        const totalSize = ref(0);
+        const totalSizePercent = ref(0);
+
+        // ---------------------------
+        // 2. COMPUTED / HELPERS
+        // ---------------------------
+        const formatSize = (bytes: number) => {
+            const k = 1024;
+            const dm = 2;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes === 0) return `0 ${sizes[0]}`;
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+            return `${formattedSize} ${sizes[i]}`;
+        };
+
+        // ---------------------------
+        // 3. VALIDATION RESOLVER
+        // ---------------------------
         const resolver = (options: FormResolverOptions) => {
             const values = options.values as FormValues;
             errors.driverPlate = '';
@@ -50,9 +88,13 @@ export default defineComponent({
             return { values, errors: errors };
         };
 
+        // ---------------------------
+        // 4. METHODS
+        // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             const values = event.values as FormValues;
             console.log('values', values);
+
             if (event.valid) {
                 emit('update', values);
                 emit('next-step');
@@ -62,21 +104,6 @@ export default defineComponent({
                     life: 3000
                 });
             }
-        };
-
-        // ---------------------- File Upload ----------------------
-        const files = ref<UploadFile[]>([]);
-        const totalSize = ref(0);
-        const totalSizePercent = ref(0);
-
-        const formatSize = (bytes: number) => {
-            const k = 1024;
-            const dm = 2;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            if (bytes === 0) return `0 ${sizes[0]}`;
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-            return `${formattedSize} ${sizes[i]}`;
         };
 
         const onSelectedFiles = (event: { files: UploadFile[] }) => {
@@ -96,24 +123,37 @@ export default defineComponent({
             callback();
         };
 
-        const onTemplatedUpload = (event?: any) => {
-            toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+        const onTemplatedUpload = () => {
+            toast.add({
+                severity: 'info',
+                summary: 'Success',
+                detail: 'File Uploaded',
+                life: 3000
+            });
         };
 
+        const goBack = () => {
+            router.push('/deliveries');
+        };
+
+        // ---------------------------
+        // 5. RETURN (expose to template)
+        // ---------------------------
         return {
             initialValues,
-            resolver,
-            onFormSubmit,
-            toastRef,
             errors,
             files,
             totalSize,
             totalSizePercent,
+            toastRef,
             formatSize,
+            resolver,
+            onFormSubmit,
             onSelectedFiles,
             onRemoveTemplatingFile,
             uploadEvent,
-            onTemplatedUpload
+            onTemplatedUpload,
+            goBack
         };
     }
 });

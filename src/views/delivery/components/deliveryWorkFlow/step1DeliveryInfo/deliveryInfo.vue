@@ -99,7 +99,10 @@
                             </template>
                         </FileUpload>
                     </div>
-                    <div class="flex justify-end mt-4"><Button type="submit" label="Next" severity="primary" /></div>
+                    <div class="flex justify-end mt-4">
+                        <Button type="button" label="Cancel" severity="secondary" @click="goBack" />
+                        <Button type="submit" label="Next" severity="primary" class="ms-2" />
+                    </div>
                 </Form>
             </template>
         </Card>

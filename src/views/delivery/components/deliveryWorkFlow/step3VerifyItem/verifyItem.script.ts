@@ -12,19 +12,60 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, ref, watch } from 'vue';
 
+interface PurchaseOrder {
+    id: string;
+    code: string;
+    title?: string;
+    content?: string;
+}
+
+interface Item {
+    name: string;
+    order: string;
+    status: string;
+    location: string;
+    category: string;
+    type: string;
+    delivered: number;
+    total: number;
+}
+
 export default defineComponent({
     name: 'VerifyItem',
-    components: { Card, InputText, Button, Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, Badge },
+    components: {
+        Card,
+        InputText,
+        Button,
+        Message,
+        Toast,
+        Form,
+        Calendar,
+        Textarea,
+        FileUpload,
+        ProgressBar,
+        Badge
+    },
     emits: ['update', 'next-step', 'prev-step'],
     props: {
         selectedPo: {
-            type: Object,
+            type: Object as () => PurchaseOrder | null,
             required: true
         }
     },
     setup(props, { emit }) {
-        const itemList = ref<any[]>([]);
+        // ---------------------------
+        // 1. STATE
+        // ---------------------------
+        const itemList = ref<Item[]>([]);
         const poNumber = ref<string | null>(null);
+        const expanded = ref<number[]>([]);
+        const activeIndex = ref<number[]>([0]);
+        const toast = useToast();
+        const toastRef = ref<InstanceType<typeof Toast> | null>(null);
+
+        // ---------------------------
+        // 2. WATCHERS
+        // ---------------------------
         watch(
             () => props.selectedPo,
             (newPo) => {
@@ -100,9 +141,9 @@ export default defineComponent({
             { immediate: true }
         );
 
-        const toast = useToast();
-        const toastRef = ref<InstanceType<typeof Toast> | null>(null);
-
+        // ---------------------------
+        // 3. METHODS
+        // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             if (event.valid) {
                 if (itemList.value.length > 0) {
@@ -137,26 +178,22 @@ export default defineComponent({
             emit('prev-step');
         };
 
-        const expanded = ref<number[]>([]);
-
         const toggle = (id: number) => {
-            if (expanded.value.includes(id)) {
-                expanded.value = expanded.value.filter((x) => x !== id);
-            } else {
-                expanded.value.push(id);
-            }
+            expanded.value = expanded.value.includes(id) ? expanded.value.filter((x) => x !== id) : [...expanded.value, id];
         };
 
-        const activeIndex = ref([0]);
+        // ---------------------------
+        // 4. RETURN (expose to template)
+        // ---------------------------
         return {
-            onFormSubmit,
-            toastRef,
-            goBack,
-            toggle,
-            expanded,
             itemList,
             poNumber,
-            activeIndex
+            expanded,
+            activeIndex,
+            toastRef,
+            onFormSubmit,
+            goBack,
+            toggle
         };
     }
 });
