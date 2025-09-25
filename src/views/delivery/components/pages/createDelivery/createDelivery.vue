@@ -2,7 +2,7 @@
 
 <template>
     <div class="card flex justify-center">
-        <Stepper v-model:value="activeStep" class="w-full max-w-6xl mt-4">
+        <Stepper v-model:value="activeStep" class="w-full max-w-6xl mt-4" :clickable="false">
             <StepList class="flex justify-between">
                 <!-- Step 1 -->
                 <Step :value="1">
