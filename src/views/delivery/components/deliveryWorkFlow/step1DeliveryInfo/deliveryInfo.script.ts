@@ -17,6 +17,13 @@ interface FormValues {
     deliveryDate: Date | null;
 }
 
+interface UploadFile {
+    name: string;
+    size: number;
+    type?: string;
+    [key: string]: any;
+}
+
 export default defineComponent({
     name: 'DeliveryFormCard',
     components: { Card, InputText, Button, Message, Toast, Form, Calendar, Textarea, FileUpload, ProgressBar, Badge },
@@ -57,7 +64,7 @@ export default defineComponent({
             }
         };
 
-        // File upload
+        // ---------------------- File Upload ----------------------
         const files = ref<UploadFile[]>([]);
         const totalSize = ref(0);
         const totalSizePercent = ref(0);
@@ -65,21 +72,20 @@ export default defineComponent({
         const formatSize = (bytes: number) => {
             const k = 1024;
             const dm = 2;
-            const sizes = $primevue.config?.locale?.fileSizeTypes || ['B', 'KB', 'MB', 'GB', 'TB'];
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
             if (bytes === 0) return `0 ${sizes[0]}`;
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
             return `${formattedSize} ${sizes[i]}`;
         };
 
-        const onSelectedFiles = (event: { files: any[] }) => {
+        const onSelectedFiles = (event: { files: UploadFile[] }) => {
             files.value = event.files;
-            totalSize.value = 0;
-            files.value.forEach((f) => (totalSize.value += f.size));
+            totalSize.value = files.value.reduce((sum, f) => sum + f.size, 0);
             totalSizePercent.value = (totalSize.value / 1_000_000) * 100;
         };
 
-        const onRemoveTemplatingFile = (file: any, removeFileCallback: (index: number) => void, index: number) => {
+        const onRemoveTemplatingFile = (file: UploadFile, removeFileCallback: (index: number) => void, index: number) => {
             removeFileCallback(index);
             totalSize.value -= file.size;
             totalSizePercent.value = (totalSize.value / 1_000_000) * 100;
