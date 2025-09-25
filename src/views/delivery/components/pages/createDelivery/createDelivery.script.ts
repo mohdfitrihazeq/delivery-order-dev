@@ -7,6 +7,9 @@ import { computed, defineComponent, ref } from 'vue';
 export default defineComponent({
     components: { DeliveryInfo, SelectPO, VerifyItem, Review },
     setup() {
+        // ---------------------------
+        // 1. DATA (constants, refs)
+        // ---------------------------
         const activeStep = ref(1);
 
         const deliveryData = ref({
@@ -16,6 +19,24 @@ export default defineComponent({
             review: {}
         });
 
+        // ---------------------------
+        // 2. COMPUTED PROPERTIES
+        // ---------------------------
+        const canPassToReview = computed(() => {
+            return (
+                deliveryData.value.deliveryInfo &&
+                Object.keys(deliveryData.value.deliveryInfo).length > 0 &&
+                deliveryData.value.selectPO &&
+                Object.keys(deliveryData.value.selectPO).length > 0 &&
+                deliveryData.value.verifyItem &&
+                Array.isArray(deliveryData.value.verifyItem) &&
+                deliveryData.value.verifyItem.length > 0
+            );
+        });
+
+        // ---------------------------
+        // 3. FUNCTIONS (handlers, business logic)
+        // ---------------------------
         const handleStep1Update = (data: any) => {
             console.log('Step 1 data received in update', data);
             deliveryData.value.deliveryInfo = data;
@@ -38,22 +59,23 @@ export default defineComponent({
             console.log('Step 4 data received in update', data);
             deliveryData.value.review = data;
         };
+
         const goStep = (step: number) => {
             activeStep.value = step;
         };
 
-        const canPassToReview = computed(() => {
-            return (
-                deliveryData.value.deliveryInfo &&
-                Object.keys(deliveryData.value.deliveryInfo).length > 0 &&
-                deliveryData.value.selectPO &&
-                Object.keys(deliveryData.value.selectPO).length > 0 &&
-                deliveryData.value.verifyItem &&
-                Array.isArray(deliveryData.value.verifyItem) &&
-                deliveryData.value.verifyItem.length > 0
-            );
-        });
-
-        return { activeStep, deliveryData, handleStep1Update, handleStep2Update, handleStep3Update, handleStep4Update, canPassToReview, goStep };
+        // ---------------------------
+        // 5. RETURN (expose to template)
+        // ---------------------------
+        return {
+            activeStep,
+            deliveryData,
+            canPassToReview,
+            handleStep1Update,
+            handleStep2Update,
+            handleStep3Update,
+            handleStep4Update,
+            goStep
+        };
     }
 });

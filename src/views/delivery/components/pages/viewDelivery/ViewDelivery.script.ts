@@ -8,8 +8,12 @@ export default defineComponent({
     name: 'ViewDelivery',
     components: { Tag, ReusableTable, Motion },
     setup() {
+        // ---------------------------
+        // 1. DATA (constants, refs)
+        // ---------------------------
         const route = useRoute();
         const doNumber = ref(route.params.doNumber || '');
+        const search = ref('');
 
         const deliveryDetailsData = ref([
             {
@@ -38,6 +42,22 @@ export default defineComponent({
             }
         ]);
 
+        const items = ref<any[]>([]);
+
+        const itemsColumns = ref([
+            { field: 'no', header: 'No', bodySlot: 'no' },
+            { field: 'code', header: 'Item Code' },
+            { field: 'description', header: 'Description' },
+            { field: 'ordered', header: 'Ordered' },
+            { field: 'received', header: 'Received' },
+            { field: 'remaining', header: 'Remaining' },
+            { field: 'unitPrice', header: 'Unit Price' },
+            { field: 'status', header: 'Status', bodySlot: 'status' }
+        ]);
+
+        // ---------------------------
+        // 2. COMPUTED PROPERTIES
+        // ---------------------------
         const deliveryDetail = computed(() => {
             return (
                 deliveryDetailsData.value.find((d) => d.doNumber === doNumber.value) || {
@@ -53,9 +73,11 @@ export default defineComponent({
 
         const allItems = computed(() => deliveryDetail.value.items.map((item, i) => ({ ...item, no: i + 1 })));
 
-        const search = ref('');
-        const items = ref(allItems.value);
+        const status = computed(() => deliveryDetail.value.status || '');
 
+        // ---------------------------
+        // 3. FUNCTIONS (handlers, business logic)
+        // ---------------------------
         function handleSearch(value: string) {
             search.value = value;
             if (!value) {
@@ -66,19 +88,11 @@ export default defineComponent({
             items.value = allItems.value.filter((item) => item.code.toLowerCase().includes(lower) || item.description.toLowerCase().includes(lower));
         }
 
-        const itemsColumns = ref([
-            { field: 'no', header: 'No', bodySlot: 'no' },
-            { field: 'code', header: 'Item Code' },
-            { field: 'description', header: 'Description' },
-            { field: 'ordered', header: 'Ordered' },
-            { field: 'received', header: 'Received' },
-            { field: 'remaining', header: 'Remaining' },
-            { field: 'unitPrice', header: 'Unit Price' },
-            { field: 'status', header: 'Status', bodySlot: 'status' }
-        ]);
+        items.value = allItems.value;
 
-        const status = computed(() => deliveryDetail.value.status || '');
-
+        // ---------------------------
+        // 5. RETURN (expose to template)
+        // ---------------------------
         return {
             doNumber,
             deliveryDetail,
