@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Motion } from '@motionone/vue';
 import { onMounted, ref } from 'vue';
-import Menu from './menu/Menu.vue';
+import Menu from './Menu/Menu.vue';
 
 const username = ref<string | null>(null);
 const role = ref<string | null>(null);
