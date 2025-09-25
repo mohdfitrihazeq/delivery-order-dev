@@ -1,12 +1,13 @@
 import BudgetSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import type { CardItem } from '@/types/card.type';
-import Highcharts from 'highcharts';
+import { Chart } from 'highcharts-vue';
 import { computed, defineComponent, onMounted, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'Overview',
     components: {
-        BudgetSummaryData
+        BudgetSummaryData,
+        highcharts: Chart
     },
     setup() {
         // ---------------------------
