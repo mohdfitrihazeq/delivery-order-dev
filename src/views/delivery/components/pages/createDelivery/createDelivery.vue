@@ -21,9 +21,9 @@
                                     }
                                 ]"
                             >
-                                <i class="pi pi-truck" />
+                                <i class="pi pi-box" />
                             </span>
-                            <span class="text-sm font-medium" :class="{ 'text-primary': 1 <= activeStep }"> Delivery Info </span>
+                            <span class="text-sm font-medium" :class="{ 'text-primary': 1 <= activeStep }"> Select PO </span>
                         </div>
                     </Step>
 
@@ -39,9 +39,9 @@
                                     }
                                 ]"
                             >
-                                <i class="pi pi-box" />
+                                <i class="pi pi-check" />
                             </span>
-                            <span class="text-sm font-medium" :class="{ 'text-primary': 2 <= activeStep }"> Select PO </span>
+                            <span class="text-sm font-medium" :class="{ 'text-primary': 2 <= activeStep }"> Verify Items </span>
                         </div>
                     </Step>
 
@@ -57,9 +57,9 @@
                                     }
                                 ]"
                             >
-                                <i class="pi pi-check" />
+                                <i class="pi pi-truck" />
                             </span>
-                            <span class="text-sm font-medium" :class="{ 'text-primary': 3 <= activeStep }"> Verify Items </span>
+                            <span class="text-sm font-medium" :class="{ 'text-primary': 3 <= activeStep }"> Delivery Info </span>
                         </div>
                     </Step>
 
@@ -85,13 +85,13 @@
                 <!-- Panels -->
                 <StepPanels>
                     <StepPanel :value="1">
-                        <DeliveryInfo @update="handleStep1Update" />
+                        <SelectPO @update="handleStep1Update" />
                     </StepPanel>
                     <StepPanel :value="2">
-                        <SelectPO @update="handleStep2Update" @next-step="goStep(3)" @prev-step="goStep(1)" />
+                        <VerifyItem @update="handleStep2Update" @next-step="goStep(3)" :selected-po="deliveryData.selectPO" @prev-step="goStep(1)" />
                     </StepPanel>
                     <StepPanel :value="3">
-                        <VerifyItem @update="handleStep3Update" @next-step="goStep(4)" :selected-po="deliveryData.selectPO" @prev-step="goStep(2)" />
+                        <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" />
                     </StepPanel>
                     <StepPanel :value="4">
                         <div v-if="canPassToReview"><Review @update="handleStep4Update" :deliveryData="deliveryData" /></div>
