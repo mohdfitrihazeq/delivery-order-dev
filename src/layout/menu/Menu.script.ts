@@ -38,8 +38,8 @@ export default defineComponent({
             {
                 label: 'Setting',
                 items: [
-                    { label: 'Company', icon: 'pi pi-fw pi-building-columns', to: '/' },
-                    { label: 'Project', icon: 'pi pi-fw pi-server', to: '/' }
+                    { label: 'Company', icon: 'pi pi-fw pi-building-columns', to: '/company' },
+                    { label: 'Project', icon: 'pi pi-fw pi-server', to: '/project' }
                 ]
             }
         ];
