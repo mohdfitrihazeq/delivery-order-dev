@@ -1,7 +1,7 @@
 <script lang="ts" src="./create-ro.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal" class="create-ro-modal">
+    <Dialog v-model:visible="localVisible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal" class="create-ro-modal">
         <template #header>
             <div class="flex items-center gap-3">
                 <i class="pi pi-box text-xl"></i>
