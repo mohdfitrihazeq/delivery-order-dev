@@ -2,20 +2,24 @@
 
 <template>
     <div v-for="item in cardItems" :key="item.title" class="col-span-12 lg:col-span-6" :class="cardColClass">
-        <div class="glossy-card border-grey-400 p-7" style="border-color: #f8f8f8 !important">
-            <div class="flex justify-between mb-3">
-                <div>
-                    <span class="block text-muted-color font-bold mb-2">{{ item.title }}</span>
+        <Card class="p-4 border">
+            <template #title>
+                <div class="flex justify-between items-center">
+                    <span class="block text-muted-color font-bold">
+                        {{ item.title }}
+                    </span>
+                    <div class="flex items-center justify-center rounded-full w-6 h-6" :class="`bg-${item.color}-100 dark:bg-${item.color}-400/10`">
+                        <i :class="[item.icon, `text-${item.color}-500`, 'text-xs']"></i>
+                    </div>
                 </div>
+            </template>
 
-                <div class="flex items-center justify-center rounded-full w-6 h-6" :class="`bg-${item.color}-100 dark:bg-${item.color}-400/10`">
-                    <i :class="[item.icon, `text-${item.color}-500`, 'text-xs']"></i>
+            <template #content>
+                <div class="font-medium text-xl dark:text-surface-0" :class="`text-${item.color}-500 !text-${item.color}-500`">
+                    {{ item.value }}
                 </div>
-            </div>
-            <div class="font-medium text-xl dark:text-surface-0" :class="`text-${item.color}-500 !text-${item.color}-500`">
-                {{ item.value }}
-            </div>
-            <span class="text-muted-color">{{ item.description }}</span>
-        </div>
+                <span class="text-muted-color">{{ item.description }}</span>
+            </template>
+        </Card>
     </div>
 </template>

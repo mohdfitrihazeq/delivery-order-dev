@@ -4,7 +4,7 @@ import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, ref } from 'vue'; // ✅ 要加 computed
+import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -16,10 +16,7 @@ export default defineComponent({
         Button
     },
     setup() {
-        // ---------------------------
-        // 1. DATA (constants, refs)
-        // ---------------------------
-        const deliveryList = ref([
+        const incompletedList = ref([
             {
                 doNumber: 'DO2024091501',
                 poNumber: 'PO2024090102',
@@ -28,7 +25,10 @@ export default defineComponent({
                 date: '20/09/2024',
                 totalAmount: 15750,
                 status: 'incompleted'
-            },
+            }
+        ]);
+
+        const completedList = ref([
             {
                 doNumber: 'DO2024091502',
                 poNumber: 'PO2024090101',
@@ -47,43 +47,22 @@ export default defineComponent({
         ];
 
         // ---------------------------
-        // 2. STATE (filters, search)
+        // Tabs
         // ---------------------------
-        const filters = ref<Record<string, any>>({});
-
-        const search = ref('');
-        const router = useRouter();
-        const activeFilters = ref<{ [key: string]: any }>({});
-
-        const extraFilters = [
-            {
-                type: 'select',
-                field: 'status',
-                placeholder: 'Status',
-                options: [
-                    { label: 'All', value: null },
-                    { label: 'Incompleted', value: 'incompleted' },
-                    { label: 'Completed', value: 'completed' }
-                ]
-            }
+        const tabItems = [
+            { value: '0', label: 'Incompleted', badge: 1 },
+            { value: '1', label: 'Completed' }
         ];
 
-        const filteredDeliveryList = computed(() => {
-            let list = [...deliveryList.value];
-
-            if (activeFilters.value.status) {
-                list = list.filter((item) => item.status === activeFilters.value.status);
-            }
-
-            return list;
-        });
-
+        const activeTab = ref('0');
         // ---------------------------
-        // 3. FUNCTIONS (handlers)
+        // Search & Router
         // ---------------------------
+        const search = ref('');
+        const router = useRouter();
+
         function handleSearch(value: string) {
             search.value = value;
-            filters.value.global.value = value;
         }
 
         function handleAction(type: 'view', row: any) {
@@ -92,13 +71,10 @@ export default defineComponent({
             }
         }
 
-        function handleFilter(newFilters: Record<string, any>) {
-            activeFilters.value = newFilters;
-        }
+        // ---------------------------
+        // Computed: filter list by tab
+        // ---------------------------
 
-        // ---------------------------
-        // 4. TABLE CONFIG
-        // ---------------------------
         const deliveryListColumn: TableColumn[] = [
             { field: 'doNumber', header: 'DO Number', sortable: true },
             { field: 'poNumber', header: 'PO Number', sortable: true },
@@ -110,19 +86,16 @@ export default defineComponent({
             { header: 'Action', action: true, actions: ['view'] }
         ];
 
-        // ---------------------------
-        // 6. RETURN
-        // ---------------------------
         return {
-            deliveryList,
-            filteredDeliveryList,
+            incompletedList,
+            completedList,
             deliverySummaryData,
             search,
-            extraFilters,
             onSearchWrapper: handleSearch,
             handleAction,
-            handleFilter,
-            deliveryListColumn
+            deliveryListColumn,
+            activeTab,
+            tabItems
         };
     }
 });

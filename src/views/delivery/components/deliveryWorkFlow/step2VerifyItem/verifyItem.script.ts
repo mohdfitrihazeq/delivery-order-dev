@@ -137,6 +137,7 @@ export default defineComponent({
                 }
 
                 poNumber.value = newPo.code;
+                console.log('check numbe', newPo);
             },
             { immediate: true }
         );

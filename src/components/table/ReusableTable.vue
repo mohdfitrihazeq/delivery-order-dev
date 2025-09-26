@@ -96,13 +96,13 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
 
 <template>
     <!-- Search + Filter + Buttons -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-        <!-- Left: Search -->
-        <span class="p-input-icon-left w-full sm:max-w-sm">
-            <InputText v-if="props.onSearch" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full" />
+    <div class="flex flex-col sm:flex-row justify-end items-start sm:items-center mb-4 gap-2 mt-0 sm:mt-[-35px]">
+        <!-- Search -->
+        <span class="p-input-icon-left w-full sm:max-w-sm sm:w-auto">
+            <InputText v-if="props.onSearch" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
         </span>
 
-        <!-- Right: Filters + Buttons -->
+        <!-- Filters + Buttons -->
         <div class="flex gap-2 flex-wrap items-center">
             <!-- Dynamic Filters -->
             <template v-for="(f, i) in props.extraFilters" :key="i">
