@@ -12,7 +12,6 @@ export default defineComponent({
         const fullMenuModel: MenuItemType[] = [
             { separator: true },
             {
-                label: 'Procurement Workflow',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
                     { label: 'Budget', icon: 'pi pi-fw pi-chart-bar', to: '/budget' },
