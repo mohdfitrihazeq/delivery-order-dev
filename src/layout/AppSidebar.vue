@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Motion } from '@motionone/vue';
 import { onMounted, ref } from 'vue';
-import Menu from './Menu/Menu.vue';
+import Menu from './menu/Menu.vue';
 
 const username = ref<string | null>(null);
 const role = ref<string | null>(null);
@@ -31,7 +31,7 @@ const initials = (name: string | null) => {
 </script>
 
 <template>
-    <Motion :initial="{ opacity: 0, x: 40 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -40 }" :transition="{ duration: 0.4 }">
+    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="layout-sidebar shadow-sm">
             <div class="flex items-center gap-3 mb-4 mt-3">
                 <!-- Avatar Circle -->
