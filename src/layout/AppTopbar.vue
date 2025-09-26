@@ -132,9 +132,6 @@ onMounted(() => {
                     </div>
                     <i class="pi pi-chevron-down text-sm text-gray-500 dark:text-gray-100 ml-3"></i>
                 </div>
-                <div v-if="selectedProject?.company" class="text-xs text-gray-400 dark:text-gray-300 mt-0.5">
-                    {{ selectedProject.company }}
-                </div>
             </div>
 
             <Dialog v-model:visible="showProjectDialog" header="Select Project" modal class="w-[500px]">
