@@ -14,10 +14,32 @@ export default defineComponent({
             {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                    { label: 'Budget', icon: 'pi pi-fw pi-chart-bar', to: '/budget' },
+                    {
+                        label: 'Budget',
+                        icon: 'pi pi-fw pi-chart-bar',
+                        items: [
+                            {
+                                label: 'Budget List',
+                                icon: 'pi pi-fw pi-ticket',
+                                to: '/budget'
+                            },
+                            {
+                                label: 'Budget Change Request',
+                                icon: 'pi pi-fw pi-tags',
+                                to: '/'
+                            }
+                        ]
+                    },
                     { label: 'Request Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/request-orders' },
                     { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '/purchase-orders', badge: 1 },
                     { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
+                ]
+            },
+            {
+                label: 'Setting',
+                items: [
+                    { label: 'Company', icon: 'pi pi-fw pi-building-columns', to: '/' },
+                    { label: 'Project', icon: 'pi pi-fw pi-server', to: '/' }
                 ]
             }
         ];
@@ -25,7 +47,7 @@ export default defineComponent({
         const rolePermissions = {
             purchasing: ['Dashboard', 'Request Orders', 'Purchase Orders'],
             site: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries', 'Administration', 'Drafts File'],
-            pm: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries']
+            pm: ['Dashboard', 'Budget', 'Request Orders', 'Purchase Orders', 'Deliveries', 'Company', 'Project']
         };
 
         const filterMenuByRole = (menuItems: MenuItemType[], allowedItems: string[]): MenuItemType[] => {
