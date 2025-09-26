@@ -3,6 +3,7 @@
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-6 card glossy-card">
+            <BreadcrumbList />
             <!-- Header -->
             <h1 class="text-xl font-bold">Delivery Order</h1>
             <p class="text-sm text-gray-500">{{ doNumber }} - {{ deliveryDetail.projectName }}</p>

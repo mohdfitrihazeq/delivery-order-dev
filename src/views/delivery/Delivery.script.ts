@@ -4,7 +4,7 @@ import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import { defineComponent, ref } from 'vue'; // ✅ 要加 computed
+import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -16,10 +16,7 @@ export default defineComponent({
         Button
     },
     setup() {
-        // ---------------------------
-        // 1. DATA (constants, refs)
-        // ---------------------------
-        const deliveryList = ref([
+        const incompletedList = ref([
             {
                 doNumber: 'DO2024091501',
                 poNumber: 'PO2024090102',
@@ -28,7 +25,10 @@ export default defineComponent({
                 date: '20/09/2024',
                 totalAmount: 15750,
                 status: 'incompleted'
-            },
+            }
+        ]);
+
+        const completedList = ref([
             {
                 doNumber: 'DO2024091502',
                 poNumber: 'PO2024090101',
@@ -47,15 +47,20 @@ export default defineComponent({
         ];
 
         // ---------------------------
-        // 2. STATE (filters, search)
+        // Tabs
         // ---------------------------
+        const tabItems = [
+            { value: '0', label: 'Incompleted', badge: 1 },
+            { value: '1', label: 'Completed' }
+        ];
 
+        const activeTab = ref('0');
+        // ---------------------------
+        // Search & Router
+        // ---------------------------
         const search = ref('');
         const router = useRouter();
 
-        // ---------------------------
-        // 3. FUNCTIONS (handlers)
-        // ---------------------------
         function handleSearch(value: string) {
             search.value = value;
         }
@@ -67,8 +72,9 @@ export default defineComponent({
         }
 
         // ---------------------------
-        // 4. TABLE CONFIG
+        // Computed: filter list by tab
         // ---------------------------
+
         const deliveryListColumn: TableColumn[] = [
             { field: 'doNumber', header: 'DO Number', sortable: true },
             { field: 'poNumber', header: 'PO Number', sortable: true },
@@ -80,16 +86,16 @@ export default defineComponent({
             { header: 'Action', action: true, actions: ['view'] }
         ];
 
-        // ---------------------------
-        // 6. RETURN
-        // ---------------------------
         return {
-            deliveryList,
+            incompletedList,
+            completedList,
             deliverySummaryData,
             search,
             onSearchWrapper: handleSearch,
             handleAction,
-            deliveryListColumn
+            deliveryListColumn,
+            activeTab,
+            tabItems
         };
     }
 });

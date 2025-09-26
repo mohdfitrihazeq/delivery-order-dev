@@ -2,7 +2,8 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card glossy-card mb-0">
+        <div class="p-6 card mb-0">
+            <BreadcrumbList />
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -16,7 +17,7 @@
             </div>
 
             <!-- Body -->
-            <div class="card">
+            <div class="mt-6">
                 <BaseTab v-model="activeTab" :tabs="tabItems">
                     <template #default="{ activeTab }">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
