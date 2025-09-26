@@ -4,7 +4,7 @@ import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, ref } from 'vue'; // ✅ 要加 computed
+import { defineComponent, ref } from 'vue'; // ✅ 要加 computed
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -49,51 +49,21 @@ export default defineComponent({
         // ---------------------------
         // 2. STATE (filters, search)
         // ---------------------------
-        const filters = ref<Record<string, any>>({});
 
         const search = ref('');
         const router = useRouter();
-        const activeFilters = ref<{ [key: string]: any }>({});
-
-        const extraFilters = [
-            {
-                type: 'select',
-                field: 'status',
-                placeholder: 'Status',
-                options: [
-                    { label: 'All', value: null },
-                    { label: 'Incompleted', value: 'incompleted' },
-                    { label: 'Completed', value: 'completed' }
-                ]
-            }
-        ];
-
-        const filteredDeliveryList = computed(() => {
-            let list = [...deliveryList.value];
-
-            if (activeFilters.value.status) {
-                list = list.filter((item) => item.status === activeFilters.value.status);
-            }
-
-            return list;
-        });
 
         // ---------------------------
         // 3. FUNCTIONS (handlers)
         // ---------------------------
         function handleSearch(value: string) {
             search.value = value;
-            filters.value.global.value = value;
         }
 
         function handleAction(type: 'view', row: any) {
             if (type === 'view') {
                 router.push(`/deliveries/viewDelivery/${row.doNumber}`);
             }
-        }
-
-        function handleFilter(newFilters: Record<string, any>) {
-            activeFilters.value = newFilters;
         }
 
         // ---------------------------
@@ -115,13 +85,10 @@ export default defineComponent({
         // ---------------------------
         return {
             deliveryList,
-            filteredDeliveryList,
             deliverySummaryData,
             search,
-            extraFilters,
             onSearchWrapper: handleSearch,
             handleAction,
-            handleFilter,
             deliveryListColumn
         };
     }
