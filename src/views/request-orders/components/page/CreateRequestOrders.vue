@@ -4,7 +4,6 @@
     <Motion :initial="{ opacity: 0, y: 20 }" :animate="{ opacity: 1, y: 0 }" :exit="{ opacity: 0, y: -20 }" :transition="{ duration: 0.6 }">
         <div class="p-6 card glossy-card">
             <div class="flex items-center mb-6 gap-4">
-                <Button icon="pi pi-arrow-left" label="Back" @click="goBack" />
                 <div>
                     <h1 class="text-2xl font-bold">Create Request Order</h1>
                     <p class="text-gray-500">Create a new request order for project: MKT</p>
