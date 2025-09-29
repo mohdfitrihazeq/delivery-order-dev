@@ -167,11 +167,10 @@
                                         </div>
                                     </div>
                                 </template>
-
                                 <template #empty>
-                                    <div class="w-full flex flex-col items-center justify-center text-center py-6">
-                                        <i class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400" />
-                                        <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                    <div class="flex items-center justify-center flex-col">
+                                        <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color" />
+                                        <p class="mt-6 mb-0">Drag and drop files to here to upload.</p>
                                     </div>
                                 </template>
                             </FileUpload>
