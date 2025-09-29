@@ -1,6 +1,6 @@
-import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step1DeliveryInfo/deliveryInfo.vue';
-import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step2SelectPO/selectPO.vue';
-import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step3VerifyItem/verifyItem.vue';
+import SelectPO from '@/views/delivery/components/deliveryWorkFlow/step1SelectPO/selectPO.vue';
+import VerifyItem from '@/views/delivery/components/deliveryWorkFlow/step2VerifyItem/verifyItem.vue';
+import DeliveryInfo from '@/views/delivery/components/deliveryWorkFlow/step3DeliveryInfo/deliveryInfo.vue';
 import Review from '@/views/delivery/components/deliveryWorkFlow/step4Review/review.vue';
 import { computed, defineComponent, ref } from 'vue';
 
@@ -39,19 +39,19 @@ export default defineComponent({
         // ---------------------------
         const handleStep1Update = (data: any) => {
             console.log('Step 1 data received in update', data);
-            deliveryData.value.deliveryInfo = data;
+            deliveryData.value.selectPO = data;
             activeStep.value = 2;
         };
 
         const handleStep2Update = (data: any) => {
             console.log('Step 2 data received in update', data);
-            deliveryData.value.selectPO = data;
+            deliveryData.value.verifyItem = data;
             activeStep.value = 3;
         };
 
         const handleStep3Update = (data: any) => {
             console.log('Step 3 data received in update', data);
-            deliveryData.value.verifyItem = data;
+            deliveryData.value.deliveryInfo = data;
             activeStep.value = 4;
         };
 

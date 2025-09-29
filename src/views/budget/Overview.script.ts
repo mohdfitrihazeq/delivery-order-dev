@@ -14,9 +14,9 @@ export default defineComponent({
         // 1. DATA (constants, refs)
         // ---------------------------
         const BudgetSummaryData: CardItem[] = [
-            { title: 'Total Budget', value: '$1800000', description: '', icon: 'pi pi-dollar', color: 'orange' },
-            { title: 'Total Items', value: '14', description: '', icon: 'pi pi-database', color: 'green' },
-            { title: 'Location', value: '4', description: '', icon: 'pi pi-building', color: 'blue' }
+            { title: 'Total Budget', value: '$1800000', description: '24 new since last visit', icon: 'pi pi-dollar', color: 'orange' },
+            { title: 'Total Items', value: '14', description: '5 Delivered', icon: 'pi pi-database', color: 'green' },
+            { title: 'Location', value: '4', description: 'Upload 10 Location', icon: 'pi pi-building', color: 'blue' }
         ];
 
         const pieData = ref<any>(null);
@@ -25,99 +25,31 @@ export default defineComponent({
         type ChartData = { categories: string[]; series: number[]; drillMap?: Record<string, ChartData> };
         const dataMap: Record<string, ChartData> = {
             root: {
-                categories: ['Labour', 'Material', 'Total Cost'],
-                series: [120, 90, 150],
+                categories: ['Concrete', 'Steel', 'Bricks'],
+                series: [60, 20, 10],
                 drillMap: {
-                    Labour: {
-                        categories: ['Skilled', 'Unskilled', 'Supervision'],
-                        series: [50, 40, 30],
+                    Concrete: {
+                        categories: ['Grade A', 'Grade B'],
+                        series: [40, 20],
                         drillMap: {
-                            Skilled: {
-                                categories: ['Plastering', 'Carpentry', 'Electrical'],
-                                series: [20, 15, 15],
-                                drillMap: {
-                                    Plastering: { categories: ['Wall', 'Ceiling'], series: [10, 10] },
-                                    Carpentry: { categories: ['Doors', 'Windows'], series: [8, 7] },
-                                    Electrical: { categories: ['Wiring', 'Lighting'], series: [10, 5] }
-                                }
-                            },
-                            Unskilled: {
-                                categories: ['Labour A', 'Labour B'],
-                                series: [25, 15],
-                                drillMap: {
-                                    'Labour A': { categories: ['Task 1', 'Task 2'], series: [12, 13] },
-                                    'Labour B': { categories: ['Task 3', 'Task 4'], series: [8, 7] }
-                                }
-                            },
-                            Supervision: {
-                                categories: ['Site Engineer', 'Foreman'],
-                                series: [10, 20],
-                                drillMap: {
-                                    'Site Engineer': { categories: ['Inspection', 'Planning'], series: [5, 5] },
-                                    Foreman: { categories: ['Schedule', 'Quality Check'], series: [10, 10] }
-                                }
-                            }
+                            'Grade A': { categories: ['Mix 1', 'Mix 2'], series: [20, 20] },
+                            'Grade B': { categories: ['Mix 3', 'Mix 4'], series: [10, 10] }
                         }
                     },
-                    Material: {
-                        categories: ['Concrete', 'Steel', 'Bricks'],
-                        series: [60, 20, 10],
+                    Steel: {
+                        categories: ['Rebar', 'Structural'],
+                        series: [10, 10],
                         drillMap: {
-                            Concrete: {
-                                categories: ['Grade A', 'Grade B'],
-                                series: [40, 20],
-                                drillMap: {
-                                    'Grade A': { categories: ['Mix 1', 'Mix 2'], series: [20, 20] },
-                                    'Grade B': { categories: ['Mix 3', 'Mix 4'], series: [10, 10] }
-                                }
-                            },
-                            Steel: {
-                                categories: ['Rebar', 'Structural'],
-                                series: [10, 10],
-                                drillMap: {
-                                    Rebar: { categories: ['Type 1', 'Type 2'], series: [5, 5] },
-                                    Structural: { categories: ['Beam', 'Column'], series: [5, 5] }
-                                }
-                            },
-                            Bricks: {
-                                categories: ['Red Bricks', 'Fly Ash Bricks'],
-                                series: [5, 5],
-                                drillMap: {
-                                    'Red Bricks': { categories: ['Size 1', 'Size 2'], series: [2, 3] },
-                                    'Fly Ash Bricks': { categories: ['Size 3', 'Size 4'], series: [2, 3] }
-                                }
-                            }
+                            Rebar: { categories: ['Type 1', 'Type 2'], series: [5, 5] },
+                            Structural: { categories: ['Beam', 'Column'], series: [5, 5] }
                         }
                     },
-                    'Total Cost': {
-                        categories: ['Labour Cost', 'Material Cost', 'Other Cost'],
-                        series: [100, 120, 30],
+                    Bricks: {
+                        categories: ['Red Bricks', 'Fly Ash Bricks'],
+                        series: [5, 5],
                         drillMap: {
-                            'Labour Cost': {
-                                categories: ['Overtime', 'Regular'],
-                                series: [60, 40],
-                                drillMap: {
-                                    Overtime: { categories: ['Weekday', 'Weekend'], series: [30, 30] },
-                                    Regular: { categories: ['Weekday', 'Weekend'], series: [20, 20] }
-                                }
-                            },
-                            'Material Cost': {
-                                categories: ['Cement', 'Steel', 'Bricks'],
-                                series: [50, 40, 30],
-                                drillMap: {
-                                    Cement: { categories: ['Type A', 'Type B'], series: [25, 25] },
-                                    Steel: { categories: ['Type 1', 'Type 2'], series: [20, 20] },
-                                    Bricks: { categories: ['Type X', 'Type Y'], series: [15, 15] }
-                                }
-                            },
-                            'Other Cost': {
-                                categories: ['Transport', 'Misc'],
-                                series: [20, 10],
-                                drillMap: {
-                                    Transport: { categories: ['Truck', 'Van'], series: [10, 10] },
-                                    Misc: { categories: ['Permit', 'Other'], series: [5, 5] }
-                                }
-                            }
+                            'Red Bricks': { categories: ['Size 1', 'Size 2'], series: [2, 3] },
+                            'Fly Ash Bricks': { categories: ['Size 3', 'Size 4'], series: [2, 3] }
                         }
                     }
                 }
@@ -158,9 +90,9 @@ export default defineComponent({
         // 2. COMPUTED
         // ---------------------------
         const breadcrumbTitle = computed(() => {
-            const levelNames = ['Category', 'Element', '1sd Element', '2nd Sub Element'];
+            const levelNames = ['Element', '1st Sub Element', '2nd Sub Element'];
             const currentLevel = path.value.length;
-            if (currentLevel === 0) return 'Budget by Work Type';
+            if (currentLevel === 0) return 'Budget by Cost Centre (Material)';
             const name = path.value[currentLevel - 1];
             return `Budget by ${levelNames[currentLevel - 1]} (${name})`;
         });
