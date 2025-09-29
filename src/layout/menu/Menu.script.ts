@@ -26,7 +26,7 @@ export default defineComponent({
                             {
                                 label: 'Budget Change Request',
                                 icon: 'pi pi-fw pi-tags',
-                                to: '/'
+                                to: '/bcr'
                             }
                         ]
                     },

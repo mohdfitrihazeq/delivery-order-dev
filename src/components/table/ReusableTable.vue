@@ -30,7 +30,7 @@ const props = defineProps<{
     onImportFile?: () => void;
     onRefresh?: () => void;
     onExport?: () => void;
-    onActionClick?: (type: 'edit' | 'view' | 'delete', rowData: any) => void;
+    onActionClick?: (type: 'edit' | 'view' | 'delete' | 'comment', rowData: any) => void;
     emptyTitle?: string;
     extraFilters?: FilterOption[];
     onFilterChange?: (filters: Record<string, any>) => void;
@@ -79,14 +79,14 @@ const menu = ref();
 const currentRow = ref<any>(null);
 const menuItems = ref<any[]>([]);
 
-function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')[]) {
+function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete' | 'comment')[]) {
     if (!actions) return;
 
     currentRow.value = row;
 
     menuItems.value = actions.map((actionType) => ({
         label: actionType.charAt(0).toUpperCase() + actionType.slice(1),
-        icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : 'pi pi-trash',
+        icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : actionType === 'delete' ? 'pi pi-trash' : 'pi pi-comment',
         command: () => props.onActionClick?.(actionType, currentRow.value)
     }));
 
@@ -151,7 +151,7 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete')
         tableStyle="min-width: 50rem"
         paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        class="overflow-hidden dark:text-white"
+        :class="['overflow-hidden dark:text-white', !props.onSearch && !props.extraFilters?.length && !props.showCreate && !props.showImportFile ? 'mt-9' : '']"
     >
         <template #paginatorstart> </template>
 
