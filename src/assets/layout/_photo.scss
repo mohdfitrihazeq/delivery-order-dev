@@ -1,3 +1,10 @@
 .p-fileupload-advanced {
     margin-top: -10px;
 }
+
+.custom-file-upload ::v-deep(.p-button) {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    height: 1.5rem;
+    min-width: 2.5rem;
+}

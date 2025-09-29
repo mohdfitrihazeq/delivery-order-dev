@@ -1,3 +1,4 @@
+```vue
 <script setup lang="ts">
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
@@ -12,6 +13,9 @@ import { ref } from 'vue';
 import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
 import BaseSpinner from '@/components/spinner/BaseSpinner.vue';
 
+// ---------------- Types ----------------
+type ActionType = 'edit' | 'view' | 'delete' | 'comment';
+
 type FilterOption = {
     type: 'select' | 'text' | 'date';
     field: string;
@@ -19,8 +23,14 @@ type FilterOption = {
     options?: { label: string; value: any }[];
 };
 
+interface TableRow {
+    [key: string]: any;
+    actions?: ActionType[]; // ✅ 新逻辑，支持 row-level actions
+}
+
+// ---------------- Props ----------------
 const props = defineProps<{
-    value: any[];
+    value: TableRow[];
     columns: TableColumn[];
     loading?: boolean;
     onSearch?: (value: string) => void;
@@ -30,15 +40,21 @@ const props = defineProps<{
     onImportFile?: () => void;
     onRefresh?: () => void;
     onExport?: () => void;
-    onActionClick?: (type: 'edit' | 'view' | 'delete' | 'comment', rowData: any) => void;
+    onActionClick?: (type: ActionType, rowData: TableRow) => void;
     emptyTitle?: string;
     extraFilters?: FilterOption[];
     onFilterChange?: (filters: Record<string, any>) => void;
 }>();
 
+// ---------------- State ----------------
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
 
+const menu = ref();
+const currentRow = ref<TableRow | null>(null);
+const menuItems = ref<any[]>([]);
+
+// ---------------- Handlers ----------------
 function handleSearch() {
     props.onSearch?.(search.value);
 }
@@ -64,7 +80,9 @@ function handleExport() {
     );
 
     const csvContent = [columns.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+    });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
@@ -75,19 +93,18 @@ function handleExport() {
     document.body.removeChild(link);
 }
 
-const menu = ref();
-const currentRow = ref<any>(null);
-const menuItems = ref<any[]>([]);
-
-function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete' | 'comment')[]) {
-    if (!actions) return;
+// ---------------- Actions Menu ----------------
+function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
+    // ✅ row.actions 优先，其次 fallback 到 column.actions
+    const actions: ActionType[] = row.actions || defaultActions || [];
+    if (!actions.length) return;
 
     currentRow.value = row;
 
     menuItems.value = actions.map((actionType) => ({
         label: actionType.charAt(0).toUpperCase() + actionType.slice(1),
         icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : actionType === 'delete' ? 'pi pi-trash' : 'pi pi-comment',
-        command: () => props.onActionClick?.(actionType, currentRow.value)
+        command: () => props.onActionClick?.(actionType, currentRow.value!)
     }));
 
     menu.value.toggle(event);
@@ -153,9 +170,10 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete' 
         currentPageReportTemplate="{first} to {last} of {totalRecords}"
         :class="['overflow-hidden dark:text-white', !props.onSearch && !props.extraFilters?.length && !props.showCreate && !props.showImportFile ? 'mt-9' : '']"
     >
-        <template #paginatorstart> </template>
+        <template #paginatorstart></template>
 
         <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <!-- 自定义 body slot -->
             <template v-if="col.bodySlot && !col.action" #body="slotProps">
                 <slot :name="col.bodySlot" :data="slotProps.data" />
             </template>
@@ -175,3 +193,4 @@ function openMenu(event: Event, row: any, actions?: ('edit' | 'view' | 'delete' 
 
     <Menu ref="menu" :model="menuItems" popup />
 </template>
+```

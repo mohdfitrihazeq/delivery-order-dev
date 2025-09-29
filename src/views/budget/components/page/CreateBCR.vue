@@ -12,9 +12,9 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <Button label="Cancel" @click="$router.push('/request-orders')" outlined />
+                    <Button label="Cancel" @click="$router.push('/bcr')" outlined />
                     <Button label="Save as Draft" severity="secondary" outlined />
-                    <Button label="Submit Request Order" :disabled="!isAttachmentValid" />
+                    <Button label="Submit Request" :disabled="!isAttachmentValid" />
                 </div>
             </div>
 
@@ -148,7 +148,6 @@
 
                         <div class="pt-3 mt-2 border-t text-sm text-gray-600 flex justify-between">
                             <span>{{ items.length }} {{ items.length > 1 ? 'items' : 'item' }}</span>
-                            <span class="font-semibold text-gray-600">Total Variance Amount: 0.00</span>
                         </div>
                     </Motion>
                 </div>

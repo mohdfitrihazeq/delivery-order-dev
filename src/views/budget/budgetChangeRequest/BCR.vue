@@ -40,11 +40,7 @@
                 </template>
             </ReusableTable>
 
-            <!-- View Modal -->
-            <!-- <ViewBCR v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" /> -->
-
-            <!-- Edit Modal -->
-            <!-- <EditBCR v-model:visible="showEditModal" :order="selectedOrder" @save="handleSaveOrder" /> -->
+            <CommentBCR v-model:visible="showCommentModal" :requestNo="selectedRequestNo" @submit="handleCommentSubmit" />
         </div>
     </Motion>
 </template>

@@ -70,6 +70,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: '/bcr/edit/:requestNo',
+                name: 'budgetChangeRequest-edit',
+                component: () => import('@/views/budget/components/page/EditBCR.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }, { label: 'Edit Budget Change Request' }]
+                }
+            },
+            {
                 path: '/deliveries',
                 name: 'deliveries',
                 component: () => import('@/views/delivery/Deliveries.vue'),

@@ -2,12 +2,27 @@ export interface Item {
     itemCode: string;
     description: string;
     uom: string;
-    quantity: string;
-    deliveryDate: Date | null;
-    notes: string;
+    unitPrice: number;
+    budgetQty: number;
+    orderedQty: number;
+    newOrder: number;
+    exceededQty: number;
+    exceededPercent: number;
+    estimatedExceed: number;
+    varianceQty: number;
+    varianceAmount: number;
     remark: string;
+    notes: string;
     showNotes: boolean;
     showRemark: boolean;
+}
+
+export interface DiscussionItem {
+    role: string;
+    name: string;
+    datetime: string;
+    message: string;
+    documentUrl?: string;
 }
 
 export interface ItemOption {
