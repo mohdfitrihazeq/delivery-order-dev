@@ -137,7 +137,7 @@ export default defineComponent({
                 case 'Rejected':
                     return 'danger';
                 case 'Under Review':
-                    return 'warning';
+                    return 'warn';
                 case 'Draft':
                     return 'info';
                 case 'Submitted':

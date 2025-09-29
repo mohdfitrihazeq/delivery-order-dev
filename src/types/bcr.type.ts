@@ -17,7 +17,7 @@ export interface ItemOption {
     uom: string;
 }
 
-export interface BudgetOption {
+export interface ReasonOption {
     label: string;
     value: string;
 }
