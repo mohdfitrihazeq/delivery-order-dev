@@ -3,7 +3,7 @@ import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
 import Menu from 'primevue/menu';
 import { useToast } from 'primevue/usetoast';
-import { ComponentPublicInstance, defineComponent, ref } from 'vue';
+import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
@@ -90,6 +90,7 @@ export default defineComponent({
                 location: '',
                 uom: '',
                 quantity: '1',
+                price: 0,
                 deliveryDate: null,
                 notes: '',
                 remark: '',
@@ -159,6 +160,7 @@ export default defineComponent({
                 deliveryDate: null,
                 notes: '',
                 remark: '',
+                price: budgetItem.price,
                 showNotes: false,
                 showRemark: false
             }));
@@ -228,6 +230,13 @@ export default defineComponent({
             return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
         };
 
+        const grandTotal = computed(() => {
+            return items.value.reduce((sum, item) => {
+                const price = item.price ?? 0;
+                const qty = parseFloat(item.quantity) || 0;
+                return sum + price * qty;
+            }, 0);
+        });
         return {
             roNumber,
             budgetType,
@@ -244,6 +253,7 @@ export default defineComponent({
             getActionItems,
             menuRefs,
             setMenuRef,
+            grandTotal,
             // Modal functionality
             showBulkItemModal,
             openBulkItemModal,

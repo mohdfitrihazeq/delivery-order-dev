@@ -4,6 +4,7 @@ export interface Item {
     location: string;
     uom: string;
     quantity: string;
+    price?: number;
     deliveryDate: Date | null;
     notes: string;
     remark: string;
@@ -32,6 +33,7 @@ export interface BudgetItem {
     itemType: string;
     uom: string;
     quantity: number;
+    price: number;
 }
 
 export interface BudgetItem {

@@ -54,75 +54,82 @@
 
                 <div v-else class="overflow-x-auto">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <table class="min-w-full rounded-lg">
-                            <thead class="text-sm text-gray-600">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Item Code</th>
-                                    <th class="px-3 py-2 text-left">Description</th>
-                                    <th class="px-3 py-2 text-left">Location</th>
-                                    <th class="px-3 py-2 text-left">UOM</th>
-                                    <th class="px-3 py-2 text-left">Quantity</th>
-                                    <th class="px-3 py-2 text-left">Delivery Date</th>
-                                    <th class="px-3 py-2 text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template v-for="(item, index) in items" :key="index">
-                                    <!-- Main row -->
-                                    <tr class="border-t align-top">
-                                        <td class="px-3 py-2">
-                                            <Dropdown v-model="item.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(item)">
-                                                <template #option="slotProps">
-                                                    <div class="flex flex-col">
-                                                        <span class="font-medium">{{ slotProps.option.label }}</span>
-                                                        <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
-                                                    </div>
-                                                </template>
-                                                <template #value="slotProps">
-                                                    <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
-                                                    <span v-else class="text-gray-400">Select item...</span>
-                                                </template>
-                                            </Dropdown>
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.description" placeholder="Description" class="w-full" disabled />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.location" placeholder="Location" class="w-full" disabled />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.uom" placeholder="Unit" class="w-full" disabled />
-                                        </td>
-
-                                        <td class="px-1 py-1">
-                                            <InputText v-model="item.quantity" type="number" placeholder="Qty" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <DatePicker v-model="item.deliveryDate" placeholder="mm/dd/yyyy" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2 text-center">
-                                            <Button icon="pi pi-ellipsis-v" class="p-button-text" @click="toggleMenu($event, index)" />
-                                            <Menu :model="getActionItems(item, index)" :popup="true" :ref="(el: any) => setMenuRef(el, index)" />
-                                        </td>
-                                    </tr>
-
-                                    <!-- Notes row immediately after the main row -->
-                                    <tr>
-                                        <td colspan="6" class="px-3 py-2">
-                                            <div v-if="item.showNotes" class="mb-2">
-                                                <label class="block text-sm text-gray-600 mb-1">Notes</label>
-                                                <Textarea v-model="item.notes" rows="2" class="w-full" />
+                        <DataTable :value="items" class="rounded-lg" scrollable scrollHeight="400px">
+                            <Column field="itemCode" header="Item Code" style="min-width: 120px; width: 20%">
+                                <template #body="{ data }">
+                                    <Dropdown v-model="data.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(data)">
+                                        <template #option="slotProps">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium">{{ slotProps.option.label }}</span>
+                                                <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </template>
+                                        <template #value="slotProps">
+                                            <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
+                                            <span v-else class="text-gray-400">Select item...</span>
+                                        </template>
+                                    </Dropdown>
                                 </template>
-                            </tbody>
-                        </table>
+                            </Column>
+
+                            <Column field="description" header="Description" style="min-width: 200px; width: 25%">
+                                <template #body="{ data }">
+                                    <div class="px-2">{{ data.description }}</div>
+                                </template>
+                            </Column>
+
+                            <Column field="location" header="Location" style="min-width: 150px; width: 18%">
+                                <template #body="{ data }">
+                                    <div class="px-2">{{ data.location }}</div>
+                                </template>
+                            </Column>
+
+                            <Column field="uom" header="UOM" style="min-width: 70px; width: 70px">
+                                <template #body="{ data }">
+                                    <div class="text-center">{{ data.uom }}</div>
+                                </template>
+                            </Column>
+
+                            <Column field="quantity" header="Quantity" style="min-width: 140px; width: 10% !important">
+                                <template #body="{ data }">
+                                    <InputNumber v-model.number="data.quantity" class="w-full" :min="0" />
+                                </template>
+                            </Column>
+
+                            <Column field="price" header="Price" style="min-width: 140px; width: 10% !important">
+                                <template #body="{ data }">
+                                    <InputNumber v-model="data.price" mode="currency" currency="MYR" locale="en-MY" class="w-full" :minFractionDigits="2" />
+                                </template>
+                            </Column>
+
+                            <Column header="Total" style="min-width: 130px; width: 130px; text-align: right">
+                                <template #body="{ data }">
+                                    <span class="font-semibold pr-2">
+                                        {{
+                                            ((data.price ?? 0) * (data.quantity ?? 0)).toLocaleString('en-MY', {
+                                                style: 'currency',
+                                                currency: 'MYR'
+                                            })
+                                        }}
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
+                                <template #body="{ data }">
+                                    <DatePicker v-model="data.deliveryDate" placeholder="mm/dd/yyyy" dateFormat="mm/dd/yy" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <Column header="Action" style="min-width: 60px; width: 60px; text-align: center">
+                                <template #body="{ data, index }">
+                                    <Button icon="pi pi-ellipsis-v" text @click="toggleMenu($event, index)" />
+                                    <Menu :model="getActionItems(data, index)" :popup="true" :ref="(el: any) => setMenuRef(el, index)" />
+                                </template>
+                            </Column>
+                        </DataTable>
+
+                        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
 
                         <!-- Overall Attachments -->
                         <div class="mt-4">
@@ -206,3 +213,13 @@
         <CreateROModal v-model:visible="showBulkItemModal" @items-selected="handleSelectedItems" />
     </Motion>
 </template>
+<style scoped>
+/* Tighten InputNumber width */
+:deep(.p-inputnumber) {
+    max-width: 100%;
+}
+
+:deep(.p-inputnumber-input) {
+    width: 100% !important;
+}
+</style>
