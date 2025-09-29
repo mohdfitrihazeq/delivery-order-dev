@@ -59,6 +59,7 @@
                                 <tr>
                                     <th class="px-3 py-2 text-left">Item Code</th>
                                     <th class="px-3 py-2 text-left">Description</th>
+                                    <th class="px-3 py-2 text-left">Location</th>
                                     <th class="px-3 py-2 text-left">UOM</th>
                                     <th class="px-3 py-2 text-left">Quantity</th>
                                     <th class="px-3 py-2 text-left">Delivery Date</th>
@@ -86,6 +87,10 @@
 
                                         <td class="px-3 py-2">
                                             <InputText v-model="item.description" placeholder="Description" class="w-full" disabled />
+                                        </td>
+
+                                        <td class="px-3 py-2">
+                                            <InputText v-model="item.location" placeholder="Location" class="w-full" disabled />
                                         </td>
 
                                         <td class="px-3 py-2">

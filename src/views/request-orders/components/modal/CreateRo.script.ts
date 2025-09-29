@@ -105,6 +105,7 @@ export default defineComponent({
                 element: 'Infrastructure > Electrical > Panel',
                 itemType: 'Installation',
                 uom: 'unit',
+
                 quantity: 24
             }
         ]);

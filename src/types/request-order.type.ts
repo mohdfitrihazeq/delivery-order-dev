@@ -1,6 +1,7 @@
 export interface Item {
     itemCode: string;
     description: string;
+    location: string;
     uom: string;
     quantity: string;
     deliveryDate: Date | null;
@@ -14,6 +15,7 @@ export interface ItemOption {
     label: string;
     value: string;
     description: string;
+    location: string;
     uom: string;
 }
 

@@ -7,7 +7,7 @@ import { ComponentPublicInstance, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
-import CreateROModal from '../modal/create-ro.vue';
+import CreateROModal from '../modal/CreateRo.vue';
 
 import ProgressBar from 'primevue/progressbar';
 
@@ -35,8 +35,8 @@ export default defineComponent({
 
         const items = ref<Item[]>([]);
         const itemOptions = ref<ItemOption[]>([
-            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
-            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
+            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', location: 'Building A > Level 1-5', uom: 'Ton' },
+            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', location: 'Building B > Level 1-8', uom: 'Bag' }
         ]);
 
         const showBulkItemModal = ref(false);
@@ -87,6 +87,7 @@ export default defineComponent({
             items.value.push({
                 itemCode: '',
                 description: '',
+                location: '',
                 uom: '',
                 quantity: '1',
                 deliveryDate: null,
@@ -102,6 +103,7 @@ export default defineComponent({
             if (selected) {
                 item.description = selected.description;
                 item.uom = selected.uom;
+                item.location = selected.location;
             }
         };
 
@@ -151,6 +153,7 @@ export default defineComponent({
             const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
                 itemCode: budgetItem.itemCode,
                 description: budgetItem.description,
+                location: budgetItem.location,
                 uom: budgetItem.uom,
                 quantity: budgetItem.quantity.toString(),
                 deliveryDate: null,
@@ -169,6 +172,7 @@ export default defineComponent({
                         label: budgetItem.itemCode,
                         value: budgetItem.itemCode,
                         description: budgetItem.description,
+                        location: budgetItem.location,
                         uom: budgetItem.uom
                     });
                 }
