@@ -29,6 +29,18 @@ export default defineComponent({
     },
     emits: ['update:visible', 'items-selected'],
     setup(props, { emit }) {
+        const localVisible = ref(props.visible);
+        watch(
+            () => props.visible,
+            (val) => {
+                localVisible.value = val;
+            }
+        );
+
+        // Emit changes to parent
+        watch(localVisible, (val) => {
+            emit('update:visible', val);
+        });
         const modalTitle = ref('Add Bulk Items from Budget');
         const loading = ref(false);
 
@@ -222,6 +234,7 @@ export default defineComponent({
             selectedItems,
             selectAll,
             budgetItems,
+            localVisible,
 
             // Computed
             locationOptions,

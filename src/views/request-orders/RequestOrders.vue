@@ -20,77 +20,44 @@
                 <BaseTab v-model="activeTab" :tabs="tabItems">
                     <template #default="{ activeTab }">
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
-                            <RoTable :orders="filteredOrders" :getStatusSeverity="getStatusSeverity" :activeTab="activeTab" :isPurchasingRole="isPurchasingRole" @view="openOrderDetails" @approve="approveOrder" @reject="rejectOrder" />
+                            <ReusableTable
+                                :value="filteredOrders"
+                                :columns="tableColumns"
+                                :loading="false"
+                                :showCreate="false"
+                                :showImportFile="false"
+                                :onActionClick="handleActionClick"
+                                :extraFilters="tableFilters"
+                                :onFilterChange="handleFilterChange"
+                                emptyTitle="No request orders found"
+                            >
+                                <!-- Status Badge Slot -->
+                                <template #status="{ data }">
+                                    <Badge :value="data.status" :severity="getStatusSeverity(data.status)" />
+                                </template>
+
+                                <!-- Budget Type Slot -->
+                                <template #budgetType="{ data }">
+                                    <span class="px-2 py-1 rounded text-xs" :class="data.budgetType === 'Budgeted' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'">
+                                        {{ data.budgetType }}
+                                    </span>
+                                </template>
+
+                                <!-- Total Amount Slot -->
+                                <template #totalAmount="{ data }">
+                                    <span class="font-semibold">RM {{ Number(data.totalAmount).toLocaleString() }}</span>
+                                </template>
+                            </ReusableTable>
                         </Motion>
                     </template>
                 </BaseTab>
             </div>
 
-            <!-- Details Modal -->
-            <Dialog v-model:visible="showDetailsModal" modal header="Request Order Details" class="w-11/12 md:w-2/3">
-                <div v-if="selectedOrder">
-                    <h2 class="text-lg font-bold mb-4">Request Order - {{ selectedOrder.roNumber }}</h2>
+            <!-- View Modal -->
+            <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
 
-                    <div class="grid grid-cols-2 gap-4 text-sm mb-6">
-                        <div>
-                            <p class="font-semibold">Status</p>
-                            <p>{{ selectedOrder.status }}</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Requested At</p>
-                            <p>{{ selectedOrder.requestedAt }}</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Requested By</p>
-                            <p>{{ selectedOrder.requestedBy }}</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Budget Type</p>
-                            <p>{{ selectedOrder.budgetType }}</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">RO Date</p>
-                            <p>{{ selectedOrder.roDate }}</p>
-                        </div>
-                    </div>
-
-                    <h3 class="font-semibold mb-2">Requested Items</h3>
-                    <table class="w-full border text-sm">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="p-2 text-left">Item Code</th>
-                                <th class="p-2 text-left">Description</th>
-                                <th class="p-2 text-left">UOM</th>
-                                <th class="p-2 text-left">Order Qty</th>
-                                <th class="p-2 text-left">Delivery Date</th>
-                                <th class="p-2 text-left">Note</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, idx) in selectedOrder.items" :key="idx">
-                                <td class="p-2">{{ item.code }}</td>
-                                <td class="p-2">{{ item.description }}</td>
-                                <td class="p-2">{{ item.uom }}</td>
-                                <td class="p-2">{{ item.qty }}</td>
-                                <td class="p-2">{{ item.deliveryDate }}</td>
-                                <td class="p-2">{{ item.note }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <template v-if="isPurchasingRole && selectedOrder?.status === 'Pending'">
-                            <Button label="Reject Request" severity="danger" outlined icon="pi pi-times" @click="rejectOrder()" />
-                            <Button label="Approve Request" severity="success" icon="pi pi-check" @click="approveOrder()" />
-                        </template>
-                        <template v-else>
-                            <Button label="Close" severity="secondary" icon="pi pi-times" @click="showDetailsModal = false" />
-                        </template>
-                    </div>
-                </template>
-            </Dialog>
+            <!-- Edit Modal -->
+            <EditRo v-model:visible="showEditModal" :order="selectedOrder" @save="handleSaveOrder" />
         </div>
     </Motion>
 </template>
