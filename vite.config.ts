@@ -7,6 +7,7 @@ export default defineConfig(async () => {
     const { PrimeVueResolver } = await import('@primevue/auto-import-resolver');
 
     return {
+        base: "/delivery-order-dev/",
         plugins: [
             vue(),
             Components({
