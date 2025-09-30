@@ -1,11 +1,10 @@
 import type { DiscussionItem, Item, ItemOption, ReasonOption } from '@/types/bcr.type';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
-import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
     name: 'EditBCR',
-    components: { Motion, DiscussionThread },
+    components: { DiscussionThread },
     setup() {
         const router = useRouter();
         const route = useRoute();
