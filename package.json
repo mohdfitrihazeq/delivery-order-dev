@@ -13,6 +13,7 @@
         "@primeuix/themes": "^1.0.0",
         "@primevue/forms": "^4.3.9",
         "@primevue/themes": "^4.3.9",
+        "axios": "^1.12.2",
         "chart.js": "^3.9.1",
         "highcharts": "^12.4.0",
         "highcharts-vue": "^2.0.1",
@@ -29,6 +30,7 @@
     "devDependencies": {
         "@primevue/auto-import-resolver": "^4.3.1",
         "@rushstack/eslint-patch": "^1.8.0",
+        "@types/axios": "^0.9.36",
         "@types/node": "^24.3.1",
         "@typescript-eslint/eslint-plugin": "^8.43.0",
         "@typescript-eslint/parser": "^8.43.0",

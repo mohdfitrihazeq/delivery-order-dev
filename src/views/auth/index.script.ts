@@ -1,8 +1,10 @@
+import { authService } from '@/service/Auth.service';
 import { animate } from '@motionone/dom';
 import { onMounted, ref } from 'vue';
 
 export const isAuthenticated = ref(false);
 export const currentUser = ref<{ username: string; role: string } | null>(null);
+
 export function useLoginCardAnimation() {
     const loginCard = ref<HTMLElement | null>(null);
 
@@ -25,32 +27,36 @@ export function useLoginCardAnimation() {
     return { loginCard };
 }
 
-// mock users (temporary, replace with API later)
-export const mockUsers = [
-    { username: 'pm_user', password: 'pm123', role: 'PM' },
-    { username: 'site_user', password: 'site123', role: 'Site' },
-    { username: 'purchasing_user', password: 'purchase123', role: 'Purchasing' }
-];
-
+// 初始化用户状态
 const storedUser = localStorage.getItem('user');
 if (storedUser) {
     currentUser.value = JSON.parse(storedUser);
     isAuthenticated.value = true;
 }
 
-export function login(username: string, password: string) {
-    const user = mockUsers.find((u) => u.username === username && u.password === password);
-    if (user) {
-        const userData = { username: user.username, role: user.role };
-        localStorage.setItem('user', JSON.stringify(userData));
-        currentUser.value = userData;
-        isAuthenticated.value = true;
-        return { success: true, role: user.role };
+// ✅ login 直接 call service
+export async function login(username: string, password: string) {
+    const response = await authService.login(username, password);
+
+    if (!response) {
+        return { success: false };
     }
-    return { success: false, message: 'Invalid username or password' };
+
+    console.log('response', response);
+
+    // const { token, user } = response;
+
+    // localStorage.setItem('token', token);
+    // localStorage.setItem('user', JSON.stringify(user));
+
+    //currentUser.value = user;
+    isAuthenticated.value = true;
+
+    // return { success: true, role: user.role };
 }
 
 export function logout() {
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     currentUser.value = null;
     isAuthenticated.value = false;
