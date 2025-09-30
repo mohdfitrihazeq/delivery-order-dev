@@ -6,6 +6,7 @@ import Badge from 'primevue/badge';
 import { computed, defineComponent, ref } from 'vue';
 import type { Order } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
+import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
 
@@ -18,9 +19,12 @@ export default defineComponent({
         RoSummary,
         ViewRo,
         EditRo,
-        Badge
+        Badge,
+        ViewDraftRo
     },
     setup() {
+        const draftCount = ref(0);
+        const showDraftModal = ref(false);
         const user = localStorage.getItem('user');
         let userRole = '';
         if (user) {
@@ -331,7 +335,9 @@ export default defineComponent({
             handleActionClick,
             handleFilterChange,
             open,
-            close
+            close,
+            showDraftModal,
+            draftCount
         };
     }
 });

@@ -3,11 +3,11 @@ import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
 import Menu from 'primevue/menu';
 import { useToast } from 'primevue/usetoast';
-import { ComponentPublicInstance, defineComponent, ref } from 'vue';
+import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
-import CreateROModal from '../modal/create-ro.vue';
+import CreateROModal from '../modal/CreateRo.vue';
 
 import ProgressBar from 'primevue/progressbar';
 
@@ -35,8 +35,8 @@ export default defineComponent({
 
         const items = ref<Item[]>([]);
         const itemOptions = ref<ItemOption[]>([
-            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
-            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
+            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', location: 'Building A > Level 1-5', uom: 'Ton' },
+            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', location: 'Building B > Level 1-8', uom: 'Bag' }
         ]);
 
         const showBulkItemModal = ref(false);
@@ -87,8 +87,10 @@ export default defineComponent({
             items.value.push({
                 itemCode: '',
                 description: '',
+                location: '',
                 uom: '',
                 quantity: '1',
+                price: 0,
                 deliveryDate: null,
                 notes: '',
                 remark: '',
@@ -102,6 +104,7 @@ export default defineComponent({
             if (selected) {
                 item.description = selected.description;
                 item.uom = selected.uom;
+                item.location = selected.location;
             }
         };
 
@@ -151,11 +154,13 @@ export default defineComponent({
             const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
                 itemCode: budgetItem.itemCode,
                 description: budgetItem.description,
+                location: budgetItem.location,
                 uom: budgetItem.uom,
                 quantity: budgetItem.quantity.toString(),
                 deliveryDate: null,
                 notes: '',
                 remark: '',
+                price: budgetItem.price,
                 showNotes: false,
                 showRemark: false
             }));
@@ -169,6 +174,7 @@ export default defineComponent({
                         label: budgetItem.itemCode,
                         value: budgetItem.itemCode,
                         description: budgetItem.description,
+                        location: budgetItem.location,
                         uom: budgetItem.uom
                     });
                 }
@@ -224,6 +230,13 @@ export default defineComponent({
             return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
         };
 
+        const grandTotal = computed(() => {
+            return items.value.reduce((sum, item) => {
+                const price = item.price ?? 0;
+                const qty = parseFloat(item.quantity) || 0;
+                return sum + price * qty;
+            }, 0);
+        });
         return {
             roNumber,
             budgetType,
@@ -240,6 +253,7 @@ export default defineComponent({
             getActionItems,
             menuRefs,
             setMenuRef,
+            grandTotal,
             // Modal functionality
             showBulkItemModal,
             openBulkItemModal,

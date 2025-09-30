@@ -33,6 +33,7 @@ declare module 'vue' {
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
+    OverlayBadge: typeof import('primevue/overlaybadge')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']

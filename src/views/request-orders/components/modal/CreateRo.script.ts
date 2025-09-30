@@ -60,7 +60,8 @@ export default defineComponent({
                 element: 'Structure > Foundation > Reinforcement',
                 itemType: 'Materials',
                 uom: 'kg',
-                quantity: 2500
+                quantity: 2500,
+                price: 5.5
             },
             {
                 itemCode: 'CON-002',
@@ -69,7 +70,8 @@ export default defineComponent({
                 element: 'Structure > Foundation > Concrete',
                 itemType: 'Materials',
                 uom: 'm³',
-                quantity: 180
+                quantity: 180,
+                price: 250
             },
             {
                 itemCode: 'LAB-001',
@@ -78,7 +80,8 @@ export default defineComponent({
                 element: 'Earthworks > Excavation > Manual',
                 itemType: 'Labour',
                 uom: 'm³',
-                quantity: 450
+                quantity: 450,
+                price: 40
             },
             {
                 itemCode: 'STL-002',
@@ -87,7 +90,8 @@ export default defineComponent({
                 element: 'Structure > Columns > Steel Beams',
                 itemType: 'Materials',
                 uom: 'kg',
-                quantity: 1800
+                quantity: 1800,
+                price: 6
             },
             {
                 itemCode: 'EQP-001',
@@ -96,7 +100,8 @@ export default defineComponent({
                 element: 'Equipment > Lifting > Tower Crane',
                 itemType: 'Equipment',
                 uom: 'month',
-                quantity: 12
+                quantity: 12,
+                price: 15000
             },
             {
                 itemCode: 'INS-001',
@@ -105,9 +110,11 @@ export default defineComponent({
                 element: 'Infrastructure > Electrical > Panel',
                 itemType: 'Installation',
                 uom: 'unit',
-                quantity: 24
+                quantity: 24,
+                price: 1200
             }
         ]);
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0));
 
         const locationOptions = computed<FilterOption[]>(() => {
             const locations = [...new Set(budgetItems.value.map((item) => item.location))];
@@ -235,6 +242,7 @@ export default defineComponent({
             selectAll,
             budgetItems,
             localVisible,
+            grandTotal,
 
             // Computed
             locationOptions,
