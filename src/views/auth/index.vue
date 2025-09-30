@@ -52,7 +52,7 @@ const selectedDetails = computed(() => {
                 <h1 class="text-2xl font-bold text-center mb-1 bg-gradient-to-r from-cyan-700 to-blue-400 bg-clip-text text-transparent">DO SYSTEM</h1>
                 <p class="text-center text-gray-500 mb-6">Delivery order management system</p>
                 <!-- Demo Accounts Dropdown -->
-                <div class="mt-8 border rounded-lg bg-gray-50 p-4 text-sm text-gray-700 mb-6">
+                <div class="mt-3 border rounded-lg bg-gray-50 p-4 text-sm text-gray-700 mb-6">
                     <p class="font-semibold mb-4 text-center text-blue-600">Demo Accounts</p>
                     <Dropdown v-model="selectedDemo" :options="demoAccounts" optionLabel="role" placeholder="Select a role" class="w-full" />
                     <p class="mt-3 text-center text-gray-700">
