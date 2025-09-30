@@ -1,4 +1,4 @@
-<script lang="ts" src="./create-ro.script.ts"></script>
+<script lang="ts" src="./CreateRo.script.ts"></script>
 
 <template>
     <Dialog v-model:visible="localVisible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal" class="create-ro-modal">
@@ -18,7 +18,6 @@
                 <!-- Search -->
                 <div class="flex-1">
                     <div class="p-input-icon-left w-full">
-                        <i class="pi pi-search" />
                         <InputText v-model="searchTerm" placeholder="Search by item code or description..." class="w-full" />
                     </div>
                 </div>
@@ -54,14 +53,14 @@
         <!-- Items Table -->
         <div class="border border-gray-200 rounded-lg overflow-hidden mb-4">
             <DataTable :value="filteredItems" v-model:selection="selectedItems" data-key="itemCode" :scrollable="true" scroll-height="400px" class="w-full" :loading="loading">
-                <template #header>
+                <!-- <template #header>
                     <div class="flex items-center justify-between p-3 bg-gray-50 border-b">
                         <div class="flex items-center gap-2">
                             <Checkbox v-model="selectAll" :binary="true" @change="toggleSelectAll" />
                             <span class="font-medium">Select All</span>
                         </div>
                     </div>
-                </template>
+                </template> -->
 
                 <Column selection-mode="multiple" style="width: 3rem" />
 
@@ -101,13 +100,24 @@
                     </template>
                 </Column>
 
-                <Column field="quantity" header="QTY" style="min-width: 100px" class="text-right">
+                <Column field="price" header="Price" style="min-width: 120px" class="text-right">
                     <template #body="slotProps">
-                        <span class="font-medium">{{ slotProps.data.quantity.toLocaleString() }}</span>
+                        <span class="font-medium">
+                            {{ slotProps.data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+                        </span>
+                    </template>
+                </Column>
+
+                <Column header="Total" style="min-width: 150px" class="text-right">
+                    <template #body="slotProps">
+                        <span class="font-bold">
+                            {{ (slotProps.data.price * slotProps.data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+                        </span>
                     </template>
                 </Column>
             </DataTable>
         </div>
+        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
 
         <!-- Footer -->
         <template #footer>

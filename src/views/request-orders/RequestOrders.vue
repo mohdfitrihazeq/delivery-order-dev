@@ -10,9 +10,15 @@
                     <h1 class="text-2xl font-bold">Request Orders</h1>
                     <p class="dark:text-gray-200 text-gray-500">Manage purchase requests for project materials and services</p>
                 </div>
-                <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
+                <div class="flex gap-6">
+                    <div class="relative inline-block">
+                        <Button label="View Drafts" outlined @click="showDraftModal = true" class="pr-8"> </Button>
+                        <Badge v-if="draftCount > 0" :value="draftCount" severity="danger" class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2" />
+                    </div>
+                    <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
+                </div>
             </div>
-
+            <ViewDraftRo v-model:visible="showDraftModal" @update:count="draftCount = $event" />
             <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />
 
             <!-- Tabs -->

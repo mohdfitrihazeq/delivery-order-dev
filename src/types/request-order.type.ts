@@ -1,8 +1,10 @@
 export interface Item {
     itemCode: string;
     description: string;
+    location: string;
     uom: string;
     quantity: string;
+    price?: number;
     deliveryDate: Date | null;
     notes: string;
     remark: string;
@@ -14,6 +16,7 @@ export interface ItemOption {
     label: string;
     value: string;
     description: string;
+    location: string;
     uom: string;
 }
 
@@ -30,6 +33,7 @@ export interface BudgetItem {
     itemType: string;
     uom: string;
     quantity: number;
+    price: number;
 }
 
 export interface BudgetItem {
