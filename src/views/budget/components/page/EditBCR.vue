@@ -44,115 +44,100 @@
 
             <!-- Materials Section -->
             <div class="card p-4 mb-6 shadow">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Materials Section</h3>
-                    <div class="flex items-center gap-4 text-sm">
-                        <span class="font-semibold text-red-600">Total Variance Amount: {{ totalVarianceAmount }}</span>
-                        <Button label="+ Add Material" class="text-sm" @click="addItem" />
-                    </div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Materials</h3>
+                    <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined />
                 </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full rounded-lg border">
+                        <thead class="text-sm text-gray-600 bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-2 text-left">Item Code</th>
+                                <th class="px-3 py-2 text-left">Description</th>
+                                <th class="px-3 py-2 text-left">Units</th>
+                                <th class="px-3 py-2 text-left">Unit Price</th>
+                                <th class="px-3 py-2 text-left">Budgeted Quantity</th>
+                                <th class="px-3 py-2 text-left">Ordered Quantity</th>
+                                <th class="px-3 py-2 text-left">New Order</th>
+                                <th class="px-3 py-2 text-left">Exceeded Quantity</th>
+                                <th class="px-3 py-2 text-left">Exceeded %</th>
+                                <th class="px-3 py-2 text-left">Estimated $ exceed</th>
+                                <th class="px-3 py-2 text-left">Remarks</th>
+                                <th class="px-3 py-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="(item, index) in items" :key="index">
+                                <tr class="border-t align-top">
+                                    <td class="px-3 py-2">
+                                        <Dropdown v-model="item.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(item)">
+                                            <template #option="slotProps">
+                                                <div class="flex flex-col">
+                                                    <span class="font-medium">{{ slotProps.option.label }}</span>
+                                                    <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
+                                                </div>
+                                            </template>
+                                            <template #value="slotProps">
+                                                <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
+                                                <span v-else class="text-gray-400">Select item...</span>
+                                            </template>
+                                        </Dropdown>
+                                    </td>
 
-                <!-- Empty State -->
-                <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500 text-sm">
-                    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <div class="text-center">
-                            <div class="text-5xl mb-2">📦</div>
-                            <p>No material added yet</p>
-                        </div>
-                    </Motion>
-                </div>
+                                    <td class="px-3 py-2">
+                                        <InputText v-model="item.description" placeholder="Description" class="w-full" disabled />
+                                    </td>
 
-                <!-- Table -->
-                <div v-else class="overflow-x-auto">
-                    <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <table class="min-w-full text-sm text-gray-700 rounded-lg border">
-                            <thead class="text-sm font-semibold text-gray-600 bg-gray-50">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Item Code</th>
-                                    <th class="px-3 py-2 text-left">Description</th>
-                                    <th class="px-3 py-2 text-left">Units</th>
-                                    <th class="px-3 py-2 text-left">Unit Price</th>
-                                    <th class="px-3 py-2 text-left">Budgeted Quantity</th>
-                                    <th class="px-3 py-2 text-left">Ordered Quantity</th>
-                                    <th class="px-3 py-2 text-left">New Order</th>
-                                    <th class="px-3 py-2 text-left">Exceeded Quantity</th>
-                                    <th class="px-3 py-2 text-left">Exceeded %</th>
-                                    <th class="px-3 py-2 text-left">Estimated $ exceed</th>
-                                    <th class="px-3 py-2 text-left">Remarks</th>
-                                    <th class="px-3 py-2 text-left">Actions</th>
+                                    <td class="px-3 py-2">
+                                        <InputText v-model="item.uom" placeholder="Unit" class="w-full" disabled />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.unitPrice" placeholder="0.00" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.budgetQty" placeholder="0" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.orderedQty" placeholder="0" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.newOrder" placeholder="0" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.exceededQty" placeholder="0" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.exceededPct" placeholder="0%" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputNumber type="number" v-model="item.estimatedExceed" placeholder="0.00" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2">
+                                        <InputText v-model="item.remark" placeholder="Remark" class="w-full" />
+                                    </td>
+
+                                    <td class="px-3 py-2 text-center">
+                                        <Button icon="pi pi-trash" severity="danger" text @click="items.splice(index, 1)" />
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <template v-for="(item, index) in items" :key="index">
-                                    <tr class="border-t align-top text-sm">
-                                        <td class="px-3 py-2">
-                                            <Dropdown v-model="item.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full text-sm" @change="fillItemDetails(item)">
-                                                <template #option="slotProps">
-                                                    <div class="flex flex-col">
-                                                        <span class="font-medium">{{ slotProps.option.label }}</span>
-                                                        <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
-                                                    </div>
-                                                </template>
-                                                <template #value="slotProps">
-                                                    <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
-                                                    <span v-else class="text-gray-400">Select item...</span>
-                                                </template>
-                                            </Dropdown>
-                                        </td>
-                                        <td class="px-3 py-2"><InputText v-model="item.description" class="w-full text-sm" disabled /></td>
-                                        <td class="px-3 py-2"><InputText v-model="item.uom" class="w-full text-sm" disabled /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.unitPrice" class="w-full text-sm" mode="decimal" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.budgetQty" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.orderedQty" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.newOrder" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.exceededQty" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.exceededPercent" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputNumber v-model="item.estimatedExceed" class="w-full text-sm" :min="0" /></td>
-                                        <td class="px-3 py-2"><InputText v-model="item.remark" class="w-full text-sm" /></td>
-                                        <td class="px-3 py-2 text-center">
-                                            <Button icon="pi pi-trash" severity="danger" text @click="items.splice(index, 1)" />
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-
-                        <div class="pt-3 mt-2 border-t text-sm text-gray-600 flex justify-between">
-                            <span>{{ items.length }} {{ items.length > 1 ? 'items' : 'item' }}</span>
-                        </div>
-                    </Motion>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
+
+                <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
             </div>
 
             <!-- Discussion Thread -->
-            <div class="card p-4 mb-6 shadow">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold flex items-center gap-2"><i class="pi pi-comments"></i> Discussion Thread</h3>
-                    <!-- Add Comment 按钮 -->
-                    <Button label="Add Comment" icon="pi pi-plus" class="p-button-sm" @click="showCommentModal = true" />
-                </div>
-
-                <!-- 讨论列表 -->
-                <div v-for="(item, index) in discussions" :key="index" class="border rounded p-3 bg-gray-50 flex flex-col gap-2 mb-3">
-                    <div class="flex justify-between items-start gap-2 text-sm text-gray-600">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2">
-                                <span class="font-semibold">{{ item.role }}</span>
-                                <span>{{ item.name }}</span>
-                                <span class="text-gray-400">{{ item.datetime }}</span>
-                            </div>
-                            <div class="text-sm text-gray-700 break-words mt-1">
-                                {{ item.message }}
-                            </div>
-                        </div>
-
-                        <Button v-if="item.documentUrl" text class="ml-2 flex-shrink-0 w-auto" tooltip="View Document" style="width: auto"> <i class="pi pi-file"></i> Attachments </Button>
-                    </div>
-                </div>
-
-                <!-- Comment Modal -->
-                <CommentBCR v-model:visible="showCommentModal" :requestNo="selectedRequestNo" @submit="handleCommentSubmit" />
-            </div>
+            <DiscussionThread :discussions="discussionData" :editMode="true" />
         </div>
     </Motion>
 </template>

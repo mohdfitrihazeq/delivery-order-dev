@@ -11,8 +11,8 @@ export interface Item {
     estimatedExceed: number;
     varianceQty: number;
     varianceAmount: number;
-    remark: string;
     notes: string;
+    remark: string;
     showNotes: boolean;
     showRemark: boolean;
 }
@@ -23,6 +23,7 @@ export interface DiscussionItem {
     datetime: string;
     message: string;
     documentUrl?: string;
+    isEditing: boolean;
 }
 
 export interface ItemOption {

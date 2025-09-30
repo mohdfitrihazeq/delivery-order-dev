@@ -137,7 +137,6 @@
                                             <InputText v-model="item.remark" placeholder="Remark" class="w-full" />
                                         </td>
 
-                                        <!-- Actions -->
                                         <td class="px-3 py-2 text-center">
                                             <Button icon="pi pi-trash" severity="danger" text @click="items.splice(index, 1)" />
                                         </td>

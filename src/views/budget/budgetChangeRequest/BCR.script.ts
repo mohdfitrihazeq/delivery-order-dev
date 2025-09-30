@@ -94,6 +94,7 @@ export default defineComponent({
             } else if (type === 'edit') {
                 router.push(`/bcr/edit/${rowData.requestNo}`);
             } else {
+                router.push(`/bcr/view/${rowData.requestNo}`);
             }
         }
 

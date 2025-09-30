@@ -18,7 +18,6 @@ export default defineComponent({
         const files = ref<File[]>([]);
         const toast = useToast();
 
-        // 提交
         function handleSubmit() {
             if (props.requestNo) {
                 emit('submit', props.requestNo, comment.value, files.value);
@@ -28,7 +27,6 @@ export default defineComponent({
             }
         }
 
-        // 文件上传回调
         function onAdvancedUpload() {
             toast.add({
                 severity: 'info',

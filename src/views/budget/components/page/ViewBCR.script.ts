@@ -1,32 +1,19 @@
-import type { DiscussionItem, Item, ItemOption, ReasonOption } from '@/types/bcr.type';
+import type { DiscussionItem, Item } from '@/types/bcr.type';
+import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
 export default defineComponent({
-    name: 'EditBCR',
-    components: { Motion, DiscussionThread },
+    name: 'ViewBCR',
+    components: { Motion, ActivitiesLog, DiscussionThread },
     setup() {
         const router = useRouter();
         const route = useRoute();
         const roNumber = ref<string>((route.params.requestNo as string) || '');
         const requestBy = ref('Jakson');
         const requestDate = ref('29/9/2025');
-
-        const reasonOptions = ref<ReasonOption[]>([
-            { label: 'Exceed Budget', value: 'Exceed Budget' },
-            { label: 'Mockup Remeasurement', value: 'Mockup Remeasurement' },
-            { label: 'QS remeasurement', value: 'QS remeasurement' },
-            { label: 'VO', value: 'VO' },
-            { label: 'Others', value: 'Others' }
-        ]);
-
-        const itemOptions = ref<ItemOption[]>([
-            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
-            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' },
-            { label: 'TIL-03', value: 'TIL-03', description: 'Ceramic floor tiles 600x600mm', uom: 'm²' },
-            { label: 'MAR-04', value: 'MAR-04', description: 'Premium marble slab', uom: 'm²' }
-        ]);
 
         const discussionData = ref<DiscussionItem[]>([
             {
@@ -103,61 +90,28 @@ export default defineComponent({
             }
         ]);
 
-        const addItem = () => {
-            items.value.push({
-                itemCode: '',
-                description: '',
-                uom: '',
-                unitPrice: 0,
-                budgetQty: 0,
-                orderedQty: 0,
-                newOrder: 0,
-                exceededQty: 0,
-                exceededPercent: 0,
-                estimatedExceed: 0,
-                varianceQty: 0,
-                varianceAmount: 0,
-                notes: '',
-                remark: '',
-                showNotes: false,
-                showRemark: false
-            });
-        };
-
-        const fillItemDetails = (item: Item) => {
-            const selected = itemOptions.value.find((opt) => opt.value === item.itemCode);
-            if (selected) {
-                item.description = selected.description;
-                item.uom = selected.uom;
-            }
-        };
-
-        const getItemLabel = (value: string): string => {
-            const selected = itemOptions.value.find((opt) => opt.value === value);
-            return selected ? selected.label : value;
-        };
-
         const totalVarianceAmount = computed(() => {
             return items.value.reduce((sum, item) => sum + (item.varianceAmount || 0), 0);
         });
 
         const isAttachmentValid = ref(true);
-
+        const activeTab = ref('detail');
+        const tabItems = [
+            { label: 'Detail', value: 'detail' },
+            { label: 'Activities Log', value: 'activities' }
+        ];
         return {
             roNumber,
             requestBy,
             requestDate,
-            reasonOptions,
             items,
-            addItem,
-            itemOptions,
-            fillItemDetails,
-            getItemLabel,
             totalVarianceAmount,
             isAttachmentValid,
             goBack: () => router.push({ name: 'bcr' }),
             discussionData,
-            active: ref('0')
+            active: ref('0'),
+            activeTab,
+            tabItems
         };
     }
 });
