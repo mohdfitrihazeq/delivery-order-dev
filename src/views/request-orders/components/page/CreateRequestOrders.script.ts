@@ -2,14 +2,14 @@ import { Motion } from '@motionone/vue';
 import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
 import Menu from 'primevue/menu';
+import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
-import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ComponentPublicInstance, computed, defineComponent, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
-
-import ProgressBar from 'primevue/progressbar';
+import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -17,9 +17,10 @@ type MenuInstance = ComponentPublicInstance & {
 
 export default defineComponent({
     name: 'CreateRequestOrders',
-    components: { Motion, BudgetInfoCard, Menu, CreateROModal, FileUpload, ProgressBar },
+    components: { Motion, BudgetInfoCard, Menu, CreateROModal, PreviewRo, FileUpload, ProgressBar },
     setup() {
         const router = useRouter();
+        const route = useRoute();
         const toast = useToast();
         const $primevue = usePrimeVue();
 
@@ -40,12 +41,41 @@ export default defineComponent({
         ]);
 
         const showBulkItemModal = ref(false);
+        const showPreviewModal = ref(false);
         const menuRefs = ref<(MenuInstance | null)[]>([]);
 
         // File upload states
         const totalSize = ref(0);
         const totalSizePercent = ref(0);
         const files = ref<File[]>([]);
+
+        // Overall remark
+        const overallRemark = ref('');
+
+        const MAX_FILE_SIZE = 1_000_000; // 1 MB in bytes
+        const attachments = ref<File[]>([]);
+        const isAttachmentValid = ref(true);
+
+        // Load draft data if coming from draft modal
+        onMounted(() => {
+            if (route.query.mode === 'edit-draft' && history.state.draftData) {
+                const draft = history.state.draftData;
+                roNumber.value = draft.roNumber;
+                budgetType.value = draft.budgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+                items.value = draft.items;
+                overallRemark.value = draft.overallRemark || '';
+                if (draft.roDate) {
+                    calendarValue.value = new Date(draft.roDate);
+                }
+
+                toast.add({
+                    severity: 'info',
+                    summary: 'Draft Loaded',
+                    detail: `Loaded draft ${draft.draftId}`,
+                    life: 3000
+                });
+            }
+        });
 
         const onRemoveTemplatingFile = (file: File, removeFileCallback: (index: number) => void, index: number) => {
             removeFileCallback(index);
@@ -188,13 +218,6 @@ export default defineComponent({
             });
         };
 
-        // Overall remark
-        const overallRemark = ref('');
-
-        const MAX_FILE_SIZE = 1_000_000; // 1 MB in bytes
-        const attachments = ref<File[]>([]);
-        const isAttachmentValid = ref(true);
-
         const onSelectedFiles = (event) => {
             attachments.value = event.files;
 
@@ -222,7 +245,6 @@ export default defineComponent({
             }
         };
 
-        // Helper to format bytes
         const formatBytes = (bytes: number) => {
             const sizes = ['B', 'KB', 'MB', 'GB'];
             if (bytes === 0) return '0 B';
@@ -237,6 +259,91 @@ export default defineComponent({
                 return sum + price * qty;
             }, 0);
         });
+
+        const canSubmit = computed(() => {
+            return items.value.length > 0 && isAttachmentValid.value && roNumber.value.trim() !== '';
+        });
+
+        // Preview modal data
+        const previewSummary = computed<PreviewSummary>(() => ({
+            totalItems: items.value.length,
+            totalAmount: grandTotal.value,
+            budgetType: budgetType.value,
+            project: 'MKT',
+            roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+            roNumber: roNumber.value,
+            requestedBy: 'Current User',
+            items: items.value.map((item) => ({
+                itemCode: item.itemCode,
+                itemType: 'CO',
+                description: item.description,
+                uom: item.uom,
+                quantity: item.quantity,
+                price: item.price,
+                deliveryDate: item.deliveryDate,
+                location: item.location,
+                notes: item.notes,
+                remark: item.remark
+            })),
+            overallRemark: overallRemark.value,
+            attachmentsCount: attachments.value.length
+        }));
+
+        function openPreviewModal() {
+            if (!canSubmit.value) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Validation Error',
+                    detail: 'Please ensure all required fields are filled and at least one item is added',
+                    life: 3000
+                });
+                return;
+            }
+            showPreviewModal.value = true;
+        }
+
+        function submitRequestOrder() {
+            // later use api call to submit
+            console.log('Submitting Request Order:', {
+                roNumber: roNumber.value,
+                budgetType: budgetType.value,
+                roDate: calendarValue.value,
+                items: items.value,
+                overallRemark: overallRemark.value,
+                attachments: attachments.value
+            });
+
+            toast.add({
+                severity: 'success',
+                summary: 'Request Order Submitted',
+                detail: `RO ${roNumber.value} has been submitted successfully`,
+                life: 3000
+            });
+
+            router.push('/request-orders');
+        }
+
+        function saveDraft() {
+            const draftData = {
+                draftId: `DRAFT-RO-${Date.now()}`,
+                roNumber: roNumber.value,
+                budgetType: budgetType.value,
+                roDate: calendarValue.value,
+                items: items.value,
+                overallRemark: overallRemark.value,
+                attachments: attachments.value
+            };
+
+            console.log('Saving draft:', draftData);
+
+            toast.add({
+                severity: 'success',
+                summary: 'Draft Saved',
+                detail: 'Your request order has been saved as draft',
+                life: 3000
+            });
+        }
+
         return {
             roNumber,
             budgetType,
@@ -254,10 +361,16 @@ export default defineComponent({
             menuRefs,
             setMenuRef,
             grandTotal,
+            canSubmit,
             // Modal functionality
             showBulkItemModal,
+            showPreviewModal,
             openBulkItemModal,
             handleSelectedItems,
+            openPreviewModal,
+            submitRequestOrder,
+            saveDraft,
+            previewSummary,
             // File upload
             files,
             totalSize,
@@ -269,6 +382,7 @@ export default defineComponent({
             onRemoveTemplatingFile,
             onClearTemplatingUpload,
             isAttachmentValid,
+            attachments,
             // Remark
             overallRemark
         };
