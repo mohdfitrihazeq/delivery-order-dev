@@ -72,3 +72,29 @@ export interface Order {
     requestedAt: string;
     items: OrderItem[];
 }
+
+export interface PreviewItem {
+    itemCode: string;
+    itemType?: string;
+    description: string;
+    uom: string;
+    quantity: string | number;
+    price: number;
+    deliveryDate: Date | null;
+    location: string;
+    notes?: string;
+    remark?: string;
+}
+
+export interface PreviewSummary {
+    totalItems: number;
+    totalAmount: number;
+    budgetType: string;
+    project: string;
+    roDate: string;
+    roNumber: string;
+    requestedBy: string;
+    items: PreviewItem[];
+    overallRemark?: string;
+    attachmentsCount: number;
+}
