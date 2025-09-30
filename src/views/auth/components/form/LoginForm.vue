@@ -1,7 +1,32 @@
 <script setup lang="ts">
+import { defineEmits, defineProps, watch } from 'vue';
 import { useLoginForm } from './LoginForm.script';
 
+const props = defineProps<{
+    modelValueUsername?: string;
+    modelValuePassword?: string;
+}>();
+
+const emit = defineEmits(['update:modelValueUsername', 'update:modelValuePassword']);
+
 const { username, password, showPassword, togglePasswordVisibility, handleSubmit } = useLoginForm();
+
+watch(
+    () => props.modelValueUsername,
+    (val) => {
+        if (val !== undefined) username.value = val;
+    }
+);
+
+watch(
+    () => props.modelValuePassword,
+    (val) => {
+        if (val !== undefined) password.value = val;
+    }
+);
+
+watch(username, (val) => emit('update:modelValueUsername', val));
+watch(password, (val) => emit('update:modelValuePassword', val));
 </script>
 
 <template>

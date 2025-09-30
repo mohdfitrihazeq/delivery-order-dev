@@ -16,6 +16,8 @@ declare module 'vue' {
     BreadcrumbList: typeof import('./src/components/BreadcrumbList.vue')['default']
     Button: typeof import('primevue/button')['default']
     Calendar: typeof import('primevue/calendar')['default']
+    Card: typeof import('primevue/card')['default']
+    Chart: typeof import('primevue/chart')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
