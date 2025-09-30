@@ -48,9 +48,41 @@ const routes: RouteRecordRaw[] = [
             {
                 path: '/budget',
                 name: 'budget',
-                component: () => import('@/views/budget/Budget.vue'),
+                component: () => import('@/views/budget/budgetList/Budget.vue'),
                 meta: {
                     breadcrumb: [{ label: 'Budget', route: '/budget' }]
+                }
+            },
+            {
+                path: '/bcr',
+                name: 'budgetChangeRequest',
+                component: () => import('@/views/budget/budgetChangeRequest/BCR.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }]
+                }
+            },
+            {
+                path: '/bcr/create',
+                name: 'budgetChangeRequest-create',
+                component: () => import('@/views/budget/components/page/CreateBCR.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Budget Change Request', route: '/bcr' }, { label: 'Create Budget Change Request' }]
+                }
+            },
+            {
+                path: '/bcr/edit/:requestNo',
+                name: 'budgetChangeRequest-edit',
+                component: () => import('@/views/budget/components/page/EditBCR.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'Edit Budget Change Request' }]
+                }
+            },
+            {
+                path: '/bcr/view/:requestNo',
+                name: 'budgetChangeRequest-view',
+                component: () => import('@/views/budget/components/page/ViewBCR.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'BCR', route: '/bcr' }, { label: 'View Budget Change Request' }]
                 }
             },
             {
