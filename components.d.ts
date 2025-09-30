@@ -7,10 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Accordion: typeof import('primevue/accordion')['default']
-    AccordionContent: typeof import('primevue/accordioncontent')['default']
-    AccordionHeader: typeof import('primevue/accordionheader')['default']
-    AccordionPanel: typeof import('primevue/accordionpanel')['default']
     Badge: typeof import('primevue/badge')['default']
     BaseSpinner: typeof import('./src/components/spinner/BaseSpinner.vue')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
@@ -20,9 +16,6 @@ declare module 'vue' {
     BreadcrumbList: typeof import('./src/components/BreadcrumbList.vue')['default']
     Button: typeof import('primevue/button')['default']
     Calendar: typeof import('primevue/calendar')['default']
-    Card: typeof import('primevue/card')['default']
-    Chart: typeof import('primevue/chart')['default']
-    Checkbox: typeof import('primevue/checkbox')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
@@ -33,7 +26,6 @@ declare module 'vue' {
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
-    OverlayBadge: typeof import('primevue/overlaybadge')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
@@ -42,14 +34,10 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
     Select: typeof import('primevue/select')['default']
-    SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
     Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
-  }
-  export interface ComponentCustomProperties {
-    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }
