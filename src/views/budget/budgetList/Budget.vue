@@ -1,8 +1,9 @@
-<script lang="ts" src="./BudgetLogic.ts"></script>
+<script lang="ts" src="./BudgetLogic"></script>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
         <div class="p-6 card mb-6">
+            <BreadcrumbList />
             <!-- HEADER -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
@@ -26,11 +27,9 @@
                             <span v-else class="text-gray-400">Select Version</span>
                         </template>
                     </Dropdown>
-
-                    <SelectButton v-model="viewMode" :options="viewOptions" optionLabel="label" optionValue="value" class="h-10 rounded-lg" />
                 </div>
             </div>
-
+            <SelectButton v-model="viewMode" :options="viewOptions" optionLabel="label" optionValue="value" class="h-10 rounded-lg" />
             <!-- BODY -->
             <div v-if="viewMode === 'overview'">
                 <Overview class="col-span-12" />

@@ -6,5 +6,5 @@ export type TableColumn = {
     style?: string;
     bodySlot?: string;
     action?: boolean;
-    actions?: ('edit' | 'view' | 'delete')[];
+    actions?: ('edit' | 'view' | 'delete' | 'comment')[];
 };

@@ -4,6 +4,7 @@ import { defineComponent, PropType } from 'vue';
 type TabItem = {
     value: string;
     label: string;
+    badge: number;
 };
 
 export default defineComponent({
@@ -26,6 +27,7 @@ export default defineComponent({
     <div class="custom-tabs">
         <button v-for="tab in tabs" :key="tab.value" :class="['custom-tab dark:text-white', { active: modelValue === tab.value }]" @click="$emit('update:modelValue', tab.value)">
             {{ tab.label }}
+            <Badge v-if="tab.badge" :value="tab.badge" class="ml-2" />
         </button>
     </div>
 

@@ -3,6 +3,8 @@ import type { TableColumn } from '@/types/table.type';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import Overview from '@/views/budget/budgetOverview/Overview.vue';
+import BudgetImportModal from '@/views/budget/components/modal/BudgetImport.vue';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
@@ -10,8 +12,6 @@ import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
 import { defineComponent, ref } from 'vue';
-import Overview from './Overview.vue';
-import BudgetImportModal from './components/modal/BudgetImport.vue';
 
 export default defineComponent({
     name: 'BudgetManagement',
