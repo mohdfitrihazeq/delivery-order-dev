@@ -91,13 +91,13 @@
                                 </template>
                             </Column>
 
-                            <Column field="quantity" header="Quantity" style="min-width: 140px; width: 10% !important">
+                            <Column field="quantity" header="Quantity" style="min-width: 110px; width: 110px">
                                 <template #body="{ data }">
                                     <InputNumber v-model.number="data.quantity" class="w-full" :min="0" />
                                 </template>
                             </Column>
 
-                            <Column field="price" header="Price" style="min-width: 140px; width: 10% !important">
+                            <Column field="price" header="Price" style="min-width: 140px; width: 140px">
                                 <template #body="{ data }">
                                     <InputNumber v-model="data.price" mode="currency" currency="MYR" locale="en-MY" class="w-full" :minFractionDigits="2" />
                                 </template>
@@ -192,7 +192,7 @@
                         <!-- Overall Remark -->
                         <div class="mt-4">
                             <label class="block text-sm text-gray-600 mb-1">Remark</label>
-                            <Textarea v-model="overallRemark" rows="3" class="w-full" placeholder="" />
+                            <Textarea v-model="overallRemark" rows="3" class="w-full" placeholder="Add any additional remarks or notes..." />
                         </div>
 
                         <div class="pt-3 mt-2 border-t text-sm text-gray-600 flex justify-between">
@@ -205,22 +205,13 @@
 
             <div class="flex justify-end gap-3">
                 <Button label="Cancel" @click="$router.push('/request-orders')" outlined />
-                <Button label="Save as Draft" severity="secondary" outlined />
-                <Button label="Submit Request Order" :disabled="!isAttachmentValid" />
+                <Button label="Save as Draft" severity="secondary" outlined @click="saveDraft" />
+                <Button label="Submit Request Order" @click="openPreviewModal" :disabled="!canSubmit" />
             </div>
         </div>
 
-        <!-- Modal Component -->
+        <!-- Modal Components -->
         <CreateROModal v-model:visible="showBulkItemModal" @items-selected="handleSelectedItems" />
+        <PreviewRo v-model:visible="showPreviewModal" :summaryData="previewSummary" @submit="submitRequestOrder" />
     </Motion>
 </template>
-<style scoped>
-/* Tighten InputNumber width */
-:deep(.p-inputnumber) {
-    max-width: 100%;
-}
-
-:deep(.p-inputnumber-input) {
-    width: 100% !important;
-}
-</style>
