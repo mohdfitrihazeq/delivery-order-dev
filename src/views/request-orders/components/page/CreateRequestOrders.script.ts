@@ -1,3 +1,4 @@
+import { requestOrderService } from '@/services/requestOrder.service';
 import { Motion } from '@motionone/vue';
 import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
@@ -302,25 +303,31 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
-        function submitRequestOrder() {
-            // later use api call to submit
-            console.log('Submitting Request Order:', {
-                roNumber: roNumber.value,
-                budgetType: budgetType.value,
-                roDate: calendarValue.value,
-                items: items.value,
-                overallRemark: overallRemark.value,
-                attachments: attachments.value
-            });
+        async function submitRequestOrder() {
+            try {
+                const payload = {
+                    roNumber: roNumber.value,
+                    budgetType: budgetType.value,
+                    roDate: calendarValue.value?.toISOString() || new Date().toISOString(),
+                    items: items.value,
+                    overallRemark: overallRemark.value,
+                    attachments: attachments.value
+                };
 
-            toast.add({
-                severity: 'success',
-                summary: 'Request Order Submitted',
-                detail: `RO ${roNumber.value} has been submitted successfully`,
-                life: 3000
-            });
+                await requestOrderService.createRequestOrder(payload);
 
-            router.push('/request-orders');
+                toast.add({
+                    severity: 'success',
+                    summary: 'Request Order Submitted',
+                    detail: `RO ${roNumber.value} has been submitted successfully`,
+                    life: 3000
+                });
+
+                router.push('/request-orders');
+            } catch (error) {
+                // Error already handled by showError in service
+                console.error('Submit failed:', error);
+            }
         }
 
         function saveDraft() {
@@ -384,7 +391,8 @@ export default defineComponent({
             isAttachmentValid,
             attachments,
             // Remark
-            overallRemark
+            overallRemark,
+            requestOrderService
         };
     }
 });

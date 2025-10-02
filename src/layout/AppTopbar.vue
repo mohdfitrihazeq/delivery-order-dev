@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
-import { logout } from '@/views/auth/index.script';
+import { useAuthStore } from '@/stores/auth.store';
 import { Motion } from '@motionone/vue';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const handleSignOut = () => {
-    logout();
-    router.push('/auth/login');
+    authStore.logout();
+    router.push({ name: 'login' });
 };
 
 const username = ref<string | null>(null);
@@ -122,7 +123,7 @@ onMounted(() => {
         </div>
 
         <div class="layout-topbar-actions flex items-center gap-3">
-            <div class="shadow-sm cursor-pointer border border-gray-300 dark:bg-gray-800 px-3 py-1 rounded hover:bg-gray-100 bg-gray-50" @click="showProjectDialog = true">
+            <div class="shadow-sm cursor-pointer border border-gray-200 dark:bg-gray-800 px-3 py-1 rounded hover:bg-gray-100" @click="showProjectDialog = true">
                 <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-2">
                         <i class="pi pi-briefcase text-xs text-gray-500 dark:text-white"></i>

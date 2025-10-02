@@ -21,7 +21,6 @@ export function useDashboard() {
                 const parsed = JSON.parse(user);
                 userRole.value = parsed.role;
             }
-            console.log('User role loaded:', userRole.value);
         } catch (error) {
             console.error('Error loading user role:', error);
         }

@@ -1,32 +1,21 @@
 <script setup lang="ts">
+import Button from 'primevue/button';
 import { defineEmits, defineProps, watch } from 'vue';
 import { useLoginForm } from './LoginForm.script';
 
 const props = defineProps<{
     modelValueUsername?: string;
     modelValuePassword?: string;
+    useRealAPI?: boolean;
 }>();
 
-const emit = defineEmits(['update:modelValueUsername', 'update:modelValuePassword']);
+const emit = defineEmits(['update:modelValueUsername', 'update:modelValuePassword', 'update:useRealAPI']);
 
-const { username, password, showPassword, togglePasswordVisibility, handleSubmit } = useLoginForm();
-
-watch(
-    () => props.modelValueUsername,
-    (val) => {
-        if (val !== undefined) username.value = val;
-    }
-);
-
-watch(
-    () => props.modelValuePassword,
-    (val) => {
-        if (val !== undefined) password.value = val;
-    }
-);
+const { username, password, showPassword, togglePasswordVisibility, handleSubmit, isLoading, useRealAPI } = useLoginForm(props);
 
 watch(username, (val) => emit('update:modelValueUsername', val));
 watch(password, (val) => emit('update:modelValuePassword', val));
+watch(useRealAPI, (val) => emit('update:useRealAPI', val));
 </script>
 
 <template>
@@ -45,12 +34,7 @@ watch(password, (val) => emit('update:modelValuePassword', val));
             </button>
         </div>
 
-        <!-- Forgot Password -->
-        <div class="flex justify-between text-sm">
-            <router-link to="/reset-password" class="text-info hover:underline"> Forgot password? </router-link>
-        </div>
-
-        <!-- Submit -->
-        <Button type="submit" label="Login" class="w-full" severity="info" />
+        <!-- Submit Button -->
+        <Button type="submit" label="Login" class="w-full" severity="info" :loading="isLoading" :disabled="isLoading" />
     </form>
 </template>
