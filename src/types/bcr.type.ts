@@ -1,3 +1,11 @@
+export interface DiscussionItem {
+    role: string;
+    name: string;
+    datetime: string;
+    message: string;
+    documentUrl?: string;
+    isEditing: boolean;
+}
 export interface Item {
     itemCode: string;
     description: string;
@@ -6,24 +14,7 @@ export interface Item {
     budgetQty: number;
     orderedQty: number;
     newOrder: number;
-    exceededQty: number;
-    exceededPercent: number;
-    estimatedExceed: number;
-    varianceQty: number;
-    varianceAmount: number;
-    notes: string;
     remark: string;
-    showNotes: boolean;
-    showRemark: boolean;
-}
-
-export interface DiscussionItem {
-    role: string;
-    name: string;
-    datetime: string;
-    message: string;
-    documentUrl?: string;
-    isEditing: boolean;
 }
 
 export interface ItemOption {

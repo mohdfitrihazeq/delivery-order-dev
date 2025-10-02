@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <div class="card p-4 mb-6 shadow">
+            <div class="card p-4 mb-6 border">
                 <h2 class="text-lg font-semibold mb-4">Header Information</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="card p-4 mb-6 shadow">
+            <div class="card p-4 mb-6 border">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Materials Section</h2>
                     <div class="flex gap-2">
@@ -54,98 +54,147 @@
                 <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
                         <div class="text-center">
-                            <div class="text-5xl mb-2">📦</div>
-                            <p>No material added yet</p>
+                            <ResultNotFound />
                         </div>
                     </Motion>
                 </div>
 
                 <div v-else class="overflow-x-auto">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <table class="min-w-full rounded-lg border">
-                            <thead class="text-sm text-gray-600 bg-gray-50">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Item Code</th>
-                                    <th class="px-3 py-2 text-left">Description</th>
-                                    <th class="px-3 py-2 text-left">Units</th>
-                                    <th class="px-3 py-2 text-left">Unit Price</th>
-                                    <th class="px-3 py-2 text-left">Budgeted Quantity</th>
-                                    <th class="px-3 py-2 text-left">Ordered Quantity</th>
-                                    <th class="px-3 py-2 text-left">New Order</th>
-                                    <th class="px-3 py-2 text-left">Exceeded Quantity</th>
-                                    <th class="px-3 py-2 text-left">Exceeded %</th>
-                                    <th class="px-3 py-2 text-left">Estimated $ exceed</th>
-                                    <th class="px-3 py-2 text-left">Remarks</th>
-                                    <th class="px-3 py-2 text-left">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template v-for="(item, index) in items" :key="index">
-                                    <tr class="border-t align-top">
-                                        <td class="px-3 py-2">
-                                            <Dropdown v-model="item.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(item)">
-                                                <template #option="slotProps">
-                                                    <div class="flex flex-col">
-                                                        <span class="font-medium">{{ slotProps.option.label }}</span>
-                                                        <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
-                                                    </div>
-                                                </template>
-                                                <template #value="slotProps">
-                                                    <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
-                                                    <span v-else class="text-gray-400">Select item...</span>
-                                                </template>
-                                            </Dropdown>
-                                        </td>
+                        <DataTable
+                            :value="items"
+                            :paginator="items?.length > 0"
+                            :rows="10"
+                            :rowsPerPageOptions="[10]"
+                            tableStyle="min-width: 80rem"
+                            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+                            currentPageReportTemplate="{first} to {last} of {totalRecords}"
+                            class="overflow-hidden"
+                        >
+                            <template #paginatorstart></template>
 
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.description" placeholder="Description" class="w-full" disabled />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.uom" placeholder="Unit" class="w-full" disabled />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0.00" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputTextStyle type="number" placeholder="0" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0%" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText type="number" placeholder="0.00" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2">
-                                            <InputText v-model="item.remark" placeholder="Remark" class="w-full" />
-                                        </td>
-
-                                        <td class="px-3 py-2 text-center">
-                                            <Button icon="pi pi-trash" severity="danger" text @click="items.splice(index, 1)" />
-                                        </td>
-                                    </tr>
+                            <!-- Item Code -->
+                            <Column field="itemCode" header="Item Code">
+                                <template #body="slotProps">
+                                    <Dropdown v-model="slotProps.data.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(slotProps.data)">
+                                        <template #option="slotProps">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium">{{ slotProps.option.label }}</span>
+                                                <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
+                                            </div>
+                                        </template>
+                                        <template #value="slotProps">
+                                            <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
+                                            <span v-else class="text-gray-400">Select item...</span>
+                                        </template>
+                                    </Dropdown>
                                 </template>
-                            </tbody>
-                        </table>
+                            </Column>
 
-                        <div class="pt-3 mt-2 border-t text-sm text-gray-600 flex justify-between">
+                            <!-- Description -->
+                            <Column field="description" header="Description">
+                                <template #body="slotProps">
+                                    <InputText v-model="slotProps.data.description" placeholder="Description" class="w-full" disabled />
+                                </template>
+                            </Column>
+
+                            <!-- Units -->
+                            <Column field="uom" header="Units">
+                                <template #body="slotProps">
+                                    <InputText v-model="slotProps.data.uom" placeholder="Unit" class="w-full" disabled />
+                                </template>
+                            </Column>
+
+                            <!-- Unit Price -->
+                            <Column field="unitPrice" header="Unit Price">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.unitPrice" placeholder="0.00" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <!-- Budgeted Quantity -->
+                            <Column field="budgetQty" header="Budgeted Quantity">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.budgetQty" placeholder="0" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <!-- Ordered Quantity -->
+                            <Column field="orderedQty" header="Ordered Quantity">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.orderedQty" placeholder="0" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <!-- New Order -->
+                            <Column field="newOrder" header="New Order">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.newOrder" placeholder="0" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <!-- Exceeded Quantity -->
+                            <Column field="exceedQty" header="Exceeded Quantity">
+                                <template #body="slotProps">
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
+                                        {{ calcExceedQty(slotProps.data) }}
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <!-- Exceeded % -->
+                            <Column field="exceedPercent" header="Exceeded %">
+                                <template #body="slotProps">
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
+                                        {{ calcExceedPercent(slotProps.data).toFixed(1) }}%
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <!-- Estimated $ exceed -->
+                            <Column field="estimatedExceed" header="Estimated $ exceed">
+                                <template #body="slotProps">
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
+                                        {{ calcEstimatedExceed(slotProps.data).toFixed(2) }}
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <!-- Remarks -->
+                            <Column field="remark" header="Remarks">
+                                <template #body="slotProps">
+                                    <InputText v-model="slotProps.data.remark" placeholder="Remark" class="w-full" />
+                                </template>
+                            </Column>
+
+                            <!-- Actions -->
+                            <Column header="Actions">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-trash" severity="danger" text @click="items.splice(items.indexOf(slotProps.data), 1)" />
+                                </template>
+                            </Column>
+
+                            <template #paginatorend>
+                                <Button type="button" icon="pi pi-download" text @click="handleExport" />
+                            </template>
+                        </DataTable>
+
+                        <div class="pt-3 mt-2 text-sm text-gray-600 flex justify-between">
                             <span>{{ items.length }} {{ items.length > 1 ? 'items' : 'item' }}</span>
                         </div>
                     </Motion>
