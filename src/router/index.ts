@@ -1,7 +1,6 @@
 import AppLayout from '@/layout/AppLayout.vue';
-import { isAuthenticated } from '@/views/auth/index.script';
+import { useAuthStore } from '@/stores/auth.store';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -134,13 +133,17 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !isAuthenticated.value) {
-        next({ name: 'login' });
-    } else if (to.name === 'login' && isAuthenticated.value) {
-        next({ name: 'dashboard' });
-    } else {
-        next();
+    const authStore = useAuthStore();
+
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        return next({ name: 'login' });
     }
+
+    if (to.name === 'login' && authStore.isAuthenticated) {
+        return next({ name: 'dashboard' });
+    }
+
+    next();
 });
 
 export default router;
