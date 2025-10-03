@@ -1,49 +1,58 @@
+import type { CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
 import { showError } from '@/utils/showError.utils';
 import apiClient from './api.client';
 
-export interface CreateRequestOrderPayload {
-    roNumber: string;
-    budgetType: string;
-    roDate: string;
-    items: any[];
-    overallRemark?: string;
-    attachments?: File[];
-}
-
-const createRequestOrder = async (payload: CreateRequestOrderPayload) => {
+const createRequestOrder = async (payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
     try {
         const formData = new FormData();
 
-        // Append basic fields
-        formData.append('roNumber', payload.roNumber);
-        formData.append('budgetType', payload.budgetType);
-        formData.append('roDate', payload.roDate);
-        formData.append('items', JSON.stringify(payload.items));
+        const cleanPayload = JSON.parse(JSON.stringify(payload, (_, value) => (value === undefined ? null : value)));
 
-        if (payload.overallRemark) {
-            formData.append('overallRemark', payload.overallRemark);
-        }
+        formData.append('data', JSON.stringify(cleanPayload));
 
-        // Append files
-        if (payload.attachments) {
-            payload.attachments.forEach((file, index) => {
-                formData.append(`attachments[${index}]`, file);
+        if (attachments && attachments.length > 0) {
+            attachments.forEach((file) => {
+                formData.append('attachment', file);
             });
         }
 
-        const response = await apiClient.post('/request-orders', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+        const response = await apiClient.post('/requestOrder', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
         });
 
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        console.error('Request Order Service Error:', error.response?.data || error);
+        showError(error, 'Failed to create request order.');
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create request order'
+        };
+    }
+};
+
+const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
+    try {
+        const response = await apiClient.get('/requestOrder', { params });
+        return response.data.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch request orders.');
+        throw error;
+    }
+};
+
+const getRequestOrderById = async (id: string): Promise<any> => {
+    try {
+        const response = await apiClient.get(`/requestOrder/${id}`);
         return response.data;
     } catch (error) {
-        showError(error, 'Failed to create request order.');
+        showError(error, 'Failed to fetch request order details.');
         throw error;
     }
 };
 
 export const requestOrderService = {
-    createRequestOrder
+    createRequestOrder,
+    getRequestOrders,
+    getRequestOrderById
 };
