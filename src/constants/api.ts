@@ -7,9 +7,10 @@ export const API_ENDPOINTS = {
         LOGOUT: '/auth/logout'
     },
     REQUEST_ORDERS: {
-        LIST: '/request-orders',
-        CREATE: '/request-orders',
-        UPDATE: (id: string) => `/request-orders/${id}`,
-        DELETE: (id: string) => `/request-orders/${id}`
+        LIST: '/requestOrder',
+        CREATE: '/requestOrder',
+        UPDATE: (id: string) => `/requestOrder/${id}`,
+        DELETE: (id: string) => `/requestOrder/${id}`,
+        GET_BY_ID: (id: string) => `/requestOrder/${id}`
     }
 };

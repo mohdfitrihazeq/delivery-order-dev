@@ -31,12 +31,14 @@ apiClient.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response) {
             switch (error.response.status) {
-                case 401:
+                case 401: {
                     console.error('Unauthorized: Redirect to login');
+
                     const authStore = useAuthStore();
                     authStore.logout();
                     router.push({ name: 'login' });
                     break;
+                }
                 case 404:
                     console.error('Resource not found');
                     break;

@@ -98,3 +98,29 @@ export interface PreviewSummary {
     overallRemark?: string;
     attachmentsCount: number;
 }
+
+export interface CreateRequestOrderPayload {
+    DocNo: string;
+    DebtorId: number;
+    RequestOrderDate: string;
+    Terms?: string;
+    RefDoc?: string;
+    BudgetType: 'Budgeted' | 'NonBudgeted';
+    Type: string;
+    Remark?: string;
+    Items: Array<{
+        BudgetItemId?: number | null;
+        NonBudgetItemId?: number | null;
+        Description: string;
+        Uom: string;
+        Quantity: number;
+        Rate: number;
+        DeliveryDate: string;
+    }>;
+}
+
+export interface CreateRequestOrderResponse {
+    success: boolean;
+    data?: any;
+    message?: string;
+}
