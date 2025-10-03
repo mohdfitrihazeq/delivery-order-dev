@@ -31,10 +31,10 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
     }
 };
 
-const getRequestOrders = async (): Promise<any[]> => {
+const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
     try {
-        const response = await apiClient.get('/requestOrder');
-        return response.data;
+        const response = await apiClient.get('/requestOrder', { params });
+        return response.data.data;
     } catch (error) {
         showError(error, 'Failed to fetch request orders.');
         throw error;

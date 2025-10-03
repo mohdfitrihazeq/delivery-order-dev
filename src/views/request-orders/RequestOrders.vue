@@ -37,6 +37,11 @@
                                 :onFilterChange="handleFilterChange"
                                 emptyTitle="No request orders found"
                             >
+                                <!-- Numbering Slot -->
+                                <template #no="{ index }">
+                                    {{ index + 1 }}
+                                </template>
+
                                 <!-- Status Badge Slot -->
                                 <template #status="{ data }">
                                     <Badge :value="data.status" :severity="getStatusSeverity(data.status)" />
