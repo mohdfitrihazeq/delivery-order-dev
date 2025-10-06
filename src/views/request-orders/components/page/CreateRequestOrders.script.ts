@@ -1,3 +1,5 @@
+import type { CreateRequestOrderPayload } from '@/services/requestOrder.service';
+import { requestOrderService } from '@/services/requestOrder.service';
 import { Motion } from '@motionone/vue';
 import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
@@ -25,7 +27,7 @@ export default defineComponent({
         const $primevue = usePrimeVue();
 
         const calendarValue = ref<Date | null>(null);
-        const roNumber = ref('RO2025208757');
+        const roNumber = ref('RO2510-0001');
         const budgetType = ref('Budgeted Item');
         const roDate = ref('');
 
@@ -48,11 +50,8 @@ export default defineComponent({
         const totalSize = ref(0);
         const totalSizePercent = ref(0);
         const files = ref<File[]>([]);
-
-        // Overall remark
         const overallRemark = ref('');
-
-        const MAX_FILE_SIZE = 1_000_000; // 1 MB in bytes
+        const MAX_FILE_SIZE = 1_000_000;
         const attachments = ref<File[]>([]);
         const isAttachmentValid = ref(true);
 
@@ -102,14 +101,9 @@ export default defineComponent({
             const k = 1024;
             const dm = 3;
             const sizes = $primevue.config.locale.fileSizeTypes;
-
-            if (bytes === 0) {
-                return `0 ${sizes[0]}`;
-            }
-
+            if (bytes === 0) return `0 ${sizes[0]}`;
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
             return `${formattedSize} ${sizes[i]}`;
         };
 
@@ -145,9 +139,7 @@ export default defineComponent({
 
         const toggleMenu = (event: Event, index: number) => {
             const menu = menuRefs.value[index];
-            if (menu) {
-                menu.toggle(event);
-            }
+            if (menu) menu.toggle(event);
         };
 
         const getActionItems = (item: Item, index: number) => [
@@ -169,9 +161,7 @@ export default defineComponent({
         ];
 
         const setMenuRef = (el: MenuInstance | null, index: number) => {
-            if (el) {
-                menuRefs.value[index] = el;
-            }
+            if (el) menuRefs.value[index] = el;
         };
 
         const openBulkItemModal = () => {
@@ -220,7 +210,6 @@ export default defineComponent({
 
         const onSelectedFiles = (event) => {
             attachments.value = event.files;
-
             let totalSizeTemp = 0;
             let valid = true;
 
@@ -264,7 +253,6 @@ export default defineComponent({
             return items.value.length > 0 && isAttachmentValid.value && roNumber.value.trim() !== '';
         });
 
-        // Preview modal data
         const previewSummary = computed<PreviewSummary>(() => ({
             totalItems: items.value.length,
             totalAmount: grandTotal.value,
@@ -302,25 +290,63 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
-        function submitRequestOrder() {
-            // later use api call to submit
-            console.log('Submitting Request Order:', {
-                roNumber: roNumber.value,
-                budgetType: budgetType.value,
-                roDate: calendarValue.value,
-                items: items.value,
-                overallRemark: overallRemark.value,
-                attachments: attachments.value
-            });
+        async function submitRequestOrder() {
+            try {
+                const formatDateToAPI = (date: Date | null): string => {
+                    if (!date) return new Date().toISOString().split('T')[0];
+                    return date.toISOString().split('T')[0];
+                };
 
-            toast.add({
-                severity: 'success',
-                summary: 'Request Order Submitted',
-                detail: `RO ${roNumber.value} has been submitted successfully`,
-                life: 3000
-            });
+                const payload: CreateRequestOrderPayload = {
+                    DocNo: roNumber.value,
+                    DebtorId: 1,
+                    RequestOrderDate: formatDateToAPI(calendarValue.value),
+                    Terms: 'Net 30',
+                    RefDoc: '',
+                    BudgetType: budgetType.value === 'Budgeted Item' ? 'Budgeted' : 'NonBudgeted',
+                    Type: 'requestOrder',
+                    Remark: overallRemark.value || '',
+                    Items: items.value.map((item) => ({
+                        BudgetItemId: budgetType.value === 'Budgeted Item' ? 1 : null,
+                        NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
+                        Description: item.description,
+                        Uom: item.uom,
+                        Quantity: parseFloat(item.quantity) || 0,
+                        Rate: item.price || 0,
+                        DeliveryDate: formatDateToAPI(item.deliveryDate)
+                    }))
+                };
 
-            router.push('/request-orders');
+                const result = await requestOrderService.createRequestOrder(payload, attachments.value.length > 0 ? attachments.value : undefined);
+
+                if (result.success) {
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Request Order Submitted',
+                        detail: `RO ${roNumber.value} has been submitted successfully`,
+                        life: 3000
+                    });
+
+                    setTimeout(() => {
+                        router.push('/request-orders');
+                    }, 1000);
+                } else {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Submission Failed',
+                        detail: result.message || 'Failed to submit request order',
+                        life: 5000
+                    });
+                }
+            } catch (error: any) {
+                console.error('Submit failed:', error);
+                toast.add({
+                    severity: 'error',
+                    summary: 'Submission Error',
+                    detail: error.message || 'An unexpected error occurred',
+                    life: 5000
+                });
+            }
         }
 
         function saveDraft() {
@@ -348,7 +374,6 @@ export default defineComponent({
             roNumber,
             budgetType,
             roDate,
-            goBack: () => router.push({ name: 'request-orders' }),
             budgetOptions,
             calendarValue,
             items,
@@ -362,7 +387,6 @@ export default defineComponent({
             setMenuRef,
             grandTotal,
             canSubmit,
-            // Modal functionality
             showBulkItemModal,
             showPreviewModal,
             openBulkItemModal,
@@ -371,7 +395,6 @@ export default defineComponent({
             submitRequestOrder,
             saveDraft,
             previewSummary,
-            // File upload
             files,
             totalSize,
             totalSizePercent,
@@ -383,7 +406,6 @@ export default defineComponent({
             onClearTemplatingUpload,
             isAttachmentValid,
             attachments,
-            // Remark
             overallRemark
         };
     }

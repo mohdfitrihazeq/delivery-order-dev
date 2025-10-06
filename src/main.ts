@@ -1,10 +1,10 @@
 import '@/assets/styles.scss';
 import '@/assets/tailwind.css';
-import 'primeicons/primeicons.css';
-
 import { definePreset } from '@primevue/themes';
 import Aura from '@primevue/themes/aura';
 import HighchartsVue from 'highcharts-vue';
+import { createPinia } from 'pinia';
+import 'primeicons/primeicons.css';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
@@ -12,6 +12,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 const app = createApp(App);
+const pinia = createPinia();
 
 const MyPreset = definePreset(Aura, {
     semantic: {
@@ -45,4 +46,5 @@ app.use(PrimeVue, {
 app.use(ToastService);
 app.use(ConfirmationService);
 app.use(HighchartsVue);
+app.use(pinia);
 app.mount('#app');
