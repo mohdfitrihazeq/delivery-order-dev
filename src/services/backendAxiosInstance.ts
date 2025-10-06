@@ -4,13 +4,13 @@ import { useAuthStore } from '@/stores/auth.store';
 import axios, { AxiosError } from 'axios';
 import config from './api.config';
 
-const apiClient = axios.create({
+const axiosInstance = axios.create({
     baseURL: `${config.getHost()}${BASE_PATH}`,
     timeout: 10000
 });
 
 // Request interceptor
-apiClient.interceptors.request.use(
+axiosInstance.interceptors.request.use(
     (request) => {
         const headers = config.getHeadersWithToken();
 
@@ -26,7 +26,7 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor
-apiClient.interceptors.response.use(
+axiosInstance.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
         if (error.response) {
@@ -58,4 +58,4 @@ apiClient.interceptors.response.use(
     }
 );
 
-export default apiClient;
+export default axiosInstance;

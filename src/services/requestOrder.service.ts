@@ -1,6 +1,6 @@
 import type { CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
 import { showError } from '@/utils/showError.utils';
-import apiClient from './api.client';
+import axiosInstance from './backendAxiosInstance';
 
 const createRequestOrder = async (payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
     try {
@@ -16,7 +16,7 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
             });
         }
 
-        const response = await apiClient.post('/requestOrder', formData, {
+        const response = await axiosInstance.post('/requestOrder', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
@@ -33,7 +33,7 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
 
 const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
     try {
-        const response = await apiClient.get('/requestOrder', { params });
+        const response = await axiosInstance.get('/requestOrder', { params });
         return response.data.data;
     } catch (error) {
         showError(error, 'Failed to fetch request orders.');
@@ -43,7 +43,7 @@ const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> =>
 
 const getRequestOrderById = async (id: string): Promise<any> => {
     try {
-        const response = await apiClient.get(`/requestOrder/${id}`);
+        const response = await axiosInstance.get(`/requestOrder/${id}`);
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch request order details.');
