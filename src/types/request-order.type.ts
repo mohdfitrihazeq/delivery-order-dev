@@ -56,7 +56,7 @@ export interface OrderItem {
     description: string;
     uom: string;
     qty: number;
-    deliveryDate: string;
+    deliveryDate: string | Date | null;
     note: string;
 }
 
@@ -65,7 +65,7 @@ export interface Order {
     roNumber: string;
     requestedBy: string;
     roDate: string;
-    deliveryDate: string;
+    deliveryDate: string | Date | null;
     totalAmount: string;
     budgetType: string;
     status: 'Approved' | 'Pending' | 'Rejected';

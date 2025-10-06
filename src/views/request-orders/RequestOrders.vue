@@ -68,7 +68,7 @@
             <ViewRo v-model:visible="showDetailsModal" :order="selectedOrder" :isPurchasingRole="isPurchasingRole" @approve="handleApproveFromModal" @reject="handleRejectFromModal" />
 
             <!-- Edit Modal -->
-            <EditRo v-model:visible="showEditModal" :order="selectedOrder" @save="handleSaveOrder" />
+            <EditRo :visible="showEditModal" :order="selectedOrder" @update:visible="showEditModal = $event" @save="handleSaveOrder" />
         </div>
     </Motion>
 </template>

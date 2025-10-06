@@ -1,7 +1,7 @@
 <script lang="ts" src="./EditRo.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" :modal="true" header="Edit Request Order" class="w-11/12 md:w-2/3">
+    <Dialog v-model:visible="localVisible" :modal="true" header="Edit Request Order" :style="{ width: '90vw', maxWidth: '1200px' }">
         <div v-if="order">
             <form @submit.prevent="handleSave">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

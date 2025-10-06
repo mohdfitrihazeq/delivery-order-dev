@@ -6,6 +6,7 @@ import { reactive, ref } from 'vue';
 
 export const useRequestOrderStore = defineStore('requestOrder', () => {
     const orders = ref<Order[]>([]);
+    const selectedOrder = ref<Order | null>(null);
     const loading = ref(false);
 
     const filters = reactive({
@@ -30,17 +31,17 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
             const data = await requestOrderService.getRequestOrders(params);
 
             orders.value = data.map(
-                (o: any): Order => ({
-                    id: o.Id,
-                    roNumber: o.DocNo,
-                    requestedBy: o.CreatedBy,
-                    roDate: o.RequestOrderDate,
-                    deliveryDate: o.RequestOrderItems?.[0]?.DeliveryDate || '',
-                    totalAmount: o.TotalAmount,
-                    budgetType: o.PrType,
-                    status: o.Status,
-                    requestedAt: o.CreatedAt,
-                    items: (o.RequestOrderItems || []).map((item: any) => ({
+                (output: any): Order => ({
+                    id: output.Id,
+                    roNumber: output.DocNo,
+                    requestedBy: output.CreatedBy,
+                    roDate: output.RequestOrderDate,
+                    deliveryDate: output.RequestOrderItems?.[0]?.DeliveryDate || '',
+                    totalAmount: output.TotalAmount,
+                    budgetType: output.PrType,
+                    status: output.Status,
+                    requestedAt: output.CreatedAt,
+                    items: (output.RequestOrderItems || []).map((item: any) => ({
                         code: item.BudgetItemId || item.NonBudgetItemId || '',
                         description: item.Description,
                         uom: item.Uom,
@@ -57,6 +58,43 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         }
     }
 
+    async function fetchOrderById(id: string): Promise<Order | null> {
+        loading.value = true;
+        try {
+            const response = await requestOrderService.getRequestOrderById(id);
+            if (!response?.data) return null;
+
+            const o = response.data;
+            const order: Order = {
+                id: o.Id,
+                roNumber: o.DocNo,
+                requestedBy: o.CreatedBy,
+                roDate: o.RequestOrderDate,
+                deliveryDate: o.RequestOrderItems?.[0]?.DeliveryDate || '',
+                totalAmount: o.TotalAmount,
+                budgetType: o.PrType,
+                status: o.Status,
+                requestedAt: o.CreatedAt,
+                items: (o.RequestOrderItems || []).map((item: any) => ({
+                    code: item.ItemCode || '',
+                    description: item.Description,
+                    uom: item.Unit,
+                    qty: Number(item.Quantity),
+                    deliveryDate: item.DeliveryDate,
+                    note: item.Notes || ''
+                }))
+            };
+
+            selectedOrder.value = order;
+            return order;
+        } catch (error) {
+            showError(error, 'Failed to fetch request order details');
+            return null;
+        } finally {
+            loading.value = false;
+        }
+    }
+
     function clearFilters() {
         filters.status = '';
         filters.budgetType = '';
@@ -67,9 +105,11 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
 
     return {
         orders,
+        selectedOrder,
         loading,
         filters,
         fetchOrders,
+        fetchOrderById,
         clearFilters
     };
 });
