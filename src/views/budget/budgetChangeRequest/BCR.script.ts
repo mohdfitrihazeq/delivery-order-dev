@@ -2,7 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { RequestData } from '@/types/bcr.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
-import CommentBCR from '@/views/budget/components/modal/CommentsBCR.vue';
+import CommentBCR from '@/views/budget/components/modal/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -28,7 +28,7 @@ export default defineComponent({
                 status: 'Under Review',
                 materials: 2,
                 varianceAmount: '+$3,865',
-                actions: ['view', 'edit', 'comment']
+                actions: ['view', 'edit']
             },
             {
                 requestNo: 'BCR2024090002',
@@ -87,11 +87,8 @@ export default defineComponent({
             }
         }
         const router = useRouter();
-        function handleActionClick(type: 'edit' | 'view' | 'comment', rowData: RequestData) {
-            if (type === 'comment') {
-                selectedRequestNo.value = rowData.requestNo;
-                showCommentModal.value = true;
-            } else if (type === 'edit') {
+        function handleActionClick(type: 'edit' | 'view', rowData: RequestData) {
+            if (type === 'edit') {
                 router.push(`/bcr/edit/${rowData.requestNo}`);
             } else {
                 router.push(`/bcr/view/${rowData.requestNo}`);

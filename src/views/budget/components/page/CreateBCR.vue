@@ -47,7 +47,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Materials Section</h2>
                     <div class="flex gap-2">
-                        <Button label="+ Add Material" @click="addItem" />
+                        <Button label="+ Add Material" @click="openMeterial" />
                     </div>
                 </div>
 
@@ -200,6 +200,8 @@
                     </Motion>
                 </div>
             </div>
+
+            <MeterialModal v-model:visible="showBulkItemModal" />
         </div>
     </Motion>
 </template>

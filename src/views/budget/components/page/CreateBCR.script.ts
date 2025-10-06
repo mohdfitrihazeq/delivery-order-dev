@@ -1,12 +1,13 @@
 // CreateBCR.script.ts
 import type { Item, ItemOption, ReasonOption } from '@/types/bcr.type';
+import MeterialModal from '@/views/budget/components/modal/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion },
+    components: { Motion, MeterialModal },
     setup() {
         const router = useRouter();
 
@@ -73,6 +74,10 @@ export default defineComponent({
             const selected = itemOptions.value.find((opt) => opt.value === value);
             return selected ? selected.label : value;
         };
+        const showBulkItemModal = ref(false);
+        const openMeterial = () => {
+            showBulkItemModal.value = true;
+        };
 
         const totalVarianceAmount = computed(() => {
             return items.value.reduce((acc, item) => acc + calcEstimatedExceed(item), 0);
@@ -90,11 +95,11 @@ export default defineComponent({
             itemOptions,
             fillItemDetails,
             getItemLabel,
-
+            showBulkItemModal,
             calcExceedQty,
             calcExceedPercent,
             calcEstimatedExceed,
-
+            openMeterial,
             totalVarianceAmount,
             isAttachmentValid,
 
