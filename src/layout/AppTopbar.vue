@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/auth/auth.store';
 import { Motion } from '@motionone/vue';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

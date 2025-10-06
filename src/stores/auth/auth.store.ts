@@ -1,17 +1,6 @@
 import { authService } from '@/services/auth.service';
+import type { AuthState, User } from '@/types/auth.type';
 import { defineStore } from 'pinia';
-
-interface User {
-    username: string;
-    role: string;
-    email?: string;
-}
-
-interface AuthState {
-    token: string | null;
-    user: User | null;
-    isLoading: boolean;
-}
 
 export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({

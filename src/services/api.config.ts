@@ -13,8 +13,6 @@ const config = {
 
     getHost: (): string => config.hosts.backendApi,
 
-    getLimit: (): number => 99999,
-
     getHeadersWithToken: (companyId?: string | null, projectId?: string | null): Record<string, string> => {
         const token = config.getTokenFromLocalStorage();
         const clientId = config.getClientIdFromLocalStorage();

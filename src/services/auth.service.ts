@@ -1,19 +1,10 @@
+import type { LoginResponse } from '@/types/auth.type';
 import { showError } from '@/utils/showError.utils';
-import apiClient from './api.client';
-
-export interface LoginResponse {
-    token: string;
-    user?: {
-        username: string;
-        role: string;
-        email?: string;
-    };
-    [key: string]: any;
-}
+import axiosInstance from './backendAxiosInstance';
 
 const login = async (username: string, password: string): Promise<LoginResponse> => {
     try {
-        const response = await apiClient.post('/auth/login', {
+        const response = await axiosInstance.post('/auth/login', {
             username,
             password
         });
@@ -27,7 +18,7 @@ const login = async (username: string, password: string): Promise<LoginResponse>
 
 const logout = async (): Promise<void> => {
     try {
-        await apiClient.post('/auth/logout');
+        await axiosInstance.post('/auth/logout');
     } catch (error) {
         showError(error, 'Failed to logout.');
         throw error;
@@ -38,23 +29,7 @@ const logout = async (): Promise<void> => {
     }
 };
 
-const register = async (username: string, password: string, email?: string): Promise<LoginResponse> => {
-    try {
-        const response = await apiClient.post('/auth/register', {
-            username,
-            password,
-            email
-        });
-
-        return response.data;
-    } catch (error) {
-        showError(error, 'Failed to register user.');
-        throw error;
-    }
-};
-
 export const authService = {
     login,
-    register,
     logout
 };
