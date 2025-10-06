@@ -1,6 +1,6 @@
 import { BASE_PATH } from '@/constants/api';
 import router from '@/router';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/auth/auth.store';
 import axios, { AxiosError } from 'axios';
 import config from './api.config';
 

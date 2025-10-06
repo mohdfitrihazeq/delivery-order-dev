@@ -1,6 +1,6 @@
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
-import { useRequestOrderStore } from '@/stores/requestOrder.store';
+import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { TableColumn } from '@/types/table.type';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';

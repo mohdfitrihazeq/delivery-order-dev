@@ -1,5 +1,5 @@
 import AppLayout from '@/layout/AppLayout.vue';
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/auth/auth.store';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
     {

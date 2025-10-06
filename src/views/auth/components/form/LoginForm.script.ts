@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/auth/auth.store';
 import { useToast } from 'primevue/usetoast';
 import { nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
