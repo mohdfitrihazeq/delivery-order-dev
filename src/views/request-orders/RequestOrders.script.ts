@@ -48,6 +48,10 @@ export default defineComponent({
         // Tabs
         const activeTab = ref(isPurchasingRole ? 'pending' : 'all');
 
+        const pendingCount = computed(() => store.orders.filter((o) => o.status === 'Pending').length);
+        const approvedCount = computed(() => store.orders.filter((o) => o.status === 'Approved').length);
+        const totalValue = computed(() => store.orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
+
         const tabItems = computed(() => {
             if (isPurchasingRole) {
                 return [
@@ -78,11 +82,6 @@ export default defineComponent({
                 rowIndex: i + 1
             }))
         );
-
-        // Summary counts
-        const pendingCount = computed(() => store.orders.filter((o) => o.status === 'Pending').length);
-        const approvedCount = computed(() => store.orders.filter((o) => o.status === 'Approved').length);
-        const totalValue = computed(() => store.orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
 
         // Table config
         const tableColumns = computed<TableColumn[]>(() => [
@@ -136,14 +135,28 @@ export default defineComponent({
             }
         }
 
-        function openOrderDetails(order: Order): void {
-            selectedOrder.value = order;
-            showDetailsModal.value = true;
+        async function openOrderDetails(order: Order): Promise<void> {
+            const fullOrder = await store.fetchOrderById(String(order.id));
+            if (fullOrder) {
+                selectedOrder.value = fullOrder;
+                showDetailsModal.value = true;
+            }
         }
 
         function editOrder(order: Order): void {
-            selectedOrder.value = order;
             showEditModal.value = true;
+            selectedOrder.value = null;
+
+            store
+                .fetchOrderById(String(order.id))
+                .then((fullOrder) => {
+                    if (fullOrder) {
+                        selectedOrder.value = fullOrder;
+                    }
+                })
+                .catch((err) => {
+                    console.error('Failed to fetch full order', err);
+                });
         }
 
         function handleSaveOrder(formData: any): void {
