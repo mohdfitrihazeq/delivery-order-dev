@@ -15,6 +15,14 @@ export interface Item {
     orderedQty: number;
     newOrder: number;
     remark: string;
+    exceededQty: number;
+    exceededPercent: number;
+    estimatedExceed: number;
+    varianceQty: number;
+    varianceAmount: number;
+    notes: string;
+    showNotes: boolean;
+    showRemark: boolean;
 }
 
 export interface ItemOption {

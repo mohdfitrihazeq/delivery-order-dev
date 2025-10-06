@@ -30,6 +30,7 @@ declare module 'vue' {
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
+    RadioButton: typeof import('primevue/radiobutton')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

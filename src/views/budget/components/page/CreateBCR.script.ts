@@ -30,19 +30,6 @@ export default defineComponent({
             { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
         ]);
 
-        const addItem = () => {
-            items.value.push({
-                itemCode: '',
-                description: '',
-                uom: '',
-                unitPrice: 0,
-                budgetQty: 0,
-                orderedQty: 0,
-                newOrder: 0,
-                remark: ''
-            });
-        };
-
         const calcExceedQty = (item: Item) => {
             const newOrder = Number(item.newOrder) || 0;
             const ordered = Number(item.orderedQty) || 0;
@@ -91,7 +78,6 @@ export default defineComponent({
             requestDate,
             reasonOptions,
             items,
-            addItem,
             itemOptions,
             fillItemDetails,
             getItemLabel,

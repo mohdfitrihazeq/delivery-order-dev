@@ -1,11 +1,17 @@
 <template>
     <div class="card p-4 mb-6 shadow">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold flex items-center gap-2"><i class="pi pi-comments"></i> Discussion Thread</h3>
+        <h3 class="text-lg font-semibold flex items-center gap-2"><i class="pi pi-comments"></i> Discussion Thread</h3>
+        <br />
 
-            <div class="flex gap-2">
-                <Button v-for="(item, index) in discussions" :key="index" @click="active = String(index)" rounded :label="item.role" class="w-auto h-8 px-2 p-0" :outlined="active !== String(index)" />
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div class="flex gap-2">
+                    <Button v-for="(item, index) in discussions" :key="index" @click="active = String(index)" rounded :label="item.role" class="w-auto h-8 px-2 p-0" :outlined="active !== String(index)" />
+                </div>
             </div>
+
+            <!-- 👇 按钮只控制 showComment -->
+            <Button icon="pi pi-plus" label="Add Comment" class="h-8" @click="showComment = true" />
         </div>
 
         <Accordion v-model:value="active">
@@ -13,17 +19,17 @@
                 <AccordionHeader>
                     <div class="flex justify-between items-center w-full">
                         <div class="flex gap-2 items-center">
-                            <span class="font-semibold">{{ item.role }}</span>
+                            <span class="font-semibold">{{ item.role }} : </span>
                             <span>{{ item.name }}</span>
-                            <span class="text-gray-400">{{ item.datetime }}</span>
+                            <span><Badge>pending review</Badge></span>
                         </div>
                     </div>
                 </AccordionHeader>
 
                 <AccordionContent>
                     <div v-if="!item.isEditing" class="flex justify-between items-start">
-                        <!-- 左边内容 -->
                         <div>
+                            <span class="text-gray-400">{{ item.datetime }}</span>
                             <p class="mb-2 text-sm text-gray-700">
                                 {{ item.message || 'No comments yet.' }}
                             </p>
@@ -33,7 +39,6 @@
                             </div>
                         </div>
 
-                        <!-- 只有 editMode 才显示铅笔 icon -->
                         <Button v-if="editMode" icon="pi pi-pencil" text rounded @click="item.isEditing = true" />
                     </div>
 
@@ -51,14 +56,18 @@
                 </AccordionContent>
             </AccordionPanel>
         </Accordion>
+
+        <commentBCRModal v-model:visible="showComment" />
     </div>
 </template>
 
 <script lang="ts">
+import commentBCRModal from '@/views/budget/components/modal/CommentBCR.vue';
 import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
     name: 'DiscussionThread',
+    components: { commentBCRModal },
     props: {
         discussions: {
             type: Array as PropType<
@@ -73,13 +82,11 @@ export default defineComponent({
             >,
             required: true
         },
-        editMode: {
-            type: Boolean,
-            default: false // 默认是 view mode
-        }
+        editMode: { type: Boolean, default: false }
     },
     setup() {
         const active = ref('0');
+        const showComment = ref(false);
 
         const onUpload = (event: any) => {
             console.log('uploaded', event);
@@ -87,6 +94,7 @@ export default defineComponent({
 
         return {
             active,
+            showComment,
             onUpload
         };
     }
