@@ -132,8 +132,5 @@
 
             <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
         </div>
-
-        <!-- Discussion Thread -->
-        <DiscussionThread :discussions="discussionData" :editMode="true" />
     </div>
 </template>

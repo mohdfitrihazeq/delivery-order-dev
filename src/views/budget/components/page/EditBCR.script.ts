@@ -1,10 +1,10 @@
-import type { DiscussionItem, Item, ItemOption, ReasonOption } from '@/types/bcr.type';
-import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
+import type { Item, ItemOption, ReasonOption } from '@/types/bcr.type';
+
 import { computed, defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
     name: 'EditBCR',
-    components: { DiscussionThread },
+    components: {},
     setup() {
         const router = useRouter();
         const route = useRoute();
@@ -25,24 +25,6 @@ export default defineComponent({
             { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' },
             { label: 'TIL-03', value: 'TIL-03', description: 'Ceramic floor tiles 600x600mm', uom: 'm²' },
             { label: 'MAR-04', value: 'MAR-04', description: 'Premium marble slab', uom: 'm²' }
-        ]);
-
-        const discussionData = ref<DiscussionItem[]>([
-            {
-                role: 'Site',
-                name: 'John Smith',
-                datetime: '08/09/2024, 23:30:00',
-                message: 'Current tiles are adequate for the purpose. Upgrade not essential from operational perspective.',
-                documentUrl: 'https://example.com/doc1.pdf',
-                isEditing: false
-            },
-            {
-                role: 'PM',
-                name: 'Jane Doe',
-                datetime: '09/09/2024, 19:20:00',
-                message: 'Cost increase is too significant without clear functional benefit. Budget constraints do not allow this upgrade.',
-                isEditing: false
-            }
         ]);
 
         const items = ref<Item[]>([
@@ -155,7 +137,6 @@ export default defineComponent({
             totalVarianceAmount,
             isAttachmentValid,
             goBack: () => router.push({ name: 'bcr' }),
-            discussionData,
             active: ref('0')
         };
     }
