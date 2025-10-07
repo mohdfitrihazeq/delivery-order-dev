@@ -1,6 +1,4 @@
-<script lang="ts" src="./CompanyDetail.script">
-import CostCenterElement from './components/tab/CostCenterElement.vue';
-</script>
+<script lang="ts" src="./CompanyDetail.script"></script>
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
@@ -15,12 +13,10 @@ import CostCenterElement from './components/tab/CostCenterElement.vue';
                 </div>
             </div>
 
-            <!-- Company Card -->
+            <!-- Company Info -->
             <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6">
-                <!-- 第一行：Logo + 名称 + 注册号 -->
                 <div class="flex items-center gap-4 mb-6">
                     <img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" alt="Company Logo" class="w-20 h-20 rounded-md object-cover" />
-
                     <div>
                         <h2 class="text-2xl font-semibold text-emerald-600">Alunan Asasa</h2>
                         <p class="text-gray-600 dark:text-gray-300">Registration No: ab223124</p>
@@ -65,14 +61,16 @@ import CostCenterElement from './components/tab/CostCenterElement.vue';
                 </div>
             </div>
 
+            <!-- Tabs -->
             <BaseTab v-model="activeTab" :tabs="tabs" class="mb-4" />
 
+            <!-- Tab Content -->
             <div v-if="activeTab === 'cost-center'">
                 <CostCenterElement />
             </div>
 
             <div v-else-if="activeTab === 'subcon'">
-                <ReusableTable :value="subconList" :columns="columns" emptyTitle="Subcon Data" :show-import-file="false" />
+                <SubconList />
             </div>
         </div>
     </Motion>
