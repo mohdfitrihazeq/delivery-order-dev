@@ -105,21 +105,21 @@ const profileMenu = ref([
         label: 'Notification',
         icon: 'pi pi-bell',
         command: (event: MenuItemCommandEvent) => {
-            toast.add({ severity: 'info', summary: 'Company', detail: 'Opening company info...', life: 2000 });
+            router.push('/notifications');
         }
     },
     {
         label: 'Company',
         icon: 'pi pi-building',
         command: (event: MenuItemCommandEvent) => {
-            toast.add({ severity: 'info', summary: 'Company', detail: 'Opening company info...', life: 2000 });
+            router.push('/companyList');
         }
     },
     {
         label: 'Project',
-        icon: 'pi pi-user-edit',
+        icon: 'pi pi-receipt',
         command: (event: MenuItemCommandEvent) => {
-            toast.add({ severity: 'success', summary: 'Profile', detail: 'Opening user profile...', life: 2000 });
+            router.push('/projectList');
         }
     },
     {
@@ -132,13 +132,11 @@ const profileMenu = ref([
     }
 ]);
 
-// ✅ 控制 Menu 打开
 const profileMenuRef = ref();
 const toggleProfileMenu = (event: Event) => {
     profileMenuRef.value.toggle(event);
 };
 
-// ---------- Project logic ----------
 const username = ref<string | null>(null);
 const showProjectDialog = ref(false);
 const selectedProject = ref<{ company: string; name: string } | null>(null);

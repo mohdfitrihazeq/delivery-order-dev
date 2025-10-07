@@ -108,6 +108,22 @@ const routes: RouteRecordRaw[] = [
                     breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'View Delivery' }]
                 }
             },
+            {
+                path: '/companyList',
+                name: 'companyList',
+                component: () => import('@/views/company/CompanyList.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Company List', route: '/companyList' }]
+                }
+            },
+            {
+                path: '/companyDetail/:companyId',
+                name: 'companyDetail',
+                component: () => import('@/views/company/CompanyDetail.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Company List', route: '/companyList' }, { label: 'Company Detail' }]
+                }
+            },
 
             // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
