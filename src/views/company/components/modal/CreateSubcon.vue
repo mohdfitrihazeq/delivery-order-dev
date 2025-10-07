@@ -131,7 +131,6 @@ export default defineComponent({
                 </div>
             </div>
 
-            <!-- Contact Persons -->
             <div>
                 <label>Contact Persons <button v-if="form.contacts.length < 3" @click="addContact" class="mt-2 bg-blue-500 text-white px-3 py-1 rounded">Add Contact Person</button></label>
                 <div v-for="(contact, idx) in form.contacts" :key="idx" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 items-end">
