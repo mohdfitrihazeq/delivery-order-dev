@@ -10,7 +10,6 @@ export default defineComponent({
         const userRole = ref<string | null>(null);
 
         const fullMenuModel: MenuItemType[] = [
-            { separator: true },
             {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
@@ -34,14 +33,14 @@ export default defineComponent({
                     { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '/purchase-orders', badge: 1 },
                     { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
                 ]
-            },
-            {
-                label: 'Setting',
-                items: [
-                    { label: 'Company', icon: 'pi pi-fw pi-building-columns', to: '/company' },
-                    { label: 'Project', icon: 'pi pi-fw pi-server', to: '/project' }
-                ]
             }
+            // {
+            //     label: 'Setting',
+            //     items: [
+            //         { label: 'Company', icon: 'pi pi-fw pi-building-columns', to: '/company' },
+            //         { label: 'Project', icon: 'pi pi-fw pi-server', to: '/project' }
+            //     ]
+            // }
         ];
 
         const rolePermissions = {
