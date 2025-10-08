@@ -33,8 +33,13 @@ declare module 'vue' {
     SampleCallTable: typeof import('./src/components/table/SampleCallTable.vue')['default']
     SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
+    Splitter: typeof import('primevue/splitter')['default']
+    SplitterPanel: typeof import('primevue/splitterpanel')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
     Tag: typeof import('primevue/tag')['default']
     Toast: typeof import('primevue/toast')['default']
+  }
+  export interface ComponentCustomProperties {
+    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }
