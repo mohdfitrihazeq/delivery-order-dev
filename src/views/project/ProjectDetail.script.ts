@@ -1,12 +1,13 @@
 import BaseTab from '@/components/tab/BaseTab.vue';
 import Location from '@/views/project/components/tab/Location.vue';
+import Roles from '@/views/project/components/tab/Roles.vue';
 // import SubconList from '@/views/company/components/tab/Subcon.vue';
 import { Motion } from '@motionone/vue';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
     name: 'ProjectDetail',
-    components: { BaseTab, Motion, Location },
+    components: { BaseTab, Motion, Location, Roles },
     setup() {
         const tabs = [
             { label: 'Project Roles', value: 'projectRoles' },
