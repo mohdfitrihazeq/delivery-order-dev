@@ -1,4 +1,4 @@
-import AssignApproval from '@/views/project/components/modal/AssignApproval.vue';
+import AssignApproval from '@/views/project/components/dialog/AssignApproval.vue';
 import Card from 'primevue/card';
 import { defineComponent, ref } from 'vue';
 interface Person {

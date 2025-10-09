@@ -1,6 +1,6 @@
 // CreateBCR.script.ts
 import type { Item, ItemOption, ReasonOption } from '@/types/bcr.type';
-import MeterialModal from '@/views/budget/components/modal/CreateBCRModal.vue';
+import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';

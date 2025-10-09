@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import commentBCRModal from '@/views/budget/components/modal/CommentBCR.vue';
+import commentBCRModal from '@/views/budget/components/dialog/CommentBCR.vue';
 import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({

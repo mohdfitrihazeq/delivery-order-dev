@@ -1,4 +1,4 @@
-import AssignRoles from '@/views/project/components/modal/AssignRoles.vue';
+import AssignRoles from '@/views/project/components/dialog/AssignRoles.vue';
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import { defineComponent, ref } from 'vue';

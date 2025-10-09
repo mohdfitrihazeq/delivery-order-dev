@@ -4,7 +4,7 @@ import type { TableColumn } from '@/types/table.type';
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
-import BudgetImportModal from '@/views/budget/components/modal/BudgetImport.vue';
+import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';

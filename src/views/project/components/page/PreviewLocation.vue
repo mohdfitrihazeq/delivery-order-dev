@@ -17,40 +17,7 @@
     </div>
 </template>
 
-<script lang="ts">
-import Button from 'primevue/button';
-import Tooltip from 'primevue/tooltip';
-import { defineComponent, PropType } from 'vue';
-
-interface Location {
-    name: string;
-    children?: Record<string, Location>;
-    [key: string]: any;
-}
-
-export default defineComponent({
-    name: 'LocationItem',
-    components: { LocationItem: () => import('@/views/project/components/tab/Location.vue'), Button },
-    directives: { tooltip: Tooltip },
-    props: {
-        location: { type: Object as PropType<Location>, required: true },
-        level: { type: Number, default: 0 }
-    },
-    data() {
-        return { isExpanded: true };
-    },
-    computed: {
-        hasChildren(): boolean {
-            return this.location.children && Object.keys(this.location.children).length > 0;
-        }
-    },
-    methods: {
-        toggleExpand() {
-            this.isExpanded = !this.isExpanded;
-        }
-    }
-});
-</script>
+<script lang="ts" src="./PreviewLocation.script.ts"></script>
 
 <style scoped>
 .location-item {

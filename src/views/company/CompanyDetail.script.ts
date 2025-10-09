@@ -1,4 +1,3 @@
-// CompanyDetail.script.ts
 import BaseTab from '@/components/tab/BaseTab.vue';
 import CostCenterElement from '@/views/company/components/tab/CostCenterElement.vue';
 import SubconList from '@/views/company/components/tab/Subcon.vue';

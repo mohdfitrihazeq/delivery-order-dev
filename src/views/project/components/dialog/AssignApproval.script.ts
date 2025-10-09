@@ -1,4 +1,4 @@
-import UpdateApprovalRoles from '@/views/project/components/modal/UpdateApprovalRoles.vue';
+import UpdateApprovalRoles from '@/views/project/components/dialog/UpdateApprovalRoles.vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import { defineComponent, ref } from 'vue';

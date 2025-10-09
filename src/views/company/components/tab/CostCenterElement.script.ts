@@ -1,7 +1,7 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { TableColumn } from '@/types/table.type';
 
-import CreateCostCenterModal from '@/views/company/components/modal/CreateCostCenter.vue';
+import CreateCostCenterModal from '@/views/company/components/dialog/CreateCostCenter.vue';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, ref } from 'vue';
 
@@ -11,7 +11,6 @@ export default defineComponent({
     setup() {
         const toast = useToast();
 
-        // ---------- 表格列 ----------
         const columns: TableColumn[] = [
             { field: 'no', header: 'No' },
             { field: 'mainElement', header: 'Main Element' },
