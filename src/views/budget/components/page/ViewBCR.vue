@@ -46,32 +46,22 @@
                             <h3 class="text-lg font-semibold mb-4">Materials</h3>
 
                             <div class="overflow-x-auto">
-                                <table class="min-w-full border border-gray-200 text-sm">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-4 py-2 border">Item Code</th>
-                                            <th class="px-4 py-2 border">Description</th>
-                                            <th class="px-4 py-2 border">UOM</th>
-                                            <th class="px-4 py-2 border">Budgeted Qty</th>
-                                            <th class="px-4 py-2 border">Variance Qty</th>
-                                            <th class="px-4 py-2 border">Rate</th>
-                                            <th class="px-4 py-2 border">Variance Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(item, index) in items" :key="index">
-                                            <td class="border px-2 py-1">{{ item.itemCode }}</td>
-                                            <td class="border px-2 py-1">{{ item.description }}</td>
-                                            <td class="border px-2 py-1">{{ item.uom }}</td>
-                                            <td class="border px-2 py-1">{{ item.budgetQty }}</td>
-                                            <td class="border px-2 py-1">{{ item.varianceQty }}</td>
-                                            <td class="border px-2 py-1">{{ item.unitPrice }}</td>
-                                            <td class="border px-2 py-1">
-                                                {{ item.varianceAmount?.toFixed(2) }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <DataTable :value="items" :responsiveLayout="'scroll'" class="p-datatable-sm">
+                                    <Column field="itemCode" header="Item Code"></Column>
+                                    <Column field="description" header="Description"></Column>
+                                    <Column field="uom" header="Units"></Column>
+                                    <Column field="unitPrice" header="Unit Price" :body="formatPrice"></Column>
+                                    <Column field="budgetQty" header="Budgeted Qty" :body="formatNumber"></Column>
+                                    <Column field="orderedQty" header="Ordered Qty" :body="formatNumber"></Column>
+                                    <Column field="newOrder" header="New Order Qty" :body="formatNumber"></Column>
+                                    <Column field="exceededQty" header="Exceeded Qty" :body="formatNumber"></Column>
+                                    <Column field="exceededPercent" header="% Exceed" :body="formatPercent"></Column>
+                                    <Column field="estimatedExceed" header="Estimated Exceed" :body="formatPrice"></Column>
+                                    <Column field="varianceQty" header="Variance Qty" :body="formatNumber"></Column>
+                                    <Column field="varianceAmount" header="Variance Amount" :body="formatPrice"></Column>
+                                    <Column field="remark" header="Remarks"></Column>
+                                    <Column field="notes" header="Notes"></Column>
+                                </DataTable>
                             </div>
 
                             <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>

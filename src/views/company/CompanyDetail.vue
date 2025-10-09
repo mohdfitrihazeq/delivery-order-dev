@@ -18,7 +18,7 @@
                 <div class="flex items-center gap-4 mb-6">
                     <img src="https://cdn-icons-png.flaticon.com/512/679/679922.png" alt="Company Logo" class="w-20 h-20 rounded-md object-cover" />
                     <div>
-                        <h2 class="text-2xl font-semibold text-emerald-600">Alunan Asasa</h2>
+                        <h2 class="text-2xl font-semibold text-blue-600">Alunan Asasa</h2>
                         <p class="text-gray-600 dark:text-gray-300">Registration No: ab223124</p>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     <div class="ml-8 mt-3">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="font-semibold text-gray-700 dark:text-white">Projects</h3>
-                            <a href="/projectList" class="text-emerald-600 hover:underline text-sm font-medium">View More</a>
+                            <a href="/projectList" class="text-blue-600 hover:underline text-sm font-medium">View More</a>
                         </div>
 
                         <div class="space-y-2">
