@@ -1,42 +1,13 @@
 import type { TableColumn } from '@/types/table.type';
+import { Motion } from '@motionone/vue';
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-import BaseTab from '@/components/tab/BaseTab.vue';
-import ReusableTable from '@/components/table/ReusableTable.vue';
-import Overview from '@/views/budget/budgetOverview/Overview.vue';
-import BudgetImportModal from '@/views/budget/components/modal/BudgetImport.vue';
-
-import { Motion } from '@motionone/vue';
-import Badge from 'primevue/badge';
-import Button from 'primevue/button';
-import Dropdown from 'primevue/dropdown';
-import SelectButton from 'primevue/selectbutton';
-import Tag from 'primevue/tag';
-
 export default defineComponent({
     name: 'CompanyList',
-    components: {
-        BaseTab,
-        Motion,
-        Badge,
-        Button,
-        Dropdown,
-        SelectButton,
-        Tag,
-        ReusableTable,
-        Overview,
-        BudgetImportModal
-    },
+    components: { Motion },
     setup() {
-        // ---------------------------
-        // 1. ROUTER
-        // ---------------------------
         const router = useRouter();
 
-        // ---------------------------
-        // 2. TABLE COLUMNS
-        // ---------------------------
         const columns: TableColumn[] = [
             { field: 'no', header: 'No', sortable: false },
             { field: 'company', header: 'Company', sortable: true },
@@ -46,9 +17,6 @@ export default defineComponent({
             { header: 'Action', action: true, actions: ['view'] }
         ];
 
-        // ---------------------------
-        // 3. COMPANY DATA
-        // ---------------------------
         const companyList = ref([
             {
                 no: 1,
@@ -66,28 +34,18 @@ export default defineComponent({
             }
         ]);
 
-        // ---------------------------
-        // 4. SEARCH STATE
-        // ---------------------------
         const search = ref('');
 
-        function handleSearch(value: string) {
+        const handleSearch = (value: string) => {
             search.value = value;
-        }
+        };
 
-        // ---------------------------
-        // 5. ACTION HANDLER
-        // ---------------------------
-
-        function handleAction(type: 'view', row: any) {
+        const handleAction = (type: 'view', row: any) => {
             if (type === 'view') {
                 router.push(`/companyDetail/${row.no}`);
             }
-        }
+        };
 
-        // ---------------------------
-        // 6. RETURN
-        // ---------------------------
         return {
             columns,
             companyList,

@@ -1,7 +1,7 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { TableColumn } from '@/types/table.type';
 
-import CreateSubconModal from '@/views/company/components/modal/CreateSubcon.vue';
+import CreateSubconModal from '@/views/company/components/dialog/CreateSubcon.vue';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, ref } from 'vue';
 
