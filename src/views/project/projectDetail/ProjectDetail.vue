@@ -46,9 +46,14 @@
             </div>
 
             <BaseTab v-model="activeTab" :tabs="tabs" class="mb-4" />
-
-            <div v-if="activeTab === 'location'">
+            <div v-if="activeTab === 'projectRoles'">
+                <Roles />
+            </div>
+            <div v-else-if="activeTab === 'location'">
                 <Location />
+            </div>
+            <div v-else-if="activeTab === 'projectApproval'">
+                <Approval />
             </div>
         </div>
     </Motion>

@@ -6,7 +6,7 @@ export interface DiscussionItem {
     documentUrl?: string;
     isEditing: boolean;
 }
-export interface Item {
+interface Item {
     itemCode: string;
     description: string;
     uom: string;
@@ -14,12 +14,12 @@ export interface Item {
     budgetQty: number;
     orderedQty: number;
     newOrder: number;
-    remark: string;
     exceededQty: number;
     exceededPercent: number;
     estimatedExceed: number;
     varianceQty: number;
     varianceAmount: number;
+    remark: string;
     notes: string;
     showNotes: boolean;
     showRemark: boolean;
