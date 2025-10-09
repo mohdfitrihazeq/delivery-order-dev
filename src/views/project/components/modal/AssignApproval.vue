@@ -1,12 +1,12 @@
+<script lang="ts" src="./AssignApproval.script.ts"></script>
 <template>
     <Dialog :visible="visible" modal header="Assign Project Roles" class="w-[750px]" @hide="close">
         <!-- Approval Flow Header -->
         <div class="flex items-center justify-between mb-5">
             <h6 class="text-gray-700 font-semibold text-lg mb-0">Approval Flow</h6>
-            <Button icon="pi pi-pencil" class="p-button-text p-button-sm hover:text-teal-700" label="Edit Flow" @click="showUpdateRoles = true" />
+            <Button icon="pi pi-pencil" class="p-button-text p-button-sm hover:text-teal-700" label="Edit Flow" @click="openUpdateRoles" />
         </div>
 
-        <!-- Approval Flow Section -->
         <div class="approval-flow text-center mb-8">
             <div class="flex items-center justify-center gap-4 flex-wrap">
                 <div v-for="(step, index) in approvalSteps" :key="step.role" class="flex items-center">
@@ -18,7 +18,6 @@
             </div>
         </div>
 
-        <!-- User Role Table -->
         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 border-b border-gray-200">
@@ -45,62 +44,11 @@
             </table>
         </div>
 
-        <!-- Footer -->
         <template #footer>
             <Button label="Close" icon="pi pi-times" class="p-button-text text-gray-500" @click="close" />
             <Button label="Save Changes" icon="pi pi-check" class="p-button-primary" @click="save" />
         </template>
 
-        <!-- Update Roles Modal -->
-        <UpdateRoles v-if="showUpdateRoles" :visible="showUpdateRoles" @close="showUpdateRoles = false" :title="props.title" />
+        <UpdateApprovalRoles v-model:visible="showUpdateRoles" />
     </Dialog>
 </template>
-
-<script lang="ts" setup>
-import UpdateRoles from '@/views/project/components/modal/UpdateRoles.vue';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import { ref } from 'vue';
-
-interface Props {
-    visible: boolean;
-    title?: string;
-}
-const props = defineProps<Props>();
-const emit = defineEmits(['close']);
-
-interface ApprovalStep {
-    role: string;
-    users: string[];
-}
-
-// ✅ 数据
-const approvalSteps = ref<ApprovalStep[]>([
-    { role: 'PM', users: ['Alice', 'Bob'] },
-    { role: 'PD', users: ['ZIYU'] },
-    { role: 'QS', users: [] }
-]);
-
-// ✅ 控制子弹窗
-const showUpdateRoles = ref(false);
-
-// ✅ 关闭
-const close = (): void => {
-    emit('close');
-};
-
-// ✅ 保存
-const save = (): void => {
-    console.log('Saving roles:', approvalSteps.value);
-    emit('close');
-};
-</script>
-
-<style scoped>
-.approval-flow {
-    h6 {
-        font-size: 16px;
-        font-weight: 600;
-    }
-}
-</style>

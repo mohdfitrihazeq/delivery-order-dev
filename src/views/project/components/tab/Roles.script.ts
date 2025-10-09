@@ -1,5 +1,6 @@
-import ProjectRoles from '@/views/project/components/modal/ProjectRoles.vue';
+import AssignRoles from '@/views/project/components/modal/AssignRoles.vue';
 import Avatar from 'primevue/avatar';
+import Button from 'primevue/button';
 import { defineComponent, ref } from 'vue';
 
 interface Member {
@@ -14,7 +15,7 @@ interface ProjectRole {
 
 export default defineComponent({
     name: 'Roles',
-    components: { Avatar, ProjectRoles },
+    components: { Avatar, AssignRoles, Button },
 
     props: {
         cardTitle: {
@@ -45,8 +46,6 @@ export default defineComponent({
             }
         ]);
 
-        const showProjectRolesModal = ref(false);
-
         const getInitials = (name: string): string =>
             name
                 .split(' ')
@@ -57,23 +56,19 @@ export default defineComponent({
         const viewMore = (roleId: number): void => {
             alert(`View more members for role ID: ${roleId}`);
         };
+        const showDialog = ref(false);
 
-        const onAssignRoles = (): void => {
-            showProjectRolesModal.value = true;
-        };
-
-        const closeModal = (): void => {
-            showProjectRolesModal.value = false;
+        const handleSave = (assignments: any[]) => {
+            console.log('Saved assignments:', assignments);
         };
 
         return {
             props,
             masterProjectRoles,
-            showProjectRolesModal,
             getInitials,
             viewMore,
-            onAssignRoles,
-            closeModal
+            showDialog,
+            handleSave
         };
     }
 });

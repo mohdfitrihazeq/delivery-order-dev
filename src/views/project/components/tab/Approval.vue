@@ -4,7 +4,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Budget Change Request</span>
-                    <i class="pi pi-wallet text-primary text-xl"></i>
+                    <i class="pi pi-wallet text-primary text-xl" @click="onAssignRoles"></i>
                 </div>
             </template>
             <template #content>
@@ -24,7 +24,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Request Order</span>
-                    <i class="pi pi-wallet text-primary text-xl"></i>
+                    <i class="pi pi-wallet text-primary text-xl" @click="onAssignRoles"></i>
                 </div>
             </template>
             <template #content>
@@ -44,7 +44,7 @@
             <template #title>
                 <div class="border-b-2 border-primary-400 pb-2 mb-3 flex justify-between items-center">
                     <span class="text-lg font-semibold text-gray-800">Request Order Exceeded Budget</span>
-                    <i class="pi pi-wallet text-primary text-xl"></i>
+                    <i class="pi pi-wallet text-primary text-xl" @click="onAssignRoles"></i>
                 </div>
             </template>
             <template #content>
@@ -60,43 +60,7 @@
             </template>
         </Card>
     </div>
+    <AssignApproval v-if="showProjectRolesModal" :visible="showProjectRolesModal" @close="closeModal" />
 </template>
 
-<script lang="ts">
-import Card from 'primevue/card';
-import { defineComponent, ref } from 'vue';
-
-interface Person {
-    name: string;
-    role: string;
-}
-
-export default defineComponent({
-    name: 'RequestSummaryCards',
-    components: { Card },
-    setup() {
-        const budgetChangeList = ref<Person[]>([
-            { name: 'ZIYU', role: 'PM' },
-            { name: 'ALICE', role: 'Finance' },
-            { name: 'KELVIN', role: 'Admin' }
-        ]);
-
-        const requestOrderList = ref<Person[]>([
-            { name: 'BRYAN', role: 'Procurement' },
-            { name: 'CINDY', role: 'PM' }
-        ]);
-
-        const exceededBudgetList = ref<Person[]>([
-            { name: 'DAVID', role: 'Finance' },
-            { name: 'EMMA', role: 'PM' },
-            { name: 'LIAM', role: 'Director' }
-        ]);
-
-        return {
-            budgetChangeList,
-            requestOrderList,
-            exceededBudgetList
-        };
-    }
-});
-</script>
+<script lang="ts" src="./Approval.script.ts"></script>
