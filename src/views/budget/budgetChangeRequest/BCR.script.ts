@@ -2,7 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { RequestData } from '@/types/bcr.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
-import CommentBCR from '@/views/budget/components/modal/CreateBCRModal.vue';
+import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
