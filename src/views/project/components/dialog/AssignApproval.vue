@@ -1,6 +1,6 @@
 <script lang="ts" src="./AssignApproval.script.ts"></script>
 <template>
-    <Dialog :visible="visible" modal header="Assign Project Roles" class="w-[750px]" @hide="close">
+    <Dialog :visible="visible" modal header="Assign Project Approval" class="w-[750px]" @hide="close">
         <!-- Approval Flow Header -->
         <div class="flex items-center justify-between mb-5">
             <h6 class="text-gray-700 font-semibold text-lg mb-0">Approval Flow</h6>
