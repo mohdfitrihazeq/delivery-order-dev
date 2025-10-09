@@ -26,24 +26,24 @@ export default defineComponent({
 
     setup(props) {
         const masterProjectRoles = ref<ProjectRole[]>([
+            { id: 1, name: 'Management (MNGT) ', members: [{ name: 'Karen Chan' }] },
             {
-                id: 1,
-                name: 'Purchase',
-                members: [{ name: 'Alice Tan' }, { name: 'Ben Lim' }, { name: 'Carmen Ong' }, { name: 'Daniel Lee' }, { name: 'Elaine Wong' }]
-            },
-            { id: 2, name: 'Site', members: [{ name: 'Francis Goh' }, { name: 'Grace Chia' }] },
-            {
-                id: 3,
+                id: 2,
                 name: 'Project Manager (PM)',
                 members: [{ name: 'Henry Low' }, { name: 'Irene Teo' }, { name: 'Jason Koh' }]
             },
-            { id: 4, name: 'Project Director (PD)', members: [] },
-            { id: 5, name: 'Account', members: [{ name: 'Karen Chan' }] },
+            { id: 3, name: 'Project Director (PD)', members: [] },
             {
-                id: 6,
+                id: 4,
+                name: 'Purchase',
+                members: [{ name: 'Alice Tan' }, { name: 'Ben Lim' }, { name: 'Carmen Ong' }, { name: 'Daniel Lee' }, { name: 'Elaine Wong' }]
+            },
+            {
+                id: 5,
                 name: 'Quantity Surveyor (QS)',
                 members: [{ name: 'Lucas Tan' }, { name: 'Megan Yeo' }, { name: 'Nicholas Chew' }, { name: 'Olivia Tan' }, { name: 'Peter Wong' }]
-            }
+            },
+            { id: 6, name: 'Site', members: [{ name: 'Francis Goh' }, { name: 'Grace Chia' }] }
         ]);
 
         const getInitials = (name: string): string =>
