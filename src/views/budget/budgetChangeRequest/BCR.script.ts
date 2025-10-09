@@ -14,7 +14,7 @@ export default defineComponent({
         const BudgetChangeRequestSummaryData: CardItem[] = [
             { title: 'Pending Review', value: '1', description: 'Requires attention', icon: 'pi pi-exclamation-triangle', color: 'orange' },
             { title: 'Under Review', value: '1', description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
-            { title: 'Approved', value: '1', description: 'Ready for implementation', icon: 'pi pi-check-circle', color: 'green' },
+            { title: 'Approved', value: '1', description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
             { title: 'Total Value', value: '$ 43,295', description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
         ];
 

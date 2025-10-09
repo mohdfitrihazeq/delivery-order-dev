@@ -52,6 +52,9 @@
             <div v-else-if="activeTab === 'location'">
                 <Location />
             </div>
+            <div v-else-if="activeTab === 'projectApproval'">
+                <Approval />
+            </div>
         </div>
     </Motion>
 </template>
