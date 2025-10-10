@@ -65,6 +65,14 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
             if (!response?.data) return null;
 
             const o = response.data;
+            const parsedAttachments = (() => {
+                try {
+                    return o.Attachment ? JSON.parse(o.Attachment) : [];
+                } catch {
+                    return [];
+                }
+            })();
+
             const order: Order = {
                 id: o.Id,
                 roNumber: o.DocNo,
@@ -77,12 +85,21 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 requestedAt: o.CreatedAt,
                 items: (o.RequestOrderItems || []).map((item: any) => ({
                     code: item.ItemCode || '',
-                    description: item.Description,
-                    uom: item.Unit,
+                    description: item.Description || '',
+                    uom: item.Unit || '',
                     qty: Number(item.Quantity),
-                    deliveryDate: item.DeliveryDate,
-                    note: item.Notes || ''
-                }))
+                    deliveryDate: item.DeliveryDate || null,
+                    note: item.Notes || '',
+                    remark: item.Remark || '',
+                    budgetItemId: item.BudgetItemId ?? null,
+                    nonBudgetItemId: item.NonBudgetItemId ?? null
+                })),
+                debtorId: o.DebtorId ?? null,
+                remark: o.Remark ?? '',
+                terms: o.Terms ?? 'Net 30',
+                refDoc: o.RefDoc ?? 'RQ-001',
+                currency: o.Currency ?? 'MYR',
+                attachments: parsedAttachments
             };
 
             selectedOrder.value = order;
@@ -90,6 +107,19 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         } catch (error) {
             showError(error, 'Failed to fetch request order details');
             return null;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    async function updateOrder(id: string, payload: any, attachments?: File[]) {
+        loading.value = true;
+        try {
+            const response = await requestOrderService.updateRequestOrder(id, payload, attachments);
+            return response;
+        } catch (error) {
+            showError(error, 'Failed to update request order');
+            throw error;
         } finally {
             loading.value = false;
         }
@@ -110,6 +140,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         filters,
         fetchOrders,
         fetchOrderById,
-        clearFilters
+        clearFilters,
+        updateOrder
     };
 });
