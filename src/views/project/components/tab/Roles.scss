@@ -1,0 +1,62 @@
+.role-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.role-table td {
+    border: 1px solid #dee2e6;
+    vertical-align: top;
+    padding: 14px 16px;
+}
+
+.role-name {
+    width: 23%;
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+.role-members {
+    width: 27%;
+    vertical-align: top;
+    padding: 12px 14px;
+}
+
+.members-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.members-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.view-more-wrapper {
+    text-align: right;
+    margin-top: 8px;
+}
+
+.view-more {
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.view-more:hover {
+    text-decoration: underline;
+}
+
+.project-roles-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: -30px;
+}

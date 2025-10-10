@@ -1,11 +1,13 @@
+// CreateBCR.script.ts
 import type { Item, ItemOption, ReasonOption } from '@/types/bcr.type';
+import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'CreateBCR',
-    components: { Motion },
+    components: { Motion, MeterialModal },
     setup() {
         const router = useRouter();
 
@@ -22,23 +24,29 @@ export default defineComponent({
         ]);
 
         const items = ref<Item[]>([]);
+
         const itemOptions = ref<ItemOption[]>([
             { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
             { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' }
         ]);
 
-        const addItem = () => {
-            items.value.push({
-                itemCode: '',
-                description: '',
-                uom: '',
-                quantity: '1',
-                deliveryDate: null,
-                notes: '',
-                remark: '',
-                showNotes: false,
-                showRemark: false
-            });
+        const calcExceedQty = (item: Item) => {
+            const newOrder = Number(item.newOrder) || 0;
+            const ordered = Number(item.orderedQty) || 0;
+            return newOrder - ordered;
+        };
+
+        const calcExceedPercent = (item: Item) => {
+            const exceed = calcExceedQty(item);
+            const budget = Number(item.budgetQty) || 0;
+            if (budget === 0) return 0;
+            return (exceed / budget) * 100;
+        };
+
+        const calcEstimatedExceed = (item: Item) => {
+            const exceed = calcExceedQty(item);
+            const price = Number(item.unitPrice) || 0;
+            return exceed * price;
         };
 
         const fillItemDetails = (item: Item) => {
@@ -53,9 +61,13 @@ export default defineComponent({
             const selected = itemOptions.value.find((opt) => opt.value === value);
             return selected ? selected.label : value;
         };
+        const showBulkItemModal = ref(false);
+        const openMeterial = () => {
+            showBulkItemModal.value = true;
+        };
 
         const totalVarianceAmount = computed(() => {
-            return items.value.length * 100;
+            return items.value.reduce((acc, item) => acc + calcEstimatedExceed(item), 0);
         });
 
         const isAttachmentValid = ref(true);
@@ -66,13 +78,18 @@ export default defineComponent({
             requestDate,
             reasonOptions,
             items,
-            addItem,
             itemOptions,
             fillItemDetails,
             getItemLabel,
+            showBulkItemModal,
+            calcExceedQty,
+            calcExceedPercent,
+            calcEstimatedExceed,
+            openMeterial,
             totalVarianceAmount,
             isAttachmentValid,
-            goBack: () => router.push({ name: 'request-orders' })
+
+            goBack: () => router.push({ name: 'budgetChangeRequest' })
         };
     }
 });

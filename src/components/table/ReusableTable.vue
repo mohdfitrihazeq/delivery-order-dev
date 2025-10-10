@@ -1,4 +1,3 @@
-```vue
 <script setup lang="ts">
 import type { TableColumn } from '@/types/table.type';
 import Button from 'primevue/button';
@@ -25,7 +24,7 @@ type FilterOption = {
 
 interface TableRow {
     [key: string]: any;
-    actions?: ActionType[]; // ✅ 新逻辑，支持 row-level actions
+    actions?: ActionType[];
 }
 
 // ---------------- Props ----------------
@@ -95,7 +94,6 @@ function handleExport() {
 
 // ---------------- Actions Menu ----------------
 function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
-    // ✅ row.actions 优先，其次 fallback 到 column.actions
     const actions: ActionType[] = row.actions || defaultActions || [];
     if (!actions.length) return;
 
@@ -173,7 +171,6 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
         <template #paginatorstart></template>
 
         <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
-            <!-- 自定义 body slot -->
             <template v-if="col.bodySlot && !col.action" #body="slotProps">
                 <slot :name="col.bodySlot" :data="slotProps.data" />
             </template>

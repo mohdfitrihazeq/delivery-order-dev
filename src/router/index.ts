@@ -108,12 +108,37 @@ const routes: RouteRecordRaw[] = [
                     breadcrumb: [{ label: 'Deliveries', route: '/deliveries' }, { label: 'View Delivery' }]
                 }
             },
-
-            // TODO: REMOVE THE DRAFTS FILES BELOW LATER
             {
-                path: '/sample-call-table',
-                name: 'samplecalltable',
-                component: () => import('@/components/table/SampleCallTable.vue')
+                path: '/companyList',
+                name: 'companyList',
+                component: () => import('@/views/company/CompanyList.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Company List', route: '/companyList' }]
+                }
+            },
+            {
+                path: '/companyDetail/:companyId',
+                name: 'companyDetail',
+                component: () => import('@/views/company/CompanyDetail.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Company List', route: '/companyList' }, { label: 'Company Detail' }]
+                }
+            },
+            {
+                path: '/projectList',
+                name: 'projectList',
+                component: () => import('@/views/project/projectList/ProjectList.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Project List', route: '/projectList' }]
+                }
+            },
+            {
+                path: '/projectDetail/:projectId',
+                name: 'projectDetail',
+                component: () => import('@/views/project/projectDetail/ProjectDetail.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'Project List', route: '/projectList' }, { label: 'Project Detail' }]
+                }
             }
         ]
     },

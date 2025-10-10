@@ -2,7 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import type { RequestData } from '@/types/bcr.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
-import CommentBCR from '@/views/budget/components/modal/CommentsBCR.vue';
+import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -14,7 +14,7 @@ export default defineComponent({
         const BudgetChangeRequestSummaryData: CardItem[] = [
             { title: 'Pending Review', value: '1', description: 'Requires attention', icon: 'pi pi-exclamation-triangle', color: 'orange' },
             { title: 'Under Review', value: '1', description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
-            { title: 'Approved', value: '1', description: 'Ready for implementation', icon: 'pi pi-check-circle', color: 'green' },
+            { title: 'Approved', value: '1', description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
             { title: 'Total Value', value: '$ 43,295', description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
         ];
 
@@ -28,7 +28,7 @@ export default defineComponent({
                 status: 'Under Review',
                 materials: 2,
                 varianceAmount: '+$3,865',
-                actions: ['view', 'edit', 'comment']
+                actions: ['view', 'edit']
             },
             {
                 requestNo: 'BCR2024090002',
@@ -87,11 +87,8 @@ export default defineComponent({
             }
         }
         const router = useRouter();
-        function handleActionClick(type: 'edit' | 'view' | 'comment', rowData: RequestData) {
-            if (type === 'comment') {
-                selectedRequestNo.value = rowData.requestNo;
-                showCommentModal.value = true;
-            } else if (type === 'edit') {
+        function handleActionClick(type: 'edit' | 'view', rowData: RequestData) {
+            if (type === 'edit') {
                 router.push(`/bcr/edit/${rowData.requestNo}`);
             } else {
                 router.push(`/bcr/view/${rowData.requestNo}`);
