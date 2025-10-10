@@ -3,13 +3,16 @@ export interface Item {
     description: string;
     location: string;
     uom: string;
-    quantity: string;
+    qty: number;
     price?: number;
-    deliveryDate: Date | null;
-    notes: string;
-    remark: string;
-    showNotes: boolean;
-    showRemark: boolean;
+    deliveryDate: string | Date | null;
+    notes?: string;
+    remark?: string;
+    showNotes?: boolean;
+    showRemark?: boolean;
+    isBudgeted: boolean;
+    budgetItemId?: number | null;
+    nonBudgetItemId?: number | null;
 }
 
 export interface ItemOption {
@@ -32,18 +35,8 @@ export interface BudgetItem {
     element: string;
     itemType: string;
     uom: string;
-    quantity: number;
+    qty: number;
     price: number;
-}
-
-export interface BudgetItem {
-    itemCode: string;
-    description: string;
-    location: string;
-    element: string;
-    itemType: string;
-    uom: string;
-    quantity: number;
 }
 
 export interface FilterOption {
@@ -58,6 +51,10 @@ export interface OrderItem {
     qty: number;
     deliveryDate: string | Date | null;
     note: string;
+    notes?: string;
+    budgetItemId?: number | null;
+    nonBudgetItemId?: number | null;
+    remark?: string;
 }
 
 export interface Order {
@@ -71,6 +68,25 @@ export interface Order {
     status: 'Approved' | 'Pending' | 'Rejected';
     requestedAt: string;
     items: OrderItem[];
+    RequestOrderItems?: Array<{
+        Id: number;
+        RequestOrderId: number;
+        BudgetItemId: number | null;
+        NonBudgetItemId: number | null;
+        Description: string;
+        Unit: string;
+        Quantity: number | string;
+        Notes?: string | null;
+        Remark?: string | null;
+        DeliveryDate: string | Date | null;
+        ItemCode: string;
+    }>;
+    debtorId?: number;
+    remark?: string;
+    terms?: string;
+    refDoc?: string;
+    currency?: string;
+    attachments?: any[];
 }
 
 export interface PreviewItem {
@@ -78,7 +94,7 @@ export interface PreviewItem {
     itemType?: string;
     description: string;
     uom: string;
-    quantity: string | number;
+    qty: string | number;
     price: number;
     deliveryDate: Date | null;
     location: string;
@@ -97,24 +113,27 @@ export interface PreviewSummary {
     items: PreviewItem[];
     overallRemark?: string;
     attachmentsCount: number;
+    remark?: string;
 }
 
 export interface CreateRequestOrderPayload {
     DocNo: string;
     DebtorId: number;
     RequestOrderDate: string;
-    Terms?: string;
-    RefDoc?: string;
+    Terms: string;
+    RefDoc: string;
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
-    Remark?: string;
+    Remark: string;
+    Currency: string;
     Items: Array<{
-        BudgetItemId?: number | null;
-        NonBudgetItemId?: number | null;
+        BudgetItemId: number | null;
+        NonBudgetItemId: number | null;
         Description: string;
         Uom: string;
         Quantity: number;
-        Rate: number;
+        Notes: string;
+        Remark: string;
         DeliveryDate: string;
     }>;
 }
@@ -123,4 +142,53 @@ export interface CreateRequestOrderResponse {
     success: boolean;
     data?: any;
     message?: string;
+}
+
+export interface EditFormItem {
+    code?: string;
+    budgetItemId?: number | null;
+    nonBudgetItemId?: number | null;
+    description: string;
+    uom: string;
+    qty: number;
+    deliveryDate: string | Date | null;
+    notes?: string;
+    remark?: string;
+}
+
+export interface EditForm {
+    roNumber: string;
+    requestedBy: string;
+    roDate: Date | null;
+    deliveryDate: Date | null;
+    totalAmount: number;
+    budgetType: string;
+    remark?: string;
+    terms?: string;
+    refDoc?: string;
+    currency?: string;
+    items: EditFormItem[];
+    attachments: Array<File | AttachmentItem>;
+}
+
+export type AttachmentItem = {
+    filename: string;
+    path: string;
+    type: string;
+    size: number;
+};
+
+export interface EditForm {
+    roNumber: string;
+    requestedBy: string;
+    roDate: Date | null;
+    deliveryDate: Date | null;
+    totalAmount: number;
+    budgetType: string;
+    remark?: string;
+    terms?: string;
+    refDoc?: string;
+    currency?: string;
+    items: EditFormItem[];
+    attachments: (File | AttachmentItem)[];
 }
