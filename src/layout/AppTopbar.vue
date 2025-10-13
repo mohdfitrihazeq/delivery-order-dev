@@ -1,5 +1,6 @@
 <template>
     <Motion tag="div" class="layout-topbar shadow" :initial="{ y: -80, opacity: 0 }" :animate="{ y: 0, opacity: 1 }" :transition="{ duration: 0.8, ease: 'easeOut' }">
+        <!-- 左侧 LOGO -->
         <div class="layout-topbar-logo-container flex items-center gap-3">
             <button class="layout-menu-button layout-topbar-action" @click="toggleMenu">
                 <i class="pi pi-bars dark:text-white"></i>
@@ -10,8 +11,9 @@
             </router-link>
         </div>
 
+        <!-- 右侧操作栏 -->
         <div class="layout-topbar-actions flex items-center gap-3">
-            <!-- Project Selector -->
+            <!-- Project Dialog -->
             <div class="shadow-sm cursor-pointer border border-gray-200 dark:bg-gray-800 px-3 py-1 rounded hover:bg-gray-100" @click="showProjectDialog = true">
                 <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-2">
@@ -24,6 +26,7 @@
                 </div>
             </div>
 
+            <!-- Project Selector Dialog -->
             <Dialog v-model:visible="showProjectDialog" header="Select Project" modal class="w-[500px]">
                 <div v-for="group in companyProjects" :key="group.company" class="mb-4">
                     <h3 class="text-lg font-semibold mb-2">{{ group.company }}</h3>
@@ -47,18 +50,27 @@
                 </div>
             </Dialog>
 
-            <!-- Profile menu -->
+            <!-- Dark Mode 切换按钮 -->
+            <div class="layout-config-menu">
+                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
+                    <i :class="['pi', { 'pi-moon text-white': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
+                </button>
+            </div>
+
+            <!-- 用户菜单 -->
             <div class="relative">
                 <Button class="p-button-text p-button-plain p-button-sm flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 transition" @click="toggleProfileMenu">
                     <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-7 h-7 rounded-full object-cover" />
                     <span class="font-medium">{{ username || 'PM User' }}</span>
                 </Button>
 
-                <Menu ref="profileMenuRef" :model="profileMenu" popup class="w-44">
+                <Menu ref="profileMenuRef" :model="profileMenu" popup class="w-40">
                     <template #item="{ item }">
-                        <div class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" @click="item.command && item.command()">
+                        <div class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" @click="item.command && item.command($event)">
                             <i :class="item.icon" class="text-gray-600 dark:text-gray-200"></i>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-100">{{ item.label }}</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-100">
+                                {{ item.label }}
+                            </span>
                         </div>
                     </template>
                 </Menu>
@@ -77,6 +89,7 @@ import { useAuthStore } from '@/stores/auth/auth.store';
 import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
+import type { MenuItemCommandEvent } from 'primevue/menuitem';
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -91,35 +104,22 @@ const handleSignOut = () => {
     router.push({ name: 'login' });
 };
 
-// ✅ Profile menu items
 const profileMenu = ref([
-    {
-        label: 'Toggle Dark Mode',
-        icon: 'pi pi-moon',
-        command: () => toggleDarkMode()
-    },
-    {
-        label: 'Notification',
-        icon: 'pi pi-bell',
-        command: () => router.push('/notifications')
-    },
     {
         label: 'Company',
         icon: 'pi pi-building',
-        command: () => router.push('/companyList')
+        command: (event: MenuItemCommandEvent) => router.push('/companyList')
     },
     {
         label: 'Project',
         icon: 'pi pi-receipt',
-        command: () => router.push('/projectList')
+        command: (event: MenuItemCommandEvent) => router.push('/projectList')
     },
-    {
-        separator: true
-    },
+    { separator: true },
     {
         label: 'Sign Out',
         icon: 'pi pi-sign-out',
-        command: () => handleSignOut()
+        command: (event: MenuItemCommandEvent) => handleSignOut()
     }
 ]);
 
@@ -199,7 +199,6 @@ onMounted(() => {
     const storedProject = loadProjectFromStorage();
     if (storedProject) {
         const projectExists = companyProjects.value.some((company) => company.company === storedProject.company && company.projects.some((project) => project.name === storedProject.name));
-
         selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT' };
     } else {
         selectedProject.value = { company: 'Alunan Asas', name: 'MKT' };
