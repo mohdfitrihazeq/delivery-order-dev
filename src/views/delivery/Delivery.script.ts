@@ -1,4 +1,3 @@
-// src/views/deliveries/Delivery.script.ts
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { TableColumn } from '@/types/table.type';
 import { defineComponent, onMounted, ref } from 'vue';

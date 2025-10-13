@@ -1,4 +1,3 @@
-// src/stores/delivery.store.ts
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import type { DeliveryOrder } from '@/types/delivery.type';
 import { defineStore } from 'pinia';
