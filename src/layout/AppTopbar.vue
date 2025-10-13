@@ -42,9 +42,8 @@ const profileMenu = ref([
         icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')),
         command: () => toggleDarkMode()
     },
-    {
-        separator: true
-    },
+
+    { separator: true },
     {
         label: 'Sign Out',
         icon: 'pi pi-sign-out',
@@ -128,7 +127,6 @@ onMounted(() => {
     const storedProject = loadProjectFromStorage();
     if (storedProject) {
         const projectExists = companyProjects.value.some((company) => company.company === storedProject.company && company.projects.some((project) => project.name === storedProject.name));
-
         selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT' };
     } else {
         selectedProject.value = { company: 'Alunan Asas', name: 'MKT' };
