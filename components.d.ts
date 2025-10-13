@@ -20,6 +20,7 @@ declare module 'vue' {
     Chart: typeof import('primevue/chart')['default']
     Column: typeof import('primevue/column')['default']
     DataTable: typeof import('primevue/datatable')['default']
+    DatePicker: typeof import('primevue/datepicker')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
@@ -28,7 +29,6 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     OverlayBadge: typeof import('primevue/overlaybadge')['default']
-    Message: typeof import('primevue/message')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
@@ -42,5 +42,8 @@ declare module 'vue' {
     Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
+  }
+  export interface ComponentCustomProperties {
+    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }

@@ -121,17 +121,6 @@
                     <label class="block text-sm text-gray-600 mb-1">Remark</label>
                     <Textarea v-model="editForm.remark" rows="3" class="w-full" placeholder="Add any additional remarks or notes..." />
                 </div>
-                <div v-if="editForm.attachments && editForm.attachments.length" class="mt-3">
-                    <h6>Attachments:</h6>
-                    <div class="flex flex-wrap gap-3">
-                        <div v-for="(file, index) in editForm.attachments" :key="index" class="flex items-center gap-2 cursor-pointer" @click="previewAttachment(file)">
-                            <i class="pi pi-paperclip text-blue-600"></i>
-                            <span class="text-sm text-blue-600 hover:underline">
-                                {{ getAttachmentName(file) }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
             </form>
         </div>
 
