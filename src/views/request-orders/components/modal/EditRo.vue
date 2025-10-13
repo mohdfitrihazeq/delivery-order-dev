@@ -31,12 +31,12 @@
                 <DataTable :value="editForm.items" class="w-full">
                     <Column field="code" header="Item Code">
                         <template #body="slotProps">
-                            <InputText v-model="slotProps.data.code" class="w-full" />
+                            <InputText v-model="slotProps.data.code" class="w-full" disabled />
                         </template>
                     </Column>
                     <Column field="description" header="Description">
                         <template #body="slotProps">
-                            <InputText v-model="slotProps.data.description" class="w-full" />
+                            <InputText v-model="slotProps.data.description" class="w-full" disabled />
                         </template>
                     </Column>
                     <Column field="uom" header="UOM">
@@ -69,56 +69,48 @@
 
                 <!-- Overall Attachments -->
                 <div class="mt-4">
-                    <label class="block text-sm text-gray-600 mb-5">Attachments</label>
-                    <FileUpload v-model="attachments" name="demo[]" url="/api/upload" @upload="onTemplatedUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000" @select="onSelectedFiles">
-                        <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
-                            <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
-                                <div class="flex gap-2">
-                                    <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined></Button>
-                                    <Button @click="uploadEvent(uploadCallback)" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
-                                    <Button @click="onClearTemplatingUpload(clearCallback)" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
-                                </div>
-                                <ProgressBar :value="totalSizePercent" :showValue="true" class="md:w-20rem h-1rem w-full md:ml-auto relative">
-                                    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-white-600"> {{ totalSize }}B / 1MB </span>
-                                </ProgressBar>
+                    <label class="block text-sm text-gray-600 mb-2">Attachments</label>
+
+                    <!-- Show existing attachments -->
+                    <div v-if="existingAttachments.length > 0" class="mb-4">
+                        <h4 class="text-sm font-semibold mb-2">Existing Attachments</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                                <i class="pi pi-file"></i>
+                                <span class="text-sm">{{ file.filename }}</span>
+                                <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" />
+                                <Button icon="pi pi-times" text rounded severity="danger" @click="removeExistingAttachment(index)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FileUpload for new attachments -->
+                    <FileUpload name="attachments" :multiple="true" accept="image/*" :maxFileSize="1000000" :auto="false" @select="onSelectedFiles" :showUploadButton="false" :showCancelButton="false">
+                        <template #header="{ chooseCallback, clearCallback, files }">
+                            <div class="flex gap-2">
+                                <Button @click="chooseCallback()" icon="pi pi-images" label="Choose Files" outlined />
+                                <Button @click="clearCallback" icon="pi pi-times" label="Clear" outlined severity="danger" :disabled="!files || files.length === 0" />
                             </div>
                         </template>
 
-                        <template #content="{ files, uploadedFiles, removeUploadedFileCallback }">
-                            <div v-if="files.length > 0">
-                                <h5>Pending</h5>
-                                <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-                                    <div v-for="(file, index) of files" :key="file.name + file.type + file.size" class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3">
-                                        <div>
-                                            <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" />
-                                        </div>
-                                        <span class="font-semibold">{{ file.name }}</span>
-                                        <div>{{ formatSize(file.size) }}</div>
-                                        <Badge value="Pending" severity="warning" />
-                                        <Button icon="pi pi-times" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded severity="danger" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="uploadedFiles.length > 0">
-                                <h5>Completed</h5>
-                                <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-                                    <div v-for="(file, index) of uploadedFiles" :key="file.name + file.type + file.size" class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3">
-                                        <div>
-                                            <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" />
-                                        </div>
-                                        <span class="font-semibold">{{ file.name }}</span>
-                                        <div>{{ formatSize(file.size) }}</div>
-                                        <Badge value="Completed" class="mt-3" severity="success" />
-                                        <Button icon="pi pi-times" @click="removeUploadedFileCallback(index)" outlined rounded severity="danger" />
+                        <template #content="{ files, removeFileCallback }">
+                            <div v-if="files.length > 0" class="mt-4">
+                                <h4 class="text-sm font-semibold mb-2">New Attachments to Upload</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <div v-for="(file, index) in files" :key="`new-${index}`" class="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
+                                        <i class="pi pi-file"></i>
+                                        <span class="text-sm">{{ file.name }}</span>
+                                        <span class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
+                                        <Button icon="pi pi-times" text rounded severity="danger" @click="removeFileCallback(index)" />
                                     </div>
                                 </div>
                             </div>
                         </template>
+
                         <template #empty>
-                            <div class="flex items-center justify-center flex-col">
-                                <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color" />
-                                <p class="mt-6 mb-0">Drag and drop files to here to upload.</p>
+                            <div class="flex items-center justify-center flex-col p-4">
+                                <i class="pi pi-cloud-upload text-4xl text-gray-400 mb-2" />
+                                <p class="text-sm text-gray-500">Drag and drop files here or click "Choose Files"</p>
                             </div>
                         </template>
                     </FileUpload>
@@ -127,7 +119,7 @@
                 <!-- Overall Remark -->
                 <div class="mt-4">
                     <label class="block text-sm text-gray-600 mb-1">Remark</label>
-                    <Textarea v-model="Remark" rows="3" class="w-full" placeholder="Add any additional remarks or notes..." />
+                    <Textarea v-model="editForm.remark" rows="3" class="w-full" placeholder="Add any additional remarks or notes..." />
                 </div>
                 <div v-if="editForm.attachments && editForm.attachments.length" class="mt-3">
                     <h6>Attachments:</h6>

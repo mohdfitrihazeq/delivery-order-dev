@@ -8,12 +8,11 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
         formData.append('data', JSON.stringify(payload));
 
         if (attachments && attachments.length > 0) {
-            attachments.forEach((file) => formData.append('attachment', file));
+            attachments.forEach((file) => formData.append('attachment', file, file.name));
         }
 
-        const response = await axiosInstance.post('/requestOrder', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        // Don't set Content-Type - let interceptor and browser handle it
+        const response = await axiosInstance.post('/requestOrder', formData);
 
         return { success: true, data: response.data };
     } catch (error: any) {
@@ -28,28 +27,24 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
 
 const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
     try {
-        const cleanPayload = JSON.parse(JSON.stringify(payload, (_, value) => (value === undefined ? null : value)));
-
         const formData = new FormData();
-        formData.append('data', JSON.stringify(cleanPayload));
+        formData.append('data', JSON.stringify(payload));
 
-        if (attachments && attachments.length > 0) {
-            attachments.forEach((file) => formData.append('attachment', file));
-        } else {
-            formData.append('attachment', '');
+        if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+            attachments.forEach((file, index) => {
+                formData.append('attachment', file, file.name);
+            });
         }
 
-        const response = await axiosInstance.put(`/requestOrder/${id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        // Don't set Content-Type - let interceptor and browser handle it
+        const response = await axiosInstance.put(`/requestOrder/${id}`, formData);
 
         return { success: true, data: response.data };
     } catch (error: any) {
-        console.error('❌ Update Request Order Service Error:', error.response?.data || error);
         showError(error, 'Failed to update request order.');
         return {
             success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to update request order'
+            message: error.response?.data?.message || 'Failed to update request order'
         };
     }
 };

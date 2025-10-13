@@ -14,9 +14,18 @@ axiosInstance.interceptors.request.use(
     (request) => {
         const headers = config.getHeadersWithToken();
 
-        Object.keys(headers).forEach((key) => {
-            request.headers.set(key, headers[key]);
-        });
+        if (request.data instanceof FormData) {
+            Object.keys(headers).forEach((key) => {
+                if (key !== 'Content-Type') {
+                    request.headers.set(key, headers[key]);
+                }
+            });
+            delete request.headers['Content-Type'];
+        } else {
+            Object.keys(headers).forEach((key) => {
+                request.headers.set(key, headers[key]);
+            });
+        }
 
         return request;
     },
@@ -25,7 +34,6 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Response interceptor
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
@@ -33,7 +41,6 @@ axiosInstance.interceptors.response.use(
             switch (error.response.status) {
                 case 401: {
                     console.error('Unauthorized: Redirect to login');
-
                     const authStore = useAuthStore();
                     authStore.logout();
                     router.push({ name: 'login' });

@@ -132,8 +132,9 @@ export interface CreateRequestOrderPayload {
         Description: string;
         Uom: string;
         Quantity: number;
+        Rate?: number;
         Notes: string;
-        Remark: string;
+        Reason: string;
         DeliveryDate: string;
     }>;
 }
