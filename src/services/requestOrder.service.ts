@@ -8,12 +8,11 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
         formData.append('data', JSON.stringify(payload));
 
         if (attachments && attachments.length > 0) {
-            attachments.forEach((file) => formData.append('attachment', file));
+            attachments.forEach((file) => formData.append('attachment', file, file.name));
         }
 
-        const response = await axiosInstance.post('/requestOrder', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        // Don't set Content-Type - let interceptor and browser handle it
+        const response = await axiosInstance.post('/requestOrder', formData);
 
         return { success: true, data: response.data };
     } catch (error: any) {
