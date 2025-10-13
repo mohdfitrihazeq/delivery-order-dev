@@ -49,6 +49,28 @@ const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload
     }
 };
 
+const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
+    try {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(payload));
+
+        if (attachments && attachments.length > 0) {
+            attachments.forEach((file) => formData.append('attachment', file, file.name));
+        }
+
+        const response = await axiosInstance.post('/requestOrder/Draft', formData);
+
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        console.error('Request Order Draft Service Error:', error.response?.data || error);
+        showError(error, 'Failed to save request order as draft.');
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Failed to save request order as draft'
+        };
+    }
+};
+
 const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
     try {
         const response = await axiosInstance.get('/requestOrder', { params });
@@ -73,5 +95,6 @@ export const requestOrderService = {
     createRequestOrder,
     getRequestOrders,
     getRequestOrderById,
-    updateRequestOrder
+    updateRequestOrder,
+    createRequestOrderDraft
 };

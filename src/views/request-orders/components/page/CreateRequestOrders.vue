@@ -205,7 +205,7 @@
 
             <div class="flex justify-end gap-3">
                 <Button label="Cancel" @click="$router.push('/request-orders')" outlined />
-                <Button label="Save as Draft" severity="secondary" outlined @click="saveDraft" />
+                <Button label="Save as Draft" severity="secondary" outlined @click="saveDraft" :disabled="!canSubmit" v-tooltip="'Save for later'" />
                 <Button label="Submit Request Order" @click="openPreviewModal" :disabled="!canSubmit" />
             </div>
         </div>

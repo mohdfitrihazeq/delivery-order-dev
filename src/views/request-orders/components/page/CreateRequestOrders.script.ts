@@ -349,25 +349,59 @@ export default defineComponent({
             }
         }
 
-        function saveDraft() {
-            const draftData = {
-                draftId: `DRAFT-RO-${Date.now()}`,
-                roNumber: roNumber.value,
-                budgetType: budgetType.value,
-                roDate: calendarValue.value,
-                items: items.value,
-                overallRemark: overallRemark.value,
-                attachments: attachments.value
-            };
+        async function saveDraft() {
+            try {
+                const formatDateToAPI = (date: Date | null): string => {
+                    if (!date) return new Date().toISOString().split('T')[0];
+                    return date.toISOString().split('T')[0];
+                };
 
-            console.log('Saving draft:', draftData);
+                const payload: CreateRequestOrderPayload = {
+                    DocNo: roNumber.value,
+                    DebtorId: 1,
+                    RequestOrderDate: formatDateToAPI(calendarValue.value),
+                    Terms: 'Net 30',
+                    RefDoc: '',
+                    BudgetType: budgetType.value === 'Budgeted Item' ? 'Budgeted' : 'NonBudgeted',
+                    Type: 'requestOrder',
+                    Remark: overallRemark.value || '',
+                    Items: items.value.map((item) => ({
+                        BudgetItemId: budgetType.value === 'Budgeted Item' ? 1 : null,
+                        NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
+                        Description: item.description,
+                        Uom: item.uom,
+                        Quantity: parseFloat(item.quantity) || 0,
+                        Rate: item.price || 0,
+                        DeliveryDate: formatDateToAPI(item.deliveryDate)
+                    }))
+                };
 
-            toast.add({
-                severity: 'success',
-                summary: 'Draft Saved',
-                detail: 'Your request order has been saved as draft',
-                life: 3000
-            });
+                const result = await requestOrderService.createRequestOrderDraft(payload, attachments.value.length > 0 ? attachments.value : undefined);
+
+                if (result.success) {
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Draft Saved',
+                        detail: `RO ${roNumber.value} has been saved as draft successfully`,
+                        life: 3000
+                    });
+                } else {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Save Draft Failed',
+                        detail: result.message || 'Failed to save request order as draft',
+                        life: 5000
+                    });
+                }
+            } catch (error: any) {
+                console.error('Save draft failed:', error);
+                toast.add({
+                    severity: 'error',
+                    summary: 'Save Draft Error',
+                    detail: error.message || 'An unexpected error occurred while saving draft',
+                    life: 5000
+                });
+            }
         }
 
         return {
