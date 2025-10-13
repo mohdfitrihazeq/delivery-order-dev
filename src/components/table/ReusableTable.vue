@@ -114,7 +114,7 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
     <div class="flex flex-col sm:flex-row justify-end items-start sm:items-center mb-4 gap-2 mt-0 sm:mt-[-35px]">
         <!-- Search -->
         <span class="p-input-icon-left w-full sm:max-w-sm sm:w-auto">
-            <InputText v-if="props.onSearch" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
+            <InputText v-if="props.onSearch && props.value && props.value.length > 0" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
         </span>
 
         <!-- Filters + Buttons -->

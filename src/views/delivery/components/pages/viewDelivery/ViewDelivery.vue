@@ -2,7 +2,7 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card glossy-card">
+        <div class="p-6 card">
             <BreadcrumbList />
             <!-- Header -->
             <h1 class="text-xl font-bold">Delivery Order</h1>
