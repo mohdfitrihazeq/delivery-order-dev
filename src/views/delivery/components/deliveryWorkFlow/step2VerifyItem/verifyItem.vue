@@ -80,7 +80,7 @@
 
                                     <div class="flex items-center gap-2 mt-2 ms-5">
                                         <label class="font-medium">Delivery Qty:</label>
-                                        <InputText v-model="item.delivered" class="w-20 text-center" />
+                                        <InputNumber v-model="item.delivered" class="w-20 text-center" />
                                         <span>
                                             <span v-if="item.order.includes('kg')">kg</span>
                                             <span v-else-if="item.order.includes('m³')">m³</span>

@@ -94,7 +94,7 @@
                         <DeliveryInfo @update="handleStep3Update" @next-step="goStep(4)" @prev-step="goStep(2)" />
                     </StepPanel>
                     <StepPanel :value="4">
-                        <div v-if="canPassToReview"><Review @update="handleStep4Update" :deliveryData="deliveryData" /></div>
+                        <div v-if="canPassToReview"><Review :deliveryData="deliveryData" /></div>
                         <div v-else class="text-gray-500">Please complete all previous steps before reviewing.</div>
                     </StepPanel>
                 </StepPanels>

@@ -1,3 +1,5 @@
+import type { VerifyPurchaseOrderItem } from '@/types/delivery.type';
+import type { PurchaseOrder, PurchaseOrderItem } from '@/types/purchase.type';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
@@ -11,24 +13,6 @@ import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, ref, watch } from 'vue';
-
-interface PurchaseOrder {
-    id: string;
-    code: string;
-    title?: string;
-    content?: string;
-}
-
-interface Item {
-    name: string;
-    order: string;
-    status: string;
-    location: string;
-    category: string;
-    type: string;
-    delivered: number;
-    total: number;
-}
 
 export default defineComponent({
     name: 'VerifyItem',
@@ -56,7 +40,7 @@ export default defineComponent({
         // ---------------------------
         // 1. STATE
         // ---------------------------
-        const itemList = ref<Item[]>([]);
+        const itemList = ref<VerifyPurchaseOrderItem[]>([]);
         const poNumber = ref<string | null>(null);
         const expanded = ref<number[]>([]);
         const activeIndex = ref<number[]>([0]);
@@ -75,69 +59,22 @@ export default defineComponent({
                     return;
                 }
 
-                if (newPo.id === '1') {
-                    itemList.value = [
-                        {
-                            name: 'Steel reinforcement bars Grade 60',
-                            order: 'Order 2,500 kg',
-                            status: 'Pending',
-                            location: 'Building A > Level 1-5',
-                            category: 'Structure > Foundation > Reinforcement',
-                            type: 'Materials',
-                            delivered: 0,
-                            total: 2500
-                        },
-                        {
-                            name: 'Soil Disposal',
-                            order: 'Order 500 m³',
-                            status: 'Delivered',
-                            location: 'Building B > Basement',
-                            category: 'Earthworks > Disposal',
-                            type: 'Services',
-                            delivered: 0,
-                            total: 500
-                        }
-                    ];
-                } else if (newPo.id === '2') {
-                    itemList.value = [
-                        {
-                            name: 'Excavation Work Package',
-                            order: 'Order 1 unit',
-                            status: 'Pending',
-                            location: 'Building B > Basement',
-                            category: 'Earthworks > Excavation',
-                            type: 'Work',
-                            delivered: 0,
-                            total: 1
-                        },
-                        {
-                            name: 'Soil Disposal',
-                            order: 'Order 500 m³',
-                            status: 'Pending',
-                            location: 'Building B > Basement',
-                            category: 'Earthworks > Disposal',
-                            type: 'Services',
-                            delivered: 0,
-                            total: 500
-                        }
-                    ];
-                } else if (newPo.id === '3') {
-                    itemList.value = [
-                        {
-                            name: 'Glass Panel Double Glazed',
-                            order: 'Order 20 pcs',
-                            status: 'Pending',
-                            location: 'Building C > Level 3',
-                            category: 'Facade > Windows > Glass',
-                            type: 'Materials',
-                            delivered: 0,
-                            total: 20
-                        }
-                    ];
-                }
+                itemList.value =
+                    newPo.PurchaseOrderItems?.map((i: PurchaseOrderItem) => ({
+                        id: i.Id,
+                        purchaseOrderId: i.PurchaseOrderId,
+                        requestOrderId: i.RequestOrderItemId,
+                        name: i.Name,
+                        order: i.ItemCode,
+                        status: 'Pending',
+                        location: '',
+                        category: '',
+                        type: '',
+                        delivered: 0,
+                        total: Number(i.Quantity) || 0
+                    })) ?? [];
 
-                poNumber.value = newPo.code;
-                console.log('check numbe', newPo);
+                poNumber.value = newPo.DocNo;
             },
             { immediate: true }
         );
@@ -148,13 +85,19 @@ export default defineComponent({
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
             if (event.valid) {
                 if (itemList.value.length > 0) {
-                    emit('update', itemList.value);
+                    const minimalItems = itemList.value.map((i) => ({
+                        purchaseOrderItemId: i.id,
+                        requestOrderId: i.requestOrderId,
+                        delivered: i.delivered
+                    }));
+
+                    emit('update', minimalItems);
                     emit('next-step');
 
                     toast.add({
                         severity: 'success',
                         summary: 'Form submitted',
-                        detail: `PO ${poNumber.value} with ${itemList.value.length} items submitted.`,
+                        detail: `PO ${poNumber.value} with ${minimalItems.length} items submitted.`,
                         life: 3000
                     });
                 } else {
@@ -184,7 +127,7 @@ export default defineComponent({
         };
 
         // ---------------------------
-        // 4. RETURN (expose to template)
+        // 4. RETURN
         // ---------------------------
         return {
             itemList,

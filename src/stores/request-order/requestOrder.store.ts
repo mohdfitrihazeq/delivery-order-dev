@@ -1,6 +1,6 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { Order } from '@/types/request-order.type';
-import { showError } from '@/utils/showError.utils';
+import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 

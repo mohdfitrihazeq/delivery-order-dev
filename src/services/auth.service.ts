@@ -1,5 +1,5 @@
 import type { LoginResponse } from '@/types/auth.type';
-import { showError } from '@/utils/showError.utils';
+import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
 
 const login = async (username: string, password: string): Promise<LoginResponse> => {
