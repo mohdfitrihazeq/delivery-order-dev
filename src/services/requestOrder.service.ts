@@ -71,6 +71,17 @@ const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attac
     }
 };
 
+const deleteRequestOrder = async (id: number): Promise<any> => {
+    try {
+        const response = await axiosInstance.delete(`/requestOrder/${id}`);
+        return response.data;
+    } catch (error: any) {
+        console.error('Delete Request Order Error:', error.response?.data || error);
+        showError(error, 'Failed to delete request order.');
+        throw error;
+    }
+};
+
 const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
     try {
         const response = await axiosInstance.get('/requestOrder', { params });
@@ -96,5 +107,6 @@ export const requestOrderService = {
     getRequestOrders,
     getRequestOrderById,
     updateRequestOrder,
-    createRequestOrderDraft
+    createRequestOrderDraft,
+    deleteRequestOrder
 };

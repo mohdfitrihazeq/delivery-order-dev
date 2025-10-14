@@ -1,6 +1,9 @@
 <script lang="ts" src="./ViewDraftRo.script"></script>
 
 <template>
+    <Toast />
+    <ConfirmDialog />
+
     <Dialog v-model:visible="localVisible" modal header="Draft Request Orders" class="w-11/12 md:w-5/6" @update:visible="handleClose">
         <div class="mb-4">
             <p class="text-gray-600">Continue editing saved draft request orders or delete unused drafts.</p>
@@ -61,7 +64,7 @@
                 <template #body="{ data }">
                     <div class="flex gap-2">
                         <Button label="Continue" icon="pi pi-pencil" size="small" outlined @click="handleContinue(data)" />
-                        <Button icon="pi pi-trash" severity="danger" size="small" outlined @click="handleDelete(data)" />
+                        <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="handleDelete(data)" />
                     </div>
                 </template>
             </Column>
