@@ -61,6 +61,7 @@ const showProjectDialog = ref(false);
 const selectedProject = ref<{ company: string; name: string } | null>(null);
 
 interface Project {
+    ProjectId: number;
     name: string;
     status: 'Active' | 'Inactive';
     budget: string;
@@ -74,21 +75,21 @@ const companyProjects = ref<CompanyGroup[]>([
     {
         company: 'Alunan Asas',
         projects: [
-            { name: 'MKT', status: 'Active', budget: 'RM 50,000' },
-            { name: 'AR469', status: 'Inactive', budget: 'RM 20,000' },
-            { name: 'BKT2CH', status: 'Active', budget: 'RM 75,000' }
+            { ProjectId: 1, name: 'MKT', status: 'Active', budget: 'RM 50,000' },
+            { ProjectId: 2, name: 'AR469', status: 'Inactive', budget: 'RM 20,000' },
+            { ProjectId: 3, name: 'BKT2CH', status: 'Active', budget: 'RM 75,000' }
         ]
     },
     {
         company: 'Metrio',
         projects: [
-            { name: 'MK3-B', status: 'Active', budget: 'RM 100,000' },
-            { name: 'Forum 2', status: 'Inactive', budget: 'RM 10,000' }
+            { ProjectId: 4, name: 'MK3-B', status: 'Active', budget: 'RM 100,000' },
+            { ProjectId: 5, name: 'Forum 2', status: 'Inactive', budget: 'RM 10,000' }
         ]
     }
 ]);
 
-const saveProjectToStorage = (project: { company: string; name: string } | null) => {
+const saveProjectToStorage = (project: { company: string; name: string; ProjectId: number } | null) => {
     try {
         if (project) localStorage.setItem('selectedProject', JSON.stringify(project));
         else localStorage.removeItem('selectedProject');
@@ -97,7 +98,7 @@ const saveProjectToStorage = (project: { company: string; name: string } | null)
     }
 };
 
-const loadProjectFromStorage = (): { company: string; name: string } | null => {
+const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
         if (stored) return JSON.parse(stored);
@@ -107,8 +108,12 @@ const loadProjectFromStorage = (): { company: string; name: string } | null => {
     return null;
 };
 
-const selectProject = (company: string, name: string) => {
-    selectedProject.value = { company, name };
+const selectProject = (company: string, project: Project) => {
+    selectedProject.value = {
+        company,
+        name: project.name,
+        ProjectId: project.ProjectId
+    };
     showProjectDialog.value = false;
 };
 
@@ -127,9 +132,9 @@ onMounted(() => {
     const storedProject = loadProjectFromStorage();
     if (storedProject) {
         const projectExists = companyProjects.value.some((company) => company.company === storedProject.company && company.projects.some((project) => project.name === storedProject.name));
-        selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT' };
+        selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
     } else {
-        selectedProject.value = { company: 'Alunan Asas', name: 'MKT' };
+        selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
     }
 });
 </script>
@@ -194,7 +199,7 @@ onMounted(() => {
                     <div
                         v-for="project in group.projects"
                         :key="`${group.company}-${project.name}`"
-                        @click="selectProject(group.company, project.name)"
+                        @click="selectProject(group.company, project)"
                         class="cursor-pointer border rounded-lg p-3 hover:bg-gray-100 transition"
                         :class="{
                             'bg-blue-50 border-blue-300': selectedProject?.name === project.name && selectedProject?.company === group.company

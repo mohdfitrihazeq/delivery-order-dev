@@ -7,21 +7,15 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
 
-        if (attachments && attachments.length > 0) {
+        if (attachments?.length) {
             attachments.forEach((file) => formData.append('attachment', file, file.name));
         }
 
-        // Don't set Content-Type - let interceptor and browser handle it
         const response = await axiosInstance.post('/requestOrder', formData);
-
         return { success: true, data: response.data };
     } catch (error: any) {
-        console.error('Request Order Service Error:', error.response?.data || error);
         showError(error, 'Failed to create request order.');
-        return {
-            success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create request order'
-        };
+        return { success: false, message: error.response?.data?.message || 'Failed to create request order' };
     }
 };
 
@@ -30,73 +24,67 @@ const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
 
-        if (attachments && Array.isArray(attachments) && attachments.length > 0) {
-            attachments.forEach((file, index) => {
-                formData.append('attachment', file, file.name);
-            });
-        }
+        attachments?.forEach((file) => formData.append('attachment', file, file.name));
 
-        // Don't set Content-Type - let interceptor and browser handle it
         const response = await axiosInstance.put(`/requestOrder/${id}`, formData);
-
         return { success: true, data: response.data };
     } catch (error: any) {
         showError(error, 'Failed to update request order.');
-        return {
-            success: false,
-            message: error.response?.data?.message || 'Failed to update request order'
-        };
+        return { success: false, message: error.response?.data?.message || 'Failed to update request order' };
     }
 };
 
-const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
+const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attachments?: File[]) => {
     try {
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
-
-        if (attachments && attachments.length > 0) {
-            attachments.forEach((file) => formData.append('attachment', file, file.name));
-        }
+        attachments?.forEach((file) => formData.append('attachment', file, file.name));
 
         const response = await axiosInstance.post('/requestOrder/Draft', formData);
-
         return { success: true, data: response.data };
     } catch (error: any) {
-        console.error('Request Order Draft Service Error:', error.response?.data || error);
         showError(error, 'Failed to save request order as draft.');
-        return {
-            success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Failed to save request order as draft'
-        };
+        return { success: false, message: error.response?.data?.message || 'Failed to save request order as draft' };
     }
 };
 
-const deleteRequestOrder = async (id: number): Promise<any> => {
+const deleteRequestOrder = async (id: number) => {
     try {
         const response = await axiosInstance.delete(`/requestOrder/${id}`);
         return response.data;
     } catch (error: any) {
-        console.error('Delete Request Order Error:', error.response?.data || error);
         showError(error, 'Failed to delete request order.');
         throw error;
     }
 };
 
-const getRequestOrders = async (params?: Record<string, any>): Promise<any[]> => {
+// ---------- GET ORDERS (pagination-ready) ----------
+interface GetRequestOrdersParams {
+    status?: string;
+    budgetType?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number; // optional
+    limit?: number; // optional
+}
+
+const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<{ data: any[]; total?: number }> => {
     try {
         const response = await axiosInstance.get('/requestOrder', { params });
-        return response.data.data;
-    } catch (error) {
+
+        return { data: response.data.data, total: response.data.total };
+    } catch (error: any) {
         showError(error, 'Failed to fetch request orders.');
-        throw error;
+        return { data: [], total: 0 };
     }
 };
 
-const getRequestOrderById = async (id: string): Promise<any> => {
+const getRequestOrderById = async (id: string) => {
     try {
         const response = await axiosInstance.get(`/requestOrder/${id}`);
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         showError(error, 'Failed to fetch request order details.');
         throw error;
     }
@@ -104,9 +92,9 @@ const getRequestOrderById = async (id: string): Promise<any> => {
 
 export const requestOrderService = {
     createRequestOrder,
-    getRequestOrders,
-    getRequestOrderById,
     updateRequestOrder,
     createRequestOrderDraft,
-    deleteRequestOrder
+    deleteRequestOrder,
+    getRequestOrders,
+    getRequestOrderById
 };

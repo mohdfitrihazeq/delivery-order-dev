@@ -30,7 +30,8 @@ export default defineComponent({
         const fetchDrafts = async () => {
             loading.value = true;
             try {
-                const data = await requestOrderService.getRequestOrders({ status: 'Draft' });
+                const res = await requestOrderService.getRequestOrders({ status: 'Draft' });
+                const data = res.data || [];
 
                 drafts.value = data.map(
                     (output: any): DraftRO => ({

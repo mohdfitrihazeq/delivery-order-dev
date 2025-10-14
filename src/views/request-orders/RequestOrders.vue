@@ -18,7 +18,8 @@
                     <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
                 </div>
             </div>
-            <ViewDraftRo v-model:visible="showDraftModal" @update:count="draftCount = $event" />
+            <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
+
             <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />
 
             <!-- Tabs -->

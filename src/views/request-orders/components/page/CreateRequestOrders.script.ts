@@ -290,14 +290,28 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
+        const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
+            try {
+                const stored = localStorage.getItem('selectedProject');
+                if (stored) return JSON.parse(stored);
+            } catch (error) {
+                console.error('Error loading project from localStorage:', error);
+            }
+            console.log('stored', stored);
+            return null;
+        };
+
         async function submitRequestOrder() {
             try {
                 const formatDateToAPI = (date: Date | null): string => {
                     if (!date) return new Date().toISOString().split('T')[0];
                     return date.toISOString().split('T')[0];
                 };
+                const project = loadProjectFromStorage();
+                const projectId = project?.ProjectId || 0;
 
                 const payload: CreateRequestOrderPayload = {
+                    ProjectId: projectId,
                     DocNo: roNumber.value,
                     DebtorId: 1,
                     RequestOrderDate: formatDateToAPI(calendarValue.value),
@@ -318,7 +332,6 @@ export default defineComponent({
                 };
 
                 const result = await requestOrderService.createRequestOrder(payload, attachments.value.length > 0 ? attachments.value : undefined);
-
                 if (result.success) {
                     toast.add({
                         severity: 'success',
@@ -355,8 +368,11 @@ export default defineComponent({
                     if (!date) return new Date().toISOString().split('T')[0];
                     return date.toISOString().split('T')[0];
                 };
+                const project = loadProjectFromStorage();
+                const projectId = project?.ProjectId || 0;
 
                 const payload: CreateRequestOrderPayload = {
+                    ProjectId: projectId,
                     DocNo: roNumber.value,
                     DebtorId: 1,
                     RequestOrderDate: formatDateToAPI(calendarValue.value),
