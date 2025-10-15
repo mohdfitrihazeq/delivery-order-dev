@@ -1,40 +1,42 @@
-import { useToast } from 'primevue/usetoast';
-
-let toastInstance: any;
-
-export function getToast() {
-    if (!toastInstance) {
-        try {
-            toastInstance = useToast();
-        } catch {
-            console.warn('⚠️ PrimeVue Toast not available yet.');
-        }
-    }
-    return toastInstance;
+export interface ToastServiceMethods {
+    add: (options: { severity?: string; summary?: string; detail?: string; life?: number }) => void;
+    removeAll?: () => void;
 }
 
-export function showError(error: any, fallbackMessage = 'Something went wrong.') {
-    const toast = getToast();
-    if (!toast) return;
+let globalToast: ToastServiceMethods | null = null;
 
-    const message = error?.response?.data?.message || error?.message || fallbackMessage;
+export function setGlobalToast(toastInstance: ToastServiceMethods) {
+    globalToast = toastInstance;
+}
 
-    toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: message,
+export function showSuccess(message?: string, fallbackMessage = 'Success.') {
+    console.log('show Success with message', message);
+    console.log('checking have globalToas', globalToast);
+    if (!globalToast) {
+        console.warn('⚠️ Toast not initialized');
+        return;
+    }
+
+    globalToast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: message || fallbackMessage,
         life: 4000
     });
 }
 
-export function showSuccess(message?: string, fallbackMessage = 'Success.') {
-    const toast = getToast();
-    if (!toast) return;
+export function showError(error: any, fallbackMessage = 'Something went wrong.') {
+    if (!globalToast) {
+        console.warn('⚠️ Toast not initialized');
+        return;
+    }
 
-    toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: message || fallbackMessage,
+    const message = error?.response?.data?.message || error?.message || fallbackMessage;
+
+    globalToast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: message,
         life: 4000
     });
 }

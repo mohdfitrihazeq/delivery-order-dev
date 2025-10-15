@@ -7,10 +7,16 @@ import { createPinia } from 'pinia';
 import 'primeicons/primeicons.css';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
+import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+
+// 👇 加入这行
+import { setGlobalToast } from '@/utils/showNotification.utils';
+import { useToast } from 'primevue/usetoast';
+
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -44,7 +50,18 @@ app.use(PrimeVue, {
     }
 });
 app.use(ToastService);
+app.component('Toast', Toast);
+
 app.use(ConfirmationService);
 app.use(HighchartsVue);
 app.use(pinia);
+app.mixin({
+    mounted() {
+        if (this.$root === this) {
+            const toast = useToast();
+            setGlobalToast(toast);
+        }
+    }
+});
+
 app.mount('#app');

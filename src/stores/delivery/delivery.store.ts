@@ -42,8 +42,9 @@ export const useDeliveryStore = defineStore('deliveryStore', {
             this.loading = true;
             try {
                 const response = await deliveryOrderService.createDeliveryOrder(formData);
-
-                if (response.success) {
+                console.log('checking the response', response);
+                const checkTrue = response.success;
+                if (checkTrue) {
                     showSuccess(response.message || 'Delivery order created successfully.');
                     await this.fetchDeliveryOrders();
                     return true;

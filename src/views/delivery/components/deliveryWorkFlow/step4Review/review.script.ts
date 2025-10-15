@@ -114,7 +114,7 @@ export default defineComponent({
                     formData.append('attachments', file);
                 });
             }
-            console.log('checking formData', formData);
+
             try {
                 const success = await deliveryStore.createDeliveryOrder(formData);
                 if (success) {
