@@ -7,14 +7,16 @@ import Column from 'primevue/column';
 import { usePrimeVue } from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
+import FileUpload from 'primevue/fileupload';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
+import Menu from 'primevue/menu';
+import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, PropType, ref, watch } from 'vue';
-
 export default defineComponent({
     name: 'EditRo',
-    components: { Dialog, Button, InputText, InputNumber, DataTable, Column },
+    components: { Dialog, Button, InputText, InputNumber, DataTable, Column, FileUpload, ProgressBar, Menu },
     props: {
         visible: { type: Boolean, required: true },
         order: { type: Object as PropType<Order | null>, default: null }
@@ -32,8 +34,17 @@ export default defineComponent({
         const files = ref<File[]>([]);
         const overallRemark = ref('');
         const MAX_FILE_SIZE = 1_000_000;
-        const attachments = ref<File[]>([]);
+        const attachments = ref<(File | AttachmentItem)[]>([]);
         const isAttachmentValid = ref(true);
+        const $primevue = usePrimeVue();
+        const newAttachments = ref<File[]>([]);
+        const existingAttachments = ref<AttachmentItem[]>([]);
+
+        const filesToUpload = ref<File[]>([]);
+
+        function onSelectedFiles(event: any) {
+            newAttachments.value = event.files;
+        }
 
         watch(
             () => props.visible,
@@ -83,6 +94,7 @@ export default defineComponent({
                 if (!newOrder) return;
 
                 const sourceItems = newOrder.RequestOrderItems?.length ? newOrder.RequestOrderItems : newOrder.items || [];
+                attachments.value = newOrder.attachments || [];
 
                 editForm.value = {
                     roNumber: newOrder.roNumber,
@@ -111,49 +123,48 @@ export default defineComponent({
             },
             { immediate: true }
         );
-
+        watch(editForm, (form) => {
+            existingAttachments.value = form.attachments.filter((f) => !(f instanceof File)) as AttachmentItem[];
+        });
         async function handleSave(): Promise<void> {
             if (!props.order) return;
 
-            const parseDateToString = (value: string | Date | null | undefined) => {
-                if (!value) return null;
-                const d = value instanceof Date ? value : new Date(value);
-                return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+            const formatDateToAPI = (date: Date | string | null | undefined): string => {
+                if (!date) return new Date().toISOString().split('T')[0];
+                const d = date instanceof Date ? date : new Date(date);
+                return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
             };
 
-            if (!editForm.value.roNumber) {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'RO Number is required.', life: 3000 });
-                return;
-            }
+            const existingAttachments = editForm.value.existingAttachments || [];
+            const filesToUpload: File[] = Array.isArray(newAttachments.value) ? [...newAttachments.value] : [];
 
             const payload = {
-                DocNo: editForm.value.roNumber || null,
-                DebtorId: props.order.debtorId ?? null,
-                BudgetType: editForm.value.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
-                Remark: editForm.value.remark || '',
-                RequestOrderDate: parseDateToString(editForm.value.roDate),
+                DocNo: editForm.value.roNumber || '',
+                DebtorId: props.order.debtorId || 1,
+                RequestOrderDate: formatDateToAPI(editForm.value.roDate),
                 Terms: editForm.value.terms || 'Net 30',
-                RefDoc: editForm.value.refDoc || 'RQ-001',
-                Currency: editForm.value.currency || 'MYR',
+                RefDoc: editForm.value.refDoc || '',
+                BudgetType: editForm.value.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
+                Currency: 'MYR',
                 Type: 'requestOrder',
+                Remark: editForm.value.remark || '',
+                Attachment: existingAttachments,
                 Items: (editForm.value.items || []).map((item) => ({
-                    ItemCode: item.code || '',
                     BudgetItemId: item.budgetItemId ?? null,
                     NonBudgetItemId: item.nonBudgetItemId ?? null,
                     Description: item.description || '',
                     Uom: item.uom || '',
                     Quantity: Number(item.qty ?? 0),
+                    Rate: item.rate ?? 0,
                     Notes: item.notes || '',
-                    Remark: item.remark || '',
-                    DeliveryDate: parseDateToString(item.deliveryDate)
+                    Reason: item.reason || '',
+                    DeliveryDate: formatDateToAPI(item.deliveryDate)
                 }))
             };
 
-            const sanitizedPayload = JSON.parse(JSON.stringify(payload, (_, value) => (value === undefined ? null : value)));
-
             try {
-                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), sanitizedPayload);
-                console.log('Update result:', result);
+                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), payload, filesToUpload);
+
                 if (result.success) {
                     toast.add({
                         severity: 'success',
@@ -163,6 +174,7 @@ export default defineComponent({
                     });
                     emit('save');
                     localVisible.value = false;
+                    newAttachments.value = [];
                 } else {
                     toast.add({
                         severity: 'error',
@@ -185,6 +197,7 @@ export default defineComponent({
         function handleCancel(): void {
             if (props.order) {
                 editForm.value = {
+                    ...defaultForm(),
                     roNumber: props.order.roNumber || '',
                     requestedBy: props.order.requestedBy || '',
                     roDate: parseDate(props.order.roDate),
@@ -192,19 +205,21 @@ export default defineComponent({
                     totalAmount: Number(props.order.totalAmount || 0),
                     budgetType: props.order.budgetType || 'Budgeted',
                     remark: props.order.remark || '',
-                    terms: 'Net 30',
-                    refDoc: 'RQ-001',
-                    currency: 'MYR',
+                    terms: props.order.terms || 'Net 30',
+                    refDoc: props.order.refDoc || 'RQ-001',
+                    currency: props.order.currency || 'MYR',
                     items: (props.order.items || []).map((item) => ({
-                        budgetItemId: (item as any).budgetItemId ?? null,
-                        nonBudgetItemId: (item as any).nonBudgetItemId ?? null,
-                        description: item.description,
-                        uom: item.uom,
-                        quantity: Number(item.qty || 0),
+                        budgetItemId: item.budgetItemId ?? null,
+                        nonBudgetItemId: item.nonBudgetItemId ?? null,
+                        code: item.code || '',
+                        description: item.description || '',
+                        uom: item.uom || '',
+                        qty: Number(item.qty || 0),
                         deliveryDate: parseDate(item.deliveryDate),
-                        notes: (item as any).notes || '',
-                        remark: (item as any).remark || ''
-                    }))
+                        notes: item.notes || '',
+                        remark: item.remark || ''
+                    })),
+                    attachments: props.order.attachments || []
                 };
             } else {
                 editForm.value = defaultForm();
@@ -244,14 +259,9 @@ export default defineComponent({
             window.open(fileUrl, '_blank');
         }
 
-        function getAttachmentUrl(file: File | AttachmentItem): string {
-            if (file instanceof File) {
-                return URL.createObjectURL(file);
-            } else {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://103.16.42.51:9001';
-                const normalizedPath = file.path.replace(/\\/g, '/');
-                return `${backendUrl}/${normalizedPath}`;
-            }
+        function getAttachmentUrl(file: AttachmentItem) {
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+            return `${backendUrl}/${file.path.replace(/\\/g, '/')}`;
         }
 
         const onRemoveTemplatingFile = (file: File, removeFileCallback: (index: number) => void, index: number) => {
@@ -275,15 +285,21 @@ export default defineComponent({
             toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
         };
 
-        const formatSize = (bytes: number) => {
+        function formatSize(bytes: number) {
             const k = 1024;
-            const dm = 3;
-            const sizes = $primevue.config.locale.fileSizeTypes;
-            if (bytes === 0) return `0 ${sizes[0]}`;
+            const dm = 2;
+            if (bytes === 0) return '0 B';
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-            return `${formattedSize} ${sizes[i]}`;
-        };
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${['B', 'KB', 'MB', 'GB', 'TB'][i]}`;
+        }
+
+        function removeNewAttachment(index: number) {
+            newAttachments.value.splice(index, 1);
+        }
+
+        function removeExistingAttachment(index: number) {
+            existingAttachments.value.splice(index, 1);
+        }
 
         return {
             localVisible,
@@ -311,7 +327,13 @@ export default defineComponent({
             MAX_FILE_SIZE,
             attachments,
             isAttachmentValid,
-            usePrimeVue
+            usePrimeVue,
+            newAttachments,
+            existingAttachments,
+            removeNewAttachment,
+            removeExistingAttachment,
+            onSelectedFiles,
+            filesToUpload
         };
     }
 });

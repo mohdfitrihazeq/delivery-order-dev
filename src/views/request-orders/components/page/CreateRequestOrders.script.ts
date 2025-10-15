@@ -1,5 +1,5 @@
-import type { CreateRequestOrderPayload } from '@/services/requestOrder.service';
 import { requestOrderService } from '@/services/requestOrder.service';
+import type { CreateRequestOrderPayload } from '@/types/request-order.type';
 import { Motion } from '@motionone/vue';
 import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';

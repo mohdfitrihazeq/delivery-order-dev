@@ -2,7 +2,7 @@
 
 <template>
     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-        <div class="p-6 card glossy-card mb-0">
+        <div class="p-6 card mb-0">
             <BreadcrumbList />
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
