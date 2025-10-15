@@ -95,7 +95,16 @@
                     </StepPanel>
                     <StepPanel :value="4">
                         <div v-if="canPassToReview"><Review :deliveryData="deliveryData" /></div>
-                        <div v-else class="text-gray-500">Please complete all previous steps before reviewing.</div>
+                        <div v-else class="flex flex-col justify-center py-5 gap-4 w-full">
+                            <Message severity="warn" variant="outlined" :closable="false">
+                                <i class="pi pi-exclamation-triangle mr-2"></i>
+                                Please complete all previous steps before reviewing.
+                            </Message>
+
+                            <div class="flex justify-end mt-4 gap-2 w-full">
+                                <Button type="button" label="Back" severity="secondary" @prev-step="goStep(1)" />
+                            </div>
+                        </div>
                     </StepPanel>
                 </StepPanels>
             </Stepper>

@@ -84,25 +84,28 @@ export default defineComponent({
         // 4. METHODS
         // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (event.valid) {
-                if (selectedCard.value) {
-                    emit('update', selectedCard.value);
-                    emit('next-step');
-                    toast.add({
-                        severity: 'success',
-                        summary: 'Form submitted',
-                        detail: `Selected PO: ${selectedCard.value.title}`,
-                        life: 3000
-                    });
-                } else {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'No PO selected',
-                        detail: 'Please select a Purchase Order before continuing.',
-                        life: 3000
-                    });
-                }
-            }
+            if (!event.valid) return;
+
+            if (!selectedCard.value) return;
+
+            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === selectedCard.value?.id);
+
+            if (!fullPO) return;
+
+            emit('update', {
+                purchaseOrderId: fullPO.Id,
+                DocNo: fullPO.DocNo,
+                PurchaseOrderItems: fullPO.PurchaseOrderItems
+            });
+
+            emit('next-step');
+
+            toast.add({
+                severity: 'info',
+                summary: 'Purchase Order Confirmed',
+                detail: `Selected PO: ${fullPO.DocNo}`,
+                life: 2000
+            });
         };
 
         const goBack = () => emit('prev-step');

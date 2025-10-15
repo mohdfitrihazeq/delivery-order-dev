@@ -53,7 +53,8 @@ export default defineComponent({
         watch(
             () => props.selectedPo,
             (newPo) => {
-                if (!newPo) {
+                console.log('check the po', newPo);
+                if (!newPo || !newPo.PurchaseOrderItems) {
                     itemList.value = [];
                     poNumber.value = null;
                     return;
