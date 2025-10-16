@@ -1,5 +1,6 @@
 import { deliveryOrderService } from '@/services/deliveryOrder.service';
 import type { DeliveryOrder } from '@/types/delivery.type';
+import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
 interface State {
@@ -26,7 +27,7 @@ export const useDeliveryStore = defineStore('deliveryStore', {
                 this.incompletedList = incompletedRes.data || [];
                 this.completedList = completedRes.data || [];
             } catch (error) {
-                console.error('❌ fetchDeliveryOrders error:', error);
+                showError(error, 'Failed to fetch delivery orders.');
             } finally {
                 this.loading = false;
             }
@@ -35,6 +36,28 @@ export const useDeliveryStore = defineStore('deliveryStore', {
         async handleSearch(value: string) {
             this.search = value;
             await this.fetchDeliveryOrders();
+        },
+
+        async createDeliveryOrder(formData: FormData) {
+            this.loading = true;
+            try {
+                const response = await deliveryOrderService.createDeliveryOrder(formData);
+                console.log('checking the response', response);
+                const checkTrue = response.success;
+                if (checkTrue) {
+                    showSuccess(response.message || 'Delivery order created successfully.');
+                    await this.fetchDeliveryOrders();
+                    return true;
+                } else {
+                    showError(response.message || 'Failed to create delivery order.');
+                    return false;
+                }
+            } catch (error: any) {
+                showError(error, 'Failed to create delivery order.');
+                return false;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });

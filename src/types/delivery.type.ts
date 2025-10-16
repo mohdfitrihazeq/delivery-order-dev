@@ -42,3 +42,41 @@ export interface DeliveryOrderResponse {
     message: string;
     data: DeliveryOrder[];
 }
+
+export interface VerifyPurchaseOrderItem {
+    id: number;
+    name: string;
+    order: string;
+    status: string;
+    location: string;
+    purchaseOrderId: number;
+    requestOrderId: number;
+    category: string;
+    type: string;
+    delivered: number;
+    total: number;
+}
+
+export interface Step1SelectPO {
+    DocNo: string;
+    purchaseOrderId: number;
+    PurchaseOrderItems: Array<Record<string, any>>;
+}
+export interface Step2VerifyItem {
+    purchaseOrderItemId: number;
+    requestOrderId: number;
+    quantity: number;
+}
+
+export interface Step3DeliveryInfo {
+    PlateNo: string;
+    Date: string;
+    Remarks?: string;
+    attachments?: File[];
+}
+
+export interface DeliveryFlow {
+    deliveryInfo: Step3DeliveryInfo;
+    selectPO: Step1SelectPO;
+    verifyItem: Step2VerifyItem[];
+}

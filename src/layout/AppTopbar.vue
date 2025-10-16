@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth/auth.store';
 import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
+import type { MenuItemCommandEvent } from 'primevue/menuitem';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -13,6 +14,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 const router = useRouter();
 const authStore = useAuthStore();
 
+/* ================= 用户登出 ================= */
 const handleSignOut = () => {
     authStore.logout();
     router.push({ name: 'login' });
@@ -22,21 +24,19 @@ const profileMenu = ref([
     {
         label: 'Notification',
         icon: 'pi pi-bell',
-        command: () => router.push('/notifications')
+        command: (event: MenuItemCommandEvent) => router.push('/notifications')
     },
     {
         label: 'Company',
         icon: 'pi pi-building',
-        command: () => router.push('/companyList')
+        command: (event: MenuItemCommandEvent) => router.push('/companyList')
     },
     {
         label: 'Project',
         icon: 'pi pi-receipt',
-        command: () => router.push('/projectList')
+        command: (event: MenuItemCommandEvent) => router.push('/projectList')
     },
-    {
-        separator: true
-    },
+    { separator: true },
     {
         label: computed(() => (isDarkTheme.value ? 'Light Mode' : 'Dark Mode')),
         icon: computed(() => (isDarkTheme.value ? 'pi pi-sun' : 'pi pi-moon')),
@@ -56,6 +56,7 @@ const toggleProfileMenu = (event: Event) => {
     profileMenuRef.value.toggle(event);
 };
 
+/* ================= 用户名 + 项目信息 ================= */
 const username = ref<string | null>(null);
 const showProjectDialog = ref(false);
 const selectedProject = ref<{ company: string; name: string } | null>(null);
