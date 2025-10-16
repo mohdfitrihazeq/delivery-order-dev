@@ -23,53 +23,36 @@ export const useDeliveryStore = defineStore('deliveryStore', {
     actions: {
         async fetchDeliveryOrders() {
             this.loading = true;
-            try {
-                const [incompletedRes, completedRes] = await Promise.all([
-                    deliveryOrderService.getDeliveryOrders({
-                        status: 'Pending',
-                        search: this.search
-                    }),
-                    deliveryOrderService.getDeliveryOrders({
-                        status: 'Completed',
-                        search: this.search
-                    })
-                ]);
+            this.incompletedList = [];
+            this.completedList = [];
 
-                if (!incompletedRes.success || !completedRes.success) {
-                    showError('Failed to fetch delivery orders.');
+            try {
+                const [pendingRes, completedRes] = await Promise.all([deliveryOrderService.getDeliveryOrders({ status: 'Pending' }), deliveryOrderService.getDeliveryOrders({ status: 'Completed' })]);
+
+                if (!pendingRes.success && !completedRes.success) {
+                    showError(pendingRes.message || completedRes.message || 'Failed to fetch delivery orders.');
                     return;
                 }
 
-                this.incompletedList = incompletedRes.data || [];
-                this.completedList = completedRes.data || [];
-            } catch (error) {
-                showError(error, 'Failed to fetch delivery orders.');
+                if (pendingRes.success) this.incompletedList = pendingRes.data || [];
+                if (completedRes.success) this.completedList = completedRes.data || [];
+            } catch (error: any) {
+                showError(error?.message || 'Failed to fetch delivery orders.');
             } finally {
                 this.loading = false;
             }
         },
 
-        async handleSearch(value: string) {
-            this.search = value;
-            await this.fetchDeliveryOrders();
-        },
-
         async createDeliveryOrder(formData: FormData) {
             this.loading = true;
             try {
-                const response = await deliveryOrderService.createDeliveryOrder(formData);
+                const res = await deliveryOrderService.createDeliveryOrder(formData);
+                if (!res.success) return showError(res.message || 'Failed to create delivery order.');
 
-                if (!response.success) {
-                    showError(response.message || 'Failed to create delivery order.');
-                    return false;
-                }
-
-                showSuccess(response.message || 'Delivery order created successfully.');
+                showSuccess(res.message || 'Delivery order created successfully.');
                 await this.fetchDeliveryOrders();
-                return true;
             } catch (error: any) {
-                showError(error, 'Failed to create delivery order.');
-                return false;
+                showError(error?.message || 'Failed to create delivery order.');
             } finally {
                 this.loading = false;
             }
@@ -78,17 +61,15 @@ export const useDeliveryStore = defineStore('deliveryStore', {
         async getSingleDeliveryOrder(deliveryId: number) {
             this.loading = true;
             try {
-                const response = await deliveryOrderService.getSingleDeliveryOrder(deliveryId);
-
-                if (!response.success || !response.data) {
-                    showError('Delivery order not found.');
+                const res = await deliveryOrderService.getSingleDeliveryOrder(deliveryId);
+                if (res.success && res.data) {
+                    this.singleDelivery = res.data;
+                } else {
+                    showError(res.message || 'Delivery order not found.');
                     this.singleDelivery = null;
-                    return;
                 }
-
-                this.singleDelivery = response.data;
-            } catch (error) {
-                showError(error, 'Failed to fetch delivery order.');
+            } catch (error: any) {
+                showError(error?.message || 'Failed to fetch delivery order.');
                 this.singleDelivery = null;
             } finally {
                 this.loading = false;

@@ -1,6 +1,6 @@
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { TableColumn } from '@/types/table.type';
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -15,6 +15,17 @@ export default defineComponent({
         ];
 
         const activeTab = ref('0');
+        const searchQuery = ref('');
+
+        const filteredPendingList = computed(() => {
+            if (!searchQuery.value) return deliveryStore.incompletedList;
+            return deliveryStore.incompletedList.filter((item) => Object.values(item).some((value) => String(value).toLowerCase().includes(searchQuery.value.toLowerCase())));
+        });
+
+        const filteredCompletedList = computed(() => {
+            if (!searchQuery.value) return deliveryStore.completedList;
+            return deliveryStore.completedList.filter((item) => Object.values(item).some((value) => String(value).toLowerCase().includes(searchQuery.value.toLowerCase())));
+        });
 
         const deliveryListColumn: TableColumn[] = [
             { field: 'DocNo', header: 'DO Number', sortable: true },
@@ -25,13 +36,11 @@ export default defineComponent({
         ];
 
         function handleAction(type: 'view', row: any) {
-            if (type === 'view') {
-                router.push(`/deliveries/viewDelivery/${row.Id}`);
-            }
+            if (type === 'view') router.push(`/deliveries/viewDelivery/${row.Id}`);
         }
 
-        async function handleSearch(value: string) {
-            await deliveryStore.handleSearch(value);
+        function handleSearch(value: string) {
+            searchQuery.value = value.trim();
         }
 
         onMounted(() => {
@@ -44,7 +53,10 @@ export default defineComponent({
             tabItems,
             deliveryListColumn,
             handleAction,
-            handleSearch
+            handleSearch,
+            searchQuery,
+            filteredPendingList,
+            filteredCompletedList
         };
     }
 });
