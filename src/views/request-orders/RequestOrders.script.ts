@@ -188,6 +188,8 @@ export default defineComponent({
                         await store.fetchOrders(); // refresh list
                     } catch (error) {
                         showError(error, `Failed to delete order ${order.id}.`);
+                    } finally {
+                        confirm.close();
                     }
                 },
 
