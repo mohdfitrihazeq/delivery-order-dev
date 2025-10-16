@@ -27,17 +27,45 @@ export default defineComponent({
         const drafts = ref<DraftRO[]>([]);
         const loading = ref(false);
 
+        // Mock project data ( later be replaced with API or store)
+        const companyProjects = [
+            {
+                company: 'Alunan Asas',
+                projects: [
+                    { ProjectId: 1, name: 'MKT', status: 'Active', budget: 'RM 50,000' },
+                    { ProjectId: 2, name: 'AR469', status: 'Inactive', budget: 'RM 20,000' },
+                    { ProjectId: 3, name: 'BKT2CH', status: 'Active', budget: 'RM 75,000' }
+                ]
+            },
+            {
+                company: 'Metrio',
+                projects: [
+                    { ProjectId: 4, name: 'MK3-B', status: 'Active', budget: 'RM 100,000' },
+                    { ProjectId: 5, name: 'Forum 2', status: 'Inactive', budget: 'RM 10,000' }
+                ]
+            }
+        ];
+
         const fetchDrafts = async () => {
             loading.value = true;
             try {
                 const res = await requestOrderService.getRequestOrders({ status: 'Draft' });
                 const data = res.data || [];
 
-                drafts.value = data.map(
-                    (output: any): DraftRO => ({
+                drafts.value = data.map((output: any): DraftRO => {
+                    let projectName = '';
+                    for (const company of companyProjects) {
+                        const project = company.projects.find((p) => p.ProjectId === output.ProjectId);
+                        if (project) {
+                            projectName = project.name;
+                            break;
+                        }
+                    }
+
+                    return {
                         id: output.Id,
                         draftId: output.DocNo || '',
-                        project: output.ProjectCode || '',
+                        project: projectName || '',
                         budgetType: output.PrType || '',
                         requestedBy: output.CreatedBy || '',
                         itemsCount: output.RequestOrderItems?.length || 0,
@@ -57,8 +85,8 @@ export default defineComponent({
                         })),
                         overallRemark: output.Remark || '',
                         attachments: output.Attachment ? JSON.parse(output.Attachment) : []
-                    })
-                );
+                    };
+                });
             } catch (error) {
                 showError(error, 'Failed to fetch draft request orders.');
             } finally {
