@@ -101,7 +101,7 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
-                path: '/deliveries/viewDelivery/:doNumber',
+                path: '/deliveries/viewDelivery/:deliveryOrderId',
                 name: 'deliveries-view',
                 component: () => import('@/views/delivery/components/pages/viewDelivery/ViewDelivery.vue'),
                 meta: {

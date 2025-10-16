@@ -1,5 +1,6 @@
+// src/services/deliveryOrder.service.ts
 import axiosInstance from '@/services/backendAxiosInstance';
-import type { DeliveryOrderResponse } from '@/types/delivery.type';
+import type { DeliveryOrderResponse, SingleDeliveryOrderResponse } from '@/types/delivery.type';
 import { showError } from '@/utils/showNotification.utils';
 
 export interface GetDeliveryOrderParams {
@@ -33,7 +34,18 @@ const createDeliveryOrder = async (formData: FormData): Promise<DeliveryOrderRes
     }
 };
 
+const getSingleDeliveryOrder = async (deliveryId: number): Promise<SingleDeliveryOrderResponse> => {
+    try {
+        const response = await axiosInstance.get<SingleDeliveryOrderResponse>(`/deliveryOrder/${deliveryId}`);
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch single by delivery order.');
+        throw error;
+    }
+};
+
 export const deliveryOrderService = {
     getDeliveryOrders,
-    createDeliveryOrder
+    createDeliveryOrder,
+    getSingleDeliveryOrder
 };

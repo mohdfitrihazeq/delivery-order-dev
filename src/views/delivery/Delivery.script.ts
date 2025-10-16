@@ -26,7 +26,7 @@ export default defineComponent({
 
         function handleAction(type: 'view', row: any) {
             if (type === 'view') {
-                router.push(`/deliveries/viewDelivery/${row.DocNo}`);
+                router.push(`/deliveries/viewDelivery/${row.Id}`);
             }
         }
 

@@ -43,6 +43,12 @@ export interface DeliveryOrderResponse {
     data: DeliveryOrder[];
 }
 
+export interface SingleDeliveryOrderResponse {
+    success: boolean;
+    message: string;
+    data: DeliveryOrder;
+}
+
 export interface VerifyPurchaseOrderItem {
     id: number;
     name: string;
