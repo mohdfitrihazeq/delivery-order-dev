@@ -38,6 +38,11 @@ export default defineComponent({
             }))
         );
 
+        const formatDate = (dateStr: string | Date | undefined) => {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB');
+        };
         function handleSearch(value: string) {
             search.value = value.trim().toLowerCase();
             if (!search.value) {
@@ -73,6 +78,7 @@ export default defineComponent({
             singleDelivery,
             loading,
             items,
+            formatDate,
             itemsColumns,
             onSearchWrapper: handleSearch
         };

@@ -5,13 +5,8 @@ import type { TableColumn } from '@/types/table.type';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
-import FileUpload from 'primevue/fileupload';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
-import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, ref, watch } from 'vue';
@@ -21,15 +16,10 @@ export default defineComponent({
     name: 'Review',
     components: {
         Card,
-        InputText,
         Button,
         Message,
         Toast,
         Form,
-        Calendar,
-        Textarea,
-        FileUpload,
-        ProgressBar,
         Badge,
         ReusableTable
     },
@@ -116,12 +106,9 @@ export default defineComponent({
             }
 
             try {
-                const success = await deliveryStore.createDeliveryOrder(formData);
-                if (success) {
-                    router.push('/deliveries');
-                }
-            } catch (err) {
-                console.error(err);
+                await deliveryStore.createDeliveryOrder(formData);
+                router.push('/deliveries');
+            } finally {
             }
         };
 

@@ -7,7 +7,6 @@ interface State {
     loading: boolean;
     incompletedList: DeliveryOrder[];
     completedList: DeliveryOrder[];
-    search: string;
     singleDelivery: DeliveryOrder | null;
 }
 
@@ -16,7 +15,6 @@ export const useDeliveryStore = defineStore('deliveryStore', {
         loading: false,
         incompletedList: [],
         completedList: [],
-        search: '',
         singleDelivery: null
     }),
 

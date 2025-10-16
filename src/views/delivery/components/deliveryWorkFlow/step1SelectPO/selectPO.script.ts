@@ -2,13 +2,9 @@ import { usePurchaseOrderStore } from '@/stores/purchase-order/purchase-order.st
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
-import FileUpload from 'primevue/fileupload';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
-import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
@@ -31,10 +27,6 @@ export default defineComponent({
         Message,
         Toast,
         Form,
-        Calendar,
-        Textarea,
-        FileUpload,
-        ProgressBar,
         Badge
     },
     emits: ['update', 'next-step', 'prev-step'],
