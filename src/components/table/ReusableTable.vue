@@ -7,7 +7,7 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
 import BaseSpinner from '@/components/spinner/BaseSpinner.vue';
@@ -48,10 +48,22 @@ const props = defineProps<{
 // ---------------- State ----------------
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
+const hasLoadedOnce = ref(false);
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
 const menuItems = ref<any[]>([]);
+
+// ---------------- Watchers ----------------
+watch(
+    () => props.value,
+    (val) => {
+        if (val && val.length > 0) {
+            hasLoadedOnce.value = true;
+        }
+    },
+    { immediate: true }
+);
 
 // ---------------- Handlers ----------------
 function handleSearch() {
@@ -63,7 +75,7 @@ function handleFilterChange(field: string, value: any) {
     props.onFilterChange?.(activeFilters.value);
 }
 
-// Export CSV
+// ---------------- Export CSV ----------------
 function handleExport() {
     props.onExport?.();
     if (!props.value || props.value.length === 0) return;
@@ -79,9 +91,7 @@ function handleExport() {
     );
 
     const csvContent = [columns.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], {
-        type: 'text/csv;charset=utf-8;'
-    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
@@ -110,11 +120,10 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
 </script>
 
 <template>
-    <!-- Search + Filter + Buttons -->
+    <!-- Search + Filters + Buttons -->
     <div class="flex flex-col sm:flex-row justify-end items-start sm:items-center mb-4 gap-2 mt-0 sm:mt-[-35px]">
-        <!-- Search -->
         <span class="p-input-icon-left w-full sm:max-w-sm sm:w-auto">
-            <InputText v-if="props.onSearch && props.value && props.value.length > 0" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
+            <InputText v-if="props.onSearch && hasLoadedOnce" v-model="search" placeholder="Search..." @input="handleSearch" class="w-full sm:w-auto" />
         </span>
 
         <!-- Filters + Buttons -->
@@ -156,7 +165,7 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
         <ResultNotFound :message="props.emptyTitle ?? 'No List Found'" />
     </div>
 
-    <!-- Table Content -->
+    <!-- Table -->
     <DataTable
         v-else
         :value="props.value"
@@ -190,4 +199,3 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
 
     <Menu ref="menu" :model="menuItems" popup />
 </template>
-```
