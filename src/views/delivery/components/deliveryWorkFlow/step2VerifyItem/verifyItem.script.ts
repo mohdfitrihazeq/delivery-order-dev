@@ -84,39 +84,33 @@ export default defineComponent({
         // 3. METHODS
         // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (event.valid) {
-                if (itemList.value.length > 0) {
-                    const minimalItems = itemList.value.map((i) => ({
-                        purchaseOrderItemId: i.id,
-                        requestOrderId: i.requestOrderId,
-                        delivered: i.delivered
-                    }));
+            if (!event.valid || itemList.value.length === 0) {
+                const detail = !event.valid ? 'Please fix the errors in the form before submitting.' : 'No items found for this PO. Please select a valid Purchase Order.';
 
-                    emit('update', minimalItems);
-                    emit('next-step');
-
-                    toast.add({
-                        severity: 'success',
-                        summary: 'Form submitted',
-                        detail: `PO ${poNumber.value} with ${minimalItems.length} items submitted.`,
-                        life: 3000
-                    });
-                } else {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'No Items',
-                        detail: 'No items found for this PO. Please select a valid Purchase Order.',
-                        life: 3000
-                    });
-                }
-            } else {
                 toast.add({
                     severity: 'error',
                     summary: 'Form Invalid',
-                    detail: 'Please fix the errors in the form before submitting.',
+                    detail,
                     life: 3000
                 });
+                return;
             }
+
+            const minimalItems = itemList.value.map((i) => ({
+                purchaseOrderItemId: i.id,
+                requestOrderId: i.requestOrderId,
+                delivered: i.delivered
+            }));
+
+            emit('update', minimalItems);
+            emit('next-step');
+
+            toast.add({
+                severity: 'success',
+                summary: 'Form submitted',
+                detail: `PO ${poNumber.value} with ${minimalItems.length} items submitted.`,
+                life: 3000
+            });
         };
 
         const goBack = () => {

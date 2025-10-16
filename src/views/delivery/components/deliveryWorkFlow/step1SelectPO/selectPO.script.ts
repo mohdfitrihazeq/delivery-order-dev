@@ -76,13 +76,8 @@ export default defineComponent({
         // 4. METHODS
         // ---------------------------
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (!event.valid) return;
-
-            if (!selectedCard.value) return;
-
             const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === selectedCard.value?.id);
-
-            if (!fullPO) return;
+            if (!event.valid || !selectedCard.value || !fullPO) return;
 
             emit('update', {
                 purchaseOrderId: fullPO.Id,
@@ -105,25 +100,28 @@ export default defineComponent({
         const toggleSelect = (card: PurchaseOrderCard) => {
             if (selectedCard.value?.id === card.id) {
                 selectedCard.value = null;
-            } else {
-                const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === card.id);
-                if (!fullPO) return;
-
-                selectedCard.value = card;
-                emit('update', {
-                    purchaseOrderId: fullPO.Id,
-                    DocNo: fullPO.DocNo,
-                    PurchaseOrderItems: fullPO.PurchaseOrderItems
-                });
-
-                emit('next-step');
-                toast.add({
-                    severity: 'info',
-                    summary: 'PO Selected',
-                    detail: `Selected PO: ${card.title}`,
-                    life: 2000
-                });
+                return;
             }
+
+            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === card.id);
+            if (!fullPO) return;
+
+            selectedCard.value = card;
+
+            emit('update', {
+                purchaseOrderId: fullPO.Id,
+                DocNo: fullPO.DocNo,
+                PurchaseOrderItems: fullPO.PurchaseOrderItems
+            });
+
+            emit('next-step');
+
+            toast.add({
+                severity: 'info',
+                summary: 'PO Selected',
+                detail: `Selected PO: ${card.title}`,
+                life: 2000
+            });
         };
 
         const removeCard = (card: PurchaseOrderCard) => (selectedCard.value = selectedCard.value?.id === card.id ? null : selectedCard.value);
