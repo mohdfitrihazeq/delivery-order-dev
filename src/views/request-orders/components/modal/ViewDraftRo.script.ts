@@ -125,13 +125,20 @@ export default defineComponent({
         };
 
         const handleContinue = (draft: DraftRO) => {
+            console.log('Selected draft data:', draft.id);
+
             router.push({
                 path: '/request-orders/create',
-                query: { draftId: draft.draftId, mode: 'edit-draft' },
-                state: { draftData: draft }
+                query: { draftId: draft.id?.toString() ?? '', mode: 'edit-draft' }
             });
 
-            toast.add({ severity: 'info', summary: 'Draft Loaded', detail: `Continuing draft ${draft.draftId}`, life: 3000 });
+            toast.add({
+                severity: 'info',
+                summary: 'Draft Loaded',
+                detail: `Continuing draft ${draft.DocNo}`,
+                life: 3000
+            });
+
             handleClose();
         };
 

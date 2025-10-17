@@ -52,27 +52,69 @@ export default defineComponent({
         const files = ref<File[]>([]);
         const overallRemark = ref('');
         const MAX_FILE_SIZE = 1_000_000;
-        const attachments = ref<File[]>([]);
+        const attachments = ref<Array<File | AttachmentItem>>([]); // unified array
+        const newAttachments = ref<File[]>([]);
+        const existingAttachments = ref<AttachmentItem[]>([]);
         const isAttachmentValid = ref(true);
 
         // Load draft data if coming from draft modal
-        onMounted(() => {
-            if (route.query.mode === 'edit-draft' && history.state.draftData) {
-                const draft = history.state.draftData;
-                roNumber.value = draft.roNumber;
-                budgetType.value = draft.budgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
-                items.value = draft.items;
-                overallRemark.value = draft.overallRemark || '';
-                if (draft.roDate) {
-                    calendarValue.value = new Date(draft.roDate);
-                }
+        onMounted(async () => {
+            if (route.query.mode === 'edit-draft' && route.query.draftId) {
+                const draftId = route.query.draftId as string;
 
-                toast.add({
-                    severity: 'info',
-                    summary: 'Draft Loaded',
-                    detail: `Loaded draft ${draft.draftId}`,
-                    life: 3000
-                });
+                try {
+                    const res = await requestOrderService.getRequestOrderById(draftId);
+                    console.log('Fetch draft response:', res);
+                    const draft = res.data;
+                    console.log('Loaded Draft:', draft);
+                    if (!draft) return;
+
+                    // Basic fields
+                    roNumber.value = draft.DocNo;
+                    budgetType.value = draft.PrType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+                    overallRemark.value = draft.Remark || '';
+                    if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
+
+                    // Items
+                    items.value = (draft.RequestOrderItems || []).map((item: any) => ({
+                        itemCode: item.ItemCode || '',
+                        description: item.Description || '',
+                        location: item.Location || '',
+                        uom: item.Uom || '',
+                        quantity: item.Quantity?.toString() || '',
+                        price: item.Rate || 0,
+                        deliveryDate: item.DeliveryDate || null,
+                        notes: item.Notes || '',
+                        remark: item.Remark || '',
+                        showNotes: false,
+                        showRemark: false
+                    }));
+
+                    if (draft.Attachment) {
+                        const parsedAttachments = JSON.parse(draft.Attachment);
+                        existingAttachments.value = parsedAttachments.map((att: any) => ({
+                            filename: att.filename,
+                            path: att.path.replace(/\\/g, '/'),
+                            size: att.size,
+                            type: att.type
+                        }));
+                        attachments.value = [...existingAttachments.value];
+                    }
+
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Draft Loaded',
+                        detail: `Loaded draft ${draft.DocNo} with ${attachments.value.length} attachment(s)`,
+                        life: 3000
+                    });
+                } catch (error) {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Failed to Load Draft',
+                        detail: 'Could not fetch draft data. Please try again.',
+                        life: 5000
+                    });
+                }
             }
         });
 
@@ -208,6 +250,26 @@ export default defineComponent({
             });
         };
 
+        function removeAttachment(index: number) {
+            const removed = attachments.value.splice(index, 1)[0];
+
+            // If it's an existing attachment, also remove from existingAttachments
+            if ('path' in removed) {
+                existingAttachments.value = existingAttachments.value.filter((att) => att.path !== removed.path);
+            } else {
+                newAttachments.value = newAttachments.value.filter((f) => f !== removed);
+            }
+
+            console.log('Attachments after removal:', attachments.value);
+        }
+
+        // Preview/download existing attachment
+        function previewAttachment(file: AttachmentItem) {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://103.16.42.51:9001';
+            const url = `${baseUrl}/${file.path}`;
+            window.open(url, '_blank');
+        }
+
         const onSelectedFiles = (event) => {
             attachments.value = event.files;
             let totalSizeTemp = 0;
@@ -304,8 +366,9 @@ export default defineComponent({
         async function submitRequestOrder() {
             try {
                 const formatDateToAPI = (date: Date | null): string => {
-                    if (!date) return new Date().toISOString().split('T')[0];
-                    return date.toISOString().split('T')[0];
+                    if (!date) return null;
+                    const d = typeof date === 'string' ? new Date(date) : date;
+                    return d.toISOString();
                 };
                 const project = loadProjectFromStorage();
                 const projectId = project?.ProjectId || 0;
@@ -456,7 +519,12 @@ export default defineComponent({
             onClearTemplatingUpload,
             isAttachmentValid,
             attachments,
-            overallRemark
+            overallRemark,
+            removeAttachment,
+            newAttachments,
+            existingAttachments,
+            MAX_FILE_SIZE,
+            previewAttachment
         };
     }
 });
