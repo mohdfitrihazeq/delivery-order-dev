@@ -363,13 +363,10 @@ export default defineComponent({
             return null;
         };
 
-        async function submitRequestOrder() {
+        const submitRequestOrder = async () => {
             try {
-                const formatDateToAPI = (date: Date | null): string => {
-                    if (!date) return null;
-                    const d = typeof date === 'string' ? new Date(date) : date;
-                    return d.toISOString();
-                };
+                const formatDateToAPI = (date: Date | null) => (date ? new Date(date).toISOString() : null);
+
                 const project = loadProjectFromStorage();
                 const projectId = project?.ProjectId || 0;
 
@@ -394,9 +391,21 @@ export default defineComponent({
                     }))
                 };
 
-                const result = await requestOrderService.createRequestOrder(payload, attachments.value.length > 0 ? attachments.value : undefined);
+                const isDraft = !!route.query.draftId; // check if editing a draft
+                const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
+
+                let result: CreateRequestOrderResponse;
+
+                if (isDraft) {
+                    // update existing draft
+                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachments.value.length > 0 ? attachments.value : undefined);
+                } else {
+                    // Create new RO
+                    result = await requestOrderService.createRequestOrder(payload, attachmentsToSend);
+                }
+
                 if (result.success) {
-                    toast.add({
+                    toastBus.add({
                         severity: 'success',
                         summary: 'Request Order Submitted',
                         detail: `RO ${roNumber.value} has been submitted successfully`,
@@ -407,7 +416,7 @@ export default defineComponent({
                         router.push('/request-orders');
                     }, 1000);
                 } else {
-                    toast.add({
+                    toastBus.add({
                         severity: 'error',
                         summary: 'Submission Failed',
                         detail: result.message || 'Failed to submit request order',
@@ -416,14 +425,14 @@ export default defineComponent({
                 }
             } catch (error: any) {
                 console.error('Submit failed:', error);
-                toast.add({
+                toastBus.add({
                     severity: 'error',
                     summary: 'Submission Error',
                     detail: error.message || 'An unexpected error occurred',
                     life: 5000
                 });
             }
-        }
+        };
 
         async function saveDraft() {
             try {

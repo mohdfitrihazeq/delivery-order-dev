@@ -65,6 +65,20 @@ const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attac
     }
 };
 
+const submitDraftRequestOrder = async (draftId: string, payload: CreateRequestOrderPayload, attachments?: Array<File | AttachmentItem>): Promise<CreateRequestOrderResponse> => {
+    try {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(payload));
+        appendAttachmentsToFormData(formData, attachments);
+
+        const response = await axiosInstance.put(`/requestOrder/${draftId}/Draft`, formData);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        showError(error, 'Failed to submit draft request order.');
+        return { success: false, message: error.response?.data?.message || 'Failed to submit draft request order' };
+    }
+};
+
 const deleteRequestOrder = async (id: number) => {
     try {
         const response = await axiosInstance.delete(`/requestOrder/${id}`);
@@ -111,5 +125,6 @@ export const requestOrderService = {
     createRequestOrderDraft,
     deleteRequestOrder,
     getRequestOrders,
-    getRequestOrderById
+    getRequestOrderById,
+    submitDraftRequestOrder
 };
