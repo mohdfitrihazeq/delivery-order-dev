@@ -36,6 +36,8 @@ export interface BudgetChangeItem {
     CreatedBy: string | null;
     UpdatedAt: string;
     UpdatedBy: string | null;
+    location: string;
+    element: string;
 }
 
 export interface BudgetChangeRequest {
@@ -59,6 +61,31 @@ export interface BudgetChangeRequest {
 
 export interface BudgetChangeRequestResponse {
     success: boolean;
-    message: string;
-    data: BudgetChangeRequest[];
+    message?: string;
+    data?: BudgetChangeRequest[];
+}
+
+export interface BudgetChangeItemPayload {
+    ItemCode: string;
+    Name: string;
+    Uom: string;
+    UnitPrice: number;
+    OrderedQty: number;
+    NewOrder: number;
+    Description: string;
+    Remark: string;
+    location?: string;
+    element?: string;
+}
+
+export interface BudgetChangeRequestPayload {
+    DocNo: string;
+    RequestDate: string;
+    RequestedBy: string;
+    Department: string;
+    Remark: string;
+    TotalAmount: number;
+    Reason: string;
+    Type: 'BudgetChangeRequest';
+    Items: BudgetChangeItemPayload[];
 }
