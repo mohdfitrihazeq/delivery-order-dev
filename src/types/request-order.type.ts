@@ -193,3 +193,17 @@ export interface EditForm {
     items: EditFormItem[];
     attachments: (File | AttachmentItem)[];
 }
+
+export interface DraftRO {
+    draftId: string;
+    project: string;
+    budgetType: string;
+    requestedBy: string;
+    itemsCount: number;
+    lastModified: string;
+    roNumber: string;
+    roDate: string;
+    items: any[];
+    overallRemark?: string;
+    attachments?: File[];
+}
