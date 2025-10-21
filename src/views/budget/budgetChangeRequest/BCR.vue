@@ -17,26 +17,12 @@
                 <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="4" />
             </div>
 
-            <ReusableTable
-                :value="filteredRequests"
-                :columns="tableColumns"
-                :loading="false"
-                :showCreate="false"
-                :showImportFile="false"
-                :onActionClick="handleActionClick"
-                :onSearch="(val) => (searchTerm = val)"
-                :extraFilters="extraFilters"
-                :onFilterChange="(filters) => (activeFilters = filters)"
-                emptyTitle="No budget change requests found"
-            >
-                <!-- Status Badge Slot -->
+            <ReusableTable :value="filteredRequests" :columns="tableColumns" :onSearch="handleSearch" :extraFilters="extraFilters" :onFilterChange="handleFilterChange" :onActionClick="handleActionClick">
                 <template #status="{ data }">
-                    <Badge :value="data.status" :severity="getStatusSeverity(data.status)" />
+                    <Badge :value="data.Status" :severity="getStatusSeverity(data.Status)" />
                 </template>
-
-                <!-- Variance Amount Slot -->
-                <template #varianceAmount="{ data }">
-                    <span class="font-semibold">{{ data.varianceAmount }}</span>
+                <template #TotalAmount="{ data }">
+                    <span class="font-semibold">{{ data.TotalAmount }}</span>
                 </template>
             </ReusableTable>
 

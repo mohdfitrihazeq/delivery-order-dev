@@ -1,81 +1,94 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
-import type { RequestData } from '@/types/bcr.type';
+import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
+import type { BudgetChangeRequest } from '@/types/bcr.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'BudgetChangeRequest',
     components: { ReusableTable, CommentBCR, Badge },
     setup() {
-        const BudgetChangeRequestSummaryData: CardItem[] = [
-            { title: 'Pending Review', value: '1', description: 'Requires attention', icon: 'pi pi-exclamation-triangle', color: 'orange' },
-            { title: 'Under Review', value: '1', description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
-            { title: 'Approved', value: '1', description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
-            { title: 'Total Value', value: '$ 43,295', description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
+        const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
+            const draftCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Draft').length;
+            const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
+            const approvedItems = budgetChangeRequestData.value.filter((item) => item.Status === 'Approved');
+            const approvedCount = approvedItems.length;
+
+            const totalApprovedValue = approvedItems.reduce((sum, item) => sum + (item.TotalAmount || 0), 0);
+            const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+            return [
+                { title: 'Draft', value: draftCount.toString(), description: 'Draft for request', icon: 'pi pi-exclamation-triangle', color: 'orange' },
+                { title: 'Under Review', value: reviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
+                { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
+                { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
+            ];
+        });
+
+        const budgetStore = useBudgetStore();
+        onMounted(async () => {
+            await budgetStore.fetchBudgetChangesRequestList();
+        });
+
+        const budgetChangeRequestData = computed(() => {
+            return budgetStore.budgetChangeRequestList.map((item) => ({
+                ...item,
+                actions: ['view', 'edit', 'comment']
+            }));
+        });
+
+        const searchTerm = ref<string>('');
+        const activeFilters = ref<Record<string, string | number | boolean> | null>(null);
+
+        const extraFilters = [
+            {
+                type: 'select',
+                field: 'status',
+                placeholder: 'All Status',
+                options: [
+                    { label: 'All Status', value: '' },
+                    { label: 'Draft', value: 'Draft' },
+                    { label: 'Under Review', value: 'Under Review' },
+                    { label: 'Approved', value: 'Approved' },
+                    { label: 'Rejected', value: 'Rejected' }
+                ]
+            }
         ];
 
-        const requestList = ref<RequestData[]>([
-            {
-                requestNo: 'BCR2024090001',
-                projectCode: 'PROJ001',
-                requestedBy: 'Jane Doe',
-                role: 'PM',
-                dateRequested: '15/09/2024',
-                status: 'Under Review',
-                materials: 2,
-                varianceAmount: '+$3,865',
-                actions: ['view', 'edit']
-            },
-            {
-                requestNo: 'BCR2024090002',
-                projectCode: 'PROJ001',
-                requestedBy: 'John Smith',
-                role: 'Site',
-                dateRequested: '10/09/2024',
-                status: 'Approved',
-                materials: 1,
-                varianceAmount: '+$4,554',
-                actions: ['view']
-            }
-        ]);
-
-        const searchTerm = ref('');
-        const activeFilters = ref<Record<string, any>>({});
         const showCommentModal = ref(false);
         const selectedRequestNo = ref<string | null>(null);
 
+        function handleCommentSubmit(requestNo: string, comment: string) {
+            console.log('💬 Comment submitted:', requestNo, comment);
+            showCommentModal.value = false;
+        }
+
         const filteredRequests = computed(() =>
-            requestList.value.filter(
-                (r) =>
-                    (!searchTerm.value ||
-                        r.requestNo.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-                        r.projectCode.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-                        r.requestedBy.toLowerCase().includes(searchTerm.value.toLowerCase())) &&
-                    (!activeFilters.value.status || r.status === activeFilters.value.status)
-            )
+            budgetChangeRequestData.value.filter((r) => {
+                const matchSearch = !searchTerm.value || r.DocNo.toLowerCase().includes(searchTerm.value.toLowerCase());
+                const statusFilter = activeFilters.value?.status;
+                const matchStatus = !statusFilter ? true : r.Status === statusFilter;
+
+                return matchSearch && matchStatus;
+            })
         );
 
         const tableColumns = computed<TableColumn[]>(() => [
-            { field: 'requestNo', header: 'Request No' },
-            { field: 'projectCode', header: 'Project Code' },
-            { field: 'requestedBy', header: 'Requested By' },
-            { field: 'dateRequested', header: 'Date Requested' },
-            { field: 'status', header: 'Status', bodySlot: 'status' },
-            { field: 'materials', header: '# Materials' },
-            { field: 'varianceAmount', header: 'Variance Amount', bodySlot: 'varianceAmount' },
-            {
-                field: 'actions',
-                header: 'Actions',
-                action: true
-            }
+            { field: 'DocNo', header: 'Request No' },
+            { field: 'ProjectId', header: 'Project Code' },
+            { field: 'RequestedBy', header: 'Requested By' },
+            { field: 'RequestDate', header: 'Date Requested' },
+            { field: 'Status', header: 'Status', bodySlot: 'status' },
+            { field: 'BudgetChangeItem', header: '# Materials', bodySlot: 'materials' },
+            { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
+            { field: 'actions', header: 'Actions', action: true }
         ]);
-
-        function getStatusSeverity(status: string) {
-            switch (status) {
+        function getStatusSeverity(Status: string) {
+            switch (Status) {
                 case 'Approved':
                     return 'success';
                 case 'Rejected':
@@ -86,28 +99,40 @@ export default defineComponent({
                     return 'info';
             }
         }
+
+        function handleSearch(val: string) {
+            searchTerm.value = val;
+        }
+
+        function handleFilterChange(filters: Record<string, string | number | boolean>) {
+            activeFilters.value = filters;
+        }
+
         const router = useRouter();
-        function handleActionClick(type: 'edit' | 'view', rowData: RequestData) {
+
+        function handleActionClick(type: 'edit' | 'view' | 'comment', rowData: BudgetChangeRequest) {
             if (type === 'edit') {
-                router.push(`/bcr/edit/${rowData.requestNo}`);
-            } else {
-                router.push(`/bcr/view/${rowData.requestNo}`);
+                router.push(`/bcr/edit/${rowData.DocNo}`);
+            } else if (type === 'view') {
+                router.push(`/bcr/view/${rowData.DocNo}`);
+            } else if (type === 'comment') {
+                selectedRequestNo.value = rowData.DocNo;
+                showCommentModal.value = true;
             }
         }
 
-        function handleCommentSubmit(requestNo: string, comment: string) {
-            console.log('💬 Comment submitted:', requestNo, comment);
-            showCommentModal.value = false;
-        }
-
         return {
-            requestList,
+            budgetChangeRequestData,
             filteredRequests,
             searchTerm,
             activeFilters,
+            extraFilters,
             tableColumns,
             getStatusSeverity,
+            handleSearch,
+            handleFilterChange,
             handleActionClick,
+
             showCommentModal,
             selectedRequestNo,
             handleCommentSubmit,
