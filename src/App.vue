@@ -1,4 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+import { setGlobalToast } from '@/utils/toastBus';
+
+// Initialize the global toast reference
+const toast = useToast();
+setGlobalToast(toast);
+</script>
 
 <template>
     <ConfirmDialog />

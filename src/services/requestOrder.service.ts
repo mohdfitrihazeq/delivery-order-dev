@@ -2,14 +2,32 @@ import type { CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/ty
 import { showError } from '@/utils/showError.utils';
 import axiosInstance from './backendAxiosInstance';
 
-const createRequestOrder = async (payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
+interface AttachmentItem {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
+
+// Helper to append attachments to FormData
+function appendAttachmentsToFormData(formData: FormData, attachments?: Array<File | AttachmentItem>) {
+    if (!attachments?.length) return;
+
+    // Append only new File objects
+    attachments.filter((att) => att instanceof File).forEach((file) => formData.append('attachment', file, file.name));
+
+    // Append existing attachments as JSON if any
+    const existing = attachments.filter((att) => !(att instanceof File));
+    if (existing.length) {
+        formData.append('existingAttachments', JSON.stringify(existing));
+    }
+}
+
+const createRequestOrder = async (payload: CreateRequestOrderPayload, attachments?: Array<File | AttachmentItem>): Promise<CreateRequestOrderResponse> => {
     try {
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
-
-        if (attachments?.length) {
-            attachments.forEach((file) => formData.append('attachment', file, file.name));
-        }
+        appendAttachmentsToFormData(formData, attachments);
 
         const response = await axiosInstance.post('/requestOrder', formData);
         return { success: true, data: response.data };
@@ -19,12 +37,11 @@ const createRequestOrder = async (payload: CreateRequestOrderPayload, attachment
     }
 };
 
-const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload, attachments?: File[]): Promise<CreateRequestOrderResponse> => {
+const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload, attachments?: Array<File | AttachmentItem>): Promise<CreateRequestOrderResponse> => {
     try {
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
-
-        attachments?.forEach((file) => formData.append('attachment', file, file.name));
+        appendAttachmentsToFormData(formData, attachments);
 
         const response = await axiosInstance.put(`/requestOrder/${id}`, formData);
         return { success: true, data: response.data };
@@ -34,11 +51,11 @@ const updateRequestOrder = async (id: string, payload: CreateRequestOrderPayload
     }
 };
 
-const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attachments?: File[]) => {
+const createRequestOrderDraft = async (payload: CreateRequestOrderPayload, attachments?: Array<File | AttachmentItem>) => {
     try {
         const formData = new FormData();
         formData.append('data', JSON.stringify(payload));
-        attachments?.forEach((file) => formData.append('attachment', file, file.name));
+        appendAttachmentsToFormData(formData, attachments);
 
         const response = await axiosInstance.post('/requestOrder/Draft', formData);
         return { success: true, data: response.data };
@@ -58,21 +75,19 @@ const deleteRequestOrder = async (id: number) => {
     }
 };
 
-// ---------- GET ORDERS (pagination-ready) ----------
 interface GetRequestOrdersParams {
     status?: string;
     budgetType?: string;
     search?: string;
     startDate?: string;
     endDate?: string;
-    page?: number; // optional
-    limit?: number; // optional
+    page?: number;
+    limit?: number;
 }
 
 const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<{ data: any[]; total?: number }> => {
     try {
         const response = await axiosInstance.get('/requestOrder', { params });
-
         return { data: response.data.data, total: response.data.total };
     } catch (error: any) {
         showError(error, 'Failed to fetch request orders.');
