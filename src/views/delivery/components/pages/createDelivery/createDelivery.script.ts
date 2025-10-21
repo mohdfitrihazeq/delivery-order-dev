@@ -38,26 +38,21 @@ export default defineComponent({
         // 3. FUNCTIONS (handlers, business logic)
         // ---------------------------
         const handleStep1Update = (data: any) => {
-            console.log('Step 1 data received in update', data);
             deliveryData.value.selectPO = data;
+
             activeStep.value = 2;
         };
 
         const handleStep2Update = (data: any) => {
-            console.log('Step 2 data received in update', data);
             deliveryData.value.verifyItem = data;
+
             activeStep.value = 3;
         };
 
         const handleStep3Update = (data: any) => {
-            console.log('Step 3 data received in update', data);
             deliveryData.value.deliveryInfo = data;
             activeStep.value = 4;
-        };
-
-        const handleStep4Update = (data: any) => {
-            console.log('Step 4 data received in update', data);
-            deliveryData.value.review = data;
+            console.log('Step 3 data received in update', deliveryData.value);
         };
 
         const goStep = (step: number) => {
@@ -74,7 +69,6 @@ export default defineComponent({
             handleStep1Update,
             handleStep2Update,
             handleStep3Update,
-            handleStep4Update,
             goStep
         };
     }

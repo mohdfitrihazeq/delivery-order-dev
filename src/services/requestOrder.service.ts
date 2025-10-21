@@ -1,5 +1,5 @@
 import type { CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
-import { showError } from '@/utils/showError.utils';
+import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
 
 interface AttachmentItem {

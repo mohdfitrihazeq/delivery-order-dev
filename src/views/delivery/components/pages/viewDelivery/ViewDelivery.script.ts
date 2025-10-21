@@ -1,105 +1,79 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { useDeliveryStore } from '@/stores/delivery/delivery.store';
+import { showError } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
+import { storeToRefs } from 'pinia';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
     name: 'ViewDelivery',
     components: { Tag, ReusableTable, Motion },
     setup() {
-        // ---------------------------
-        // 1. DATA (constants, refs)
-        // ---------------------------
         const route = useRoute();
-        const doNumber = ref(route.params.doNumber || '');
+        const deliveryStore = useDeliveryStore();
+        const { singleDelivery, loading } = storeToRefs(deliveryStore);
+
         const search = ref('');
-
-        const deliveryDetailsData = ref([
-            {
-                doNumber: 'DO2024091501',
-                poNumber: 'PO2024090102',
-                projectName: 'Project A',
-                driverPlate: 'ABC-1234',
-                deliveryDate: '20/09/2024',
-                status: 'pending',
-                items: [
-                    { code: 'ITM-001', description: 'Item 1', ordered: 100, received: 50, remaining: 50, unitPrice: 10, status: 'Partial' },
-                    { code: 'ITM-002', description: 'Item 2', ordered: 200, received: 200, remaining: 0, unitPrice: 20, status: 'Completed' }
-                ]
-            },
-            {
-                doNumber: 'DO2024091502',
-                poNumber: 'PO2024090101',
-                projectName: 'Project B',
-                driverPlate: 'XYZ-5678',
-                deliveryDate: '15/09/2024',
-                status: 'completed',
-                items: [
-                    { code: 'ITM-003', description: 'Item 3', ordered: 50, received: 50, remaining: 0, unitPrice: 30, status: 'Completed' },
-                    { code: 'ITM-004', description: 'Item 4', ordered: 75, received: 60, remaining: 15, unitPrice: 25, status: 'Partial' }
-                ]
-            }
-        ]);
-
         const items = ref<any[]>([]);
+
+        const deliveryId = Number(route.params.deliveryOrderId);
 
         const itemsColumns = ref([
             { field: 'no', header: 'No', bodySlot: 'no' },
-            { field: 'code', header: 'Item Code' },
-            { field: 'description', header: 'Description' },
-            { field: 'ordered', header: 'Ordered' },
-            { field: 'received', header: 'Received' },
-            { field: 'remaining', header: 'Remaining' },
-            { field: 'unitPrice', header: 'Unit Price' },
+            { field: 'ItemCode', header: 'Item Code' },
+            { field: 'Name', header: 'Description' },
+            { field: 'Uom', header: 'UOM' },
+            { field: 'Quantity', header: 'Quantity' },
+            { field: 'DeliveryDate', header: 'Delivery Date' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
 
-        // ---------------------------
-        // 2. COMPUTED PROPERTIES
-        // ---------------------------
-        const deliveryDetail = computed(() => {
-            return (
-                deliveryDetailsData.value.find((d) => d.doNumber === doNumber.value) || {
-                    poNumber: '',
-                    projectName: '',
-                    driverPlate: '',
-                    deliveryDate: '',
-                    status: '',
-                    items: []
-                }
-            );
-        });
+        const formattedItems = computed(() =>
+            (singleDelivery.value?.DeliveryOrderItems || []).map((item, index) => ({
+                no: index + 1,
+                ...item,
+                status: Number(item.Quantity) > 0 ? 'Pending' : 'Completed'
+            }))
+        );
 
-        const allItems = computed(() => deliveryDetail.value.items.map((item, i) => ({ ...item, no: i + 1 })));
-
-        const status = computed(() => deliveryDetail.value.status || '');
-
-        // ---------------------------
-        // 3. FUNCTIONS (handlers, business logic)
-        // ---------------------------
         function handleSearch(value: string) {
-            search.value = value;
-            if (!value) {
-                items.value = allItems.value;
+            search.value = value.trim().toLowerCase();
+            if (!search.value) {
+                items.value = formattedItems.value;
                 return;
             }
-            const lower = value.toLowerCase();
-            items.value = allItems.value.filter((item) => item.code.toLowerCase().includes(lower) || item.description.toLowerCase().includes(lower));
+
+            items.value = formattedItems.value.filter((i) => i.ItemCode.toLowerCase().includes(search.value) || i.Name.toLowerCase().includes(search.value));
         }
 
-        items.value = allItems.value;
+        watch(singleDelivery, () => {
+            items.value = formattedItems.value;
+        });
 
-        // ---------------------------
-        // 5. RETURN (expose to template)
-        // ---------------------------
+        onMounted(async () => {
+            if (!deliveryId || isNaN(deliveryId)) {
+                showError('Invalid delivery ID in route.');
+                return;
+            }
+
+            await deliveryStore.getSingleDeliveryOrder(deliveryId);
+
+            if (!singleDelivery.value) {
+                showError('Failed to load delivery order details.');
+                return;
+            }
+
+            items.value = formattedItems.value;
+        });
+
         return {
-            doNumber,
-            deliveryDetail,
+            deliveryId,
+            singleDelivery,
+            loading,
             items,
             itemsColumns,
-            status,
-            search,
             onSearchWrapper: handleSearch
         };
     }
