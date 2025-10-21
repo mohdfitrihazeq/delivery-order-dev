@@ -6,79 +6,59 @@ export interface DiscussionItem {
     documentUrl?: string;
     isEditing: boolean;
 }
-interface Item {
-    itemCode: string;
-    description: string;
-    uom: string;
-    unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    exceededQty: number;
-    exceededPercent: number;
-    estimatedExceed: number;
-    varianceQty: number;
-    varianceAmount: number;
-    remark: string;
-    notes: string;
-    showNotes: boolean;
-    showRemark: boolean;
-}
-
-export interface ItemOption {
-    label: string;
-    value: string;
-    description: string;
-    uom: string;
-}
-
-export interface ReasonOption {
-    label: string;
-    value: string;
-}
-
-export interface BudgetItem {
-    itemCode: string;
-    description: string;
-    location: string;
-    element: string;
-    itemType: string;
-    uom: string;
-    quantity: number;
-}
-
-export interface BudgetItem {
-    itemCode: string;
-    description: string;
-    location: string;
-    element: string;
-    itemType: string;
-    uom: string;
-    quantity: number;
-}
 
 export interface FilterOption {
     label: string;
     value: string;
 }
 
-export interface OrderItem {
-    code: string;
-    description: string;
-    uom: string;
-    qty: number;
-    deliveryDate: string;
-    note: string;
+export interface BudgetAttachment {
+    filename: string;
+    path: string;
+    type: string;
+    size: number;
 }
 
-export interface RequestData {
-    requestNo: string;
-    projectCode: string;
-    requestedBy: string;
-    role: string;
-    dateRequested: string;
-    status: 'Under Review' | 'Approved' | 'Rejected';
-    materials: number;
-    varianceAmount: string;
-    actions: ('view' | 'edit' | 'comment')[];
+export interface BudgetChangeItem {
+    Id: number;
+    BudgetChangeId: number;
+    BudgetItemId: number;
+    ItemCode: string;
+    Name: string;
+    Uom: string;
+    UnitPrice: string;
+    OrderedQty: string;
+    NewOrder: string;
+    ExceededQty: string;
+    Description: string;
+    Remark: string;
+    CreatedAt: string;
+    CreatedBy: string | null;
+    UpdatedAt: string;
+    UpdatedBy: string | null;
+}
+
+export interface BudgetChangeRequest {
+    Id: number;
+    ProjectId: number;
+    DocNo: string;
+    RequestDate: string;
+    RequestedBy: string;
+    Department: string;
+    Remark: string;
+    TotalAmount: number;
+    Reason: string;
+    Attachment: string | BudgetAttachment[];
+    Status: string;
+    CreatedBy: string | null;
+    CreatedAt: string;
+    UpdatedAt: string;
+    UpdatedBy: string | null;
+    BudgetChangeItem: BudgetChangeItem[];
+}
+
+export interface BudgetChangeRequestResponse {
+    success: boolean;
+    message: string;
+    data: BudgetChangeRequest[];
 }
