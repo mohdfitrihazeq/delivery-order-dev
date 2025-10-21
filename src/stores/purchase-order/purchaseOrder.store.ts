@@ -1,5 +1,4 @@
-// src/stores/purchase.store.ts
-import { purchaseService } from '@/services/purchaseService';
+import { purchaseService } from '@/services/purchaseOrder.service';
 import type { PurchaseOrder } from '@/types/purchase.type';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
@@ -12,24 +11,20 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         loading.value = true;
         try {
             const res = await purchaseService.getPurchaseOrders(params);
-
             purchaseOrders.value = res.data ?? [];
             return purchaseOrders.value;
         } catch (err) {
-            throw err;
+            console.error('Failed to fetch purchase orders:', err);
+            purchaseOrders.value = [];
+            return [];
         } finally {
             loading.value = false;
         }
     };
 
-    const debugFetch = async (params?: { status?: string; search?: string }) => {
-        await fetchPurchaseOrders(params);
-    };
-
     return {
         purchaseOrders,
         loading,
-        fetchPurchaseOrders,
-        debugFetch
+        fetchPurchaseOrders
     };
 });

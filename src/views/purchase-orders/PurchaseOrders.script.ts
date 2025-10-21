@@ -11,8 +11,10 @@ import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
 
+import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
+
 export default defineComponent({
-    name: 'Deliveries',
+    name: 'PurchaseOrders',
     components: {
         Tag,
         POSummaryData,
@@ -23,46 +25,29 @@ export default defineComponent({
         ProgressSpinner
     },
     setup() {
+        const purchaseOrderStore = usePurchaseOrderStore();
+
         // ---------------------------
         // 1. LOADING STATE
         // ---------------------------
         const isLoading = ref(true);
 
         // ---------------------------
-        // 2. DATA (constants, refs)
+        // 2. DATA
         // ---------------------------
-        const pendingList = ref([
-            {
-                poNumber: 'PO2024090102',
-                supplier: 'DiggRight Contractors',
-                date: '20/09/2024',
-                totalAmount: 15750,
-                status: 'active'
-            }
-        ]);
-
+        const pendingList = ref([]);
         const partiallyList = ref([]);
-
-        const completedList = ref([
-            {
-                doNumber: 'DO2024091501',
-                poNumber: 'PO2024090101',
-                receivedBy: 'Site Manager',
-                date: '15/09/2024',
-                discrepancyType: 'Partial Delivery',
-                status: 'completed'
-            }
-        ]);
+        const completedList = ref([]);
 
         const poSummaryData: CardItem[] = [
-            { title: 'Pending POs', value: '1', description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
-            { title: 'Partially Delivered', value: '1', description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
-            { title: 'Completed', value: '1', description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
-            { title: 'Total POs', value: '1', description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
+            { title: 'Pending POs', value: '0', description: 'No items delivered yet', icon: 'pi pi-clock', color: 'blue' },
+            { title: 'Partially Delivered', value: '0', description: 'Some items delivered', icon: 'pi pi-exclamation-triangle', color: 'orange' },
+            { title: 'Completed', value: '0', description: 'All items delivered', icon: 'pi pi-check-circle', color: 'green' },
+            { title: 'Total POs', value: '0', description: 'Delivery orders created', icon: 'pi pi-book', color: 'gray' }
         ];
 
         // ---------------------------
-        // 3. STATE (filters, search)
+        // 3. SEARCH & FILTERS
         // ---------------------------
         const filters = ref({
             global: { value: null as string | null, matchMode: 'contains' }
@@ -70,27 +55,33 @@ export default defineComponent({
 
         const search = ref('');
 
-        // ---------------------------
-        // 4. FUNCTIONS (handlers)
-        // ---------------------------
-        function handleSearch(value: string) {
+        async function handleSearch(value: string) {
             search.value = value;
             filters.value.global.value = value;
+
+            await loadData({ search: value });
         }
 
-        const loadData = async () => {
+        // ---------------------------
+        // 4. LOAD DATA FROM API
+        // ---------------------------
+        const loadData = async (params?: { search?: string }) => {
             isLoading.value = true;
             try {
-                // Simulate API delay
-                await new Promise((resolve) => setTimeout(resolve, 3500));
+                await purchaseOrderStore.fetchPurchaseOrders(params);
 
-                // use api later in here
-                // const response = await fetchPurchaseOrders();
-                // pendingList.value = response.pending;
-                // partiallyList.value = response.partially;
-                // completedList.value = response.completed;
+                // Split lists by status
+                pendingList.value = purchaseOrderStore.purchaseOrders.filter((po) => po.status === 'pending');
+                partiallyList.value = purchaseOrderStore.purchaseOrders.filter((po) => po.status === 'partially delivered');
+                completedList.value = purchaseOrderStore.purchaseOrders.filter((po) => po.status === 'completed');
+
+                // Update summary cards
+                poSummaryData[0].value = pendingList.value.length.toString();
+                poSummaryData[1].value = partiallyList.value.length.toString();
+                poSummaryData[2].value = completedList.value.length.toString();
+                poSummaryData[3].value = purchaseOrderStore.purchaseOrders.length.toString();
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Error loading purchase orders:', error);
             } finally {
                 isLoading.value = false;
             }
@@ -100,9 +91,7 @@ export default defineComponent({
         // 5. COMPUTED PROPERTIES WITH NUMBERING
         // ---------------------------
         const pendingListWithNo = computed(() => pendingList.value.map((item, i) => ({ ...item, no: i + 1 })));
-
         const partiallyListWithNo = computed(() => partiallyList.value.map((item, i) => ({ ...item, no: i + 1 })));
-
         const completedListWithNo = computed(() => completedList.value.map((item, i) => ({ ...item, no: i + 1 })));
 
         // ---------------------------
@@ -115,12 +104,7 @@ export default defineComponent({
             { field: 'date', header: 'Date', sortable: true },
             { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
             { field: 'status', header: 'Status', sortable: false, bodySlot: 'status' },
-            {
-                field: 'action',
-                header: 'Action',
-                bodySlot: 'action',
-                sortable: false
-            }
+            { field: 'action', header: 'Action', bodySlot: 'action', sortable: false }
         ];
 
         const partiallyListColumn: TableColumn[] = [
@@ -146,7 +130,7 @@ export default defineComponent({
         // ---------------------------
         const tabItems = [
             { value: '0', label: 'Pending' },
-            { value: '1', label: 'Partial Delivery', badge: 1 },
+            { value: '1', label: 'Partial Delivery' },
             { value: '2', label: 'Completed' }
         ];
 
