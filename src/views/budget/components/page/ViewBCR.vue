@@ -1,4 +1,3 @@
-```vue
 <script lang="ts" src="./ViewBCR.script.ts"></script>
 
 <template>
@@ -14,7 +13,7 @@
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h1 class="text-2xl font-bold">View Budget Change Request</h1>
-                                <p class="text-gray-500">Project: MKT</p>
+                                <p class="text-gray-500 mt-1">Project: {{ projectName }}</p>
                             </div>
                         </div>
 
@@ -46,21 +45,19 @@
                             <h3 class="text-lg font-semibold mb-4">Materials</h3>
 
                             <div class="overflow-x-auto">
-                                <DataTable :value="items" :responsiveLayout="'scroll'" class="p-datatable-sm">
-                                    <Column field="itemCode" header="Item Code"></Column>
-                                    <Column field="description" header="Description"></Column>
-                                    <Column field="uom" header="Units"></Column>
-                                    <Column field="unitPrice" header="Unit Price" :body="formatPrice"></Column>
-                                    <Column field="budgetQty" header="Budgeted Qty" :body="formatNumber"></Column>
-                                    <Column field="orderedQty" header="Ordered Qty" :body="formatNumber"></Column>
-                                    <Column field="newOrder" header="New Order Qty" :body="formatNumber"></Column>
-                                    <Column field="exceededQty" header="Exceeded Qty" :body="formatNumber"></Column>
-                                    <Column field="exceededPercent" header="% Exceed" :body="formatPercent"></Column>
-                                    <Column field="estimatedExceed" header="Estimated Exceed" :body="formatPrice"></Column>
-                                    <Column field="varianceQty" header="Variance Qty" :body="formatNumber"></Column>
-                                    <Column field="varianceAmount" header="Variance Amount" :body="formatPrice"></Column>
-                                    <Column field="remark" header="Remarks"></Column>
-                                    <Column field="notes" header="Notes"></Column>
+                                <DataTable :value="itemsWithCalc" :responsiveLayout="'scroll'" class="p-datatable-sm">
+                                    <Column field="ItemCode" header="Item Code"></Column>
+                                    <Column field="Description" header="Description"></Column>
+                                    <Column field="Uom" header="Units"></Column>
+                                    <Column field="UnitPrice" header="Unit Price" :body="formatPrice"></Column>
+                                    <Column field="OrderedQty" header="Ordered Qty" :body="formatNumber"></Column>
+                                    <Column field="NewOrder" header="New Order Qty" :body="formatNumber"></Column>
+                                    <Column field="ExceededQty" header="Exceeded Qty" :body="formatNumber"></Column>
+                                    <Column field="ExceededPercent" header="% Exceed" :body="formatPercent"></Column>
+                                    <Column field="EstimatedExceed" header="Estimated Exceed" :body="formatPrice"></Column>
+                                    <Column field="VarianceQty" header="Variance Qty" :body="formatNumber"></Column>
+                                    <Column field="VarianceAmount" header="Variance Amount" :body="formatPrice"></Column>
+                                    <Column field="Remark" header="Remarks"></Column>
                                 </DataTable>
                             </div>
 

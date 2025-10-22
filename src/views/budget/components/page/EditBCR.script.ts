@@ -152,7 +152,7 @@ export default defineComponent({
                 UpdatedBy: singleBudgetChangeRequest.value?.UpdatedBy ?? null,
                 BudgetChangeItem: items.value
             };
-            const isSuccess = await store.editBudgetChangeRequest(payload, payload.Id);
+            const isSuccess = await store.editBudgetChangeRequest(payload as any, payload.Id);
 
             if (isSuccess) router.push('/bcr');
         };
