@@ -1,18 +1,23 @@
-import type { Item, ItemOption, ReasonOption } from '@/types/bcr.type';
-
-import { computed, defineComponent, ref } from 'vue';
+import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
+import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/bcr.type';
+import { storeToRefs } from 'pinia';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
 export default defineComponent({
     name: 'EditBCR',
-    components: {},
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const roNumber = ref<string>((route.params.requestNo as string) || '');
-        const requestBy = ref('Jakson');
-        const requestDate = ref('29/9/2025');
+        const store = useBudgetStore();
+        const { singleBudgetChangeRequest, loading } = storeToRefs(store);
 
-        const reasonOptions = ref<ReasonOption[]>([
+        const roNumber = ref('');
+        const requestBy = ref('');
+        const requestDate = ref<Date | null>(null);
+        const reason = ref('');
+
+        const reasonOptions = ref([
             { label: 'Exceed Budget', value: 'Exceed Budget' },
             { label: 'Mockup Remeasurement', value: 'Mockup Remeasurement' },
             { label: 'QS remeasurement', value: 'QS remeasurement' },
@@ -20,124 +25,180 @@ export default defineComponent({
             { label: 'Others', value: 'Others' }
         ]);
 
-        const itemOptions = ref<ItemOption[]>([
-            { label: 'STL-01', value: 'STL-01', description: 'Steel reinforcement bar 60mm', uom: 'Ton' },
-            { label: 'CEM-02', value: 'CEM-02', description: 'Cement Portland Type I', uom: 'Bag' },
-            { label: 'TIL-03', value: 'TIL-03', description: 'Ceramic floor tiles 600x600mm', uom: 'm²' },
-            { label: 'MAR-04', value: 'MAR-04', description: 'Premium marble slab', uom: 'm²' }
-        ]);
+        const items = ref<BudgetChangeItem[]>([]);
 
-        const items = ref<Item[]>([
-            {
-                itemCode: 'TIL-03',
-                description: 'Ceramic floor tiles 600x600mm',
-                uom: 'm²',
-                unitPrice: 165,
-                budgetQty: 250,
-                orderedQty: 0,
-                newOrder: 250,
-                exceededQty: 0,
-                exceededPercent: 0,
-                estimatedExceed: 41250,
-                varianceQty: 0,
-                varianceAmount: 34875,
-                remark: 'Upgrade to premium marble for enhanced aesthetic appeal',
-                notes: '',
-                showNotes: false,
-                showRemark: false
-            },
-            {
-                itemCode: 'STL-01',
-                description: 'Steel reinforcement bar 60mm',
-                uom: 'Ton',
-                unitPrice: 500,
-                budgetQty: 10,
-                orderedQty: 10,
-                newOrder: 12,
-                exceededQty: 2,
-                exceededPercent: 20,
-                estimatedExceed: 1000,
-                varianceQty: 2,
-                varianceAmount: 1000,
-                remark: '',
-                notes: 'Urgent requirement',
-                showNotes: false,
-                showRemark: false
-            },
-            {
-                itemCode: 'CEM-02',
-                description: 'Cement Portland Type I',
-                uom: 'Bag',
-                unitPrice: 12,
-                budgetQty: 200,
-                orderedQty: 200,
-                newOrder: 250,
-                exceededQty: 50,
-                exceededPercent: 25,
-                estimatedExceed: 600,
-                varianceQty: 50,
-                varianceAmount: 600,
-                remark: 'For foundation work',
-                notes: '',
-                showNotes: false,
-                showRemark: false
+        const itemOptions = computed(() => {
+            const map = new Map<string, { label: string; value: string; description: string; uom: string; unitPrice: string }>();
+            for (const it of items.value) {
+                const code = it.ItemCode ?? '';
+                if (!map.has(code)) {
+                    map.set(code, {
+                        label: code || it.Name || '',
+                        value: code || '',
+                        description: it.Description ?? it.Name ?? '',
+                        uom: it.Uom ?? '',
+                        unitPrice: it.UnitPrice ?? '0'
+                    });
+                }
             }
-        ]);
+            return Array.from(map.values());
+        });
+
+        onMounted(async () => {
+            const id = Number(route.params.id ?? route.params.requestNo ?? 0);
+            if (!id) return;
+
+            await store.getSingleBudgetChange(id);
+
+            if (singleBudgetChangeRequest.value) {
+                const s = singleBudgetChangeRequest.value as BudgetChangeRequest;
+                roNumber.value = s.DocNo ?? '';
+                requestBy.value = s.RequestedBy ?? '';
+                requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
+                reason.value = s.Reason ?? '';
+
+                items.value = (s.BudgetChangeItem ?? []).map((x) => ({
+                    Id: x.Id ?? 0,
+                    BudgetChangeId: x.BudgetChangeId ?? 0,
+                    BudgetItemId: x.BudgetItemId ?? 0,
+                    ItemCode: x.ItemCode ?? '',
+                    Name: x.Name ?? '',
+                    Uom: x.Uom ?? '',
+                    UnitPrice: x.UnitPrice ?? '0',
+                    OrderedQty: x.OrderedQty ?? '0',
+                    NewOrder: x.NewOrder ?? '0',
+                    ExceededQty: x.ExceededQty ?? '0',
+                    Description: x.Description ?? '',
+                    Remark: x.Remark ?? '',
+                    CreatedAt: x.CreatedAt ?? '',
+                    CreatedBy: x.CreatedBy ?? null,
+                    UpdatedAt: x.UpdatedAt ?? '',
+                    UpdatedBy: x.UpdatedBy ?? null,
+                    location: x.location ?? '',
+                    element: x.element ?? ''
+                }));
+            } else {
+                items.value = [];
+            }
+        });
 
         const addItem = () => {
             items.value.push({
-                itemCode: '',
-                description: '',
-                uom: '',
-                unitPrice: 0,
-                budgetQty: 0,
-                orderedQty: 0,
-                newOrder: 0,
-                exceededQty: 0,
-                exceededPercent: 0,
-                estimatedExceed: 0,
-                varianceQty: 0,
-                varianceAmount: 0,
-                notes: '',
-                remark: '',
-                showNotes: false,
-                showRemark: false
+                Id: 0,
+                BudgetChangeId: 0,
+                BudgetItemId: 0,
+                ItemCode: '',
+                Name: '',
+                Uom: '',
+                UnitPrice: '0',
+                OrderedQty: '0',
+                NewOrder: '0',
+                ExceededQty: '0',
+                Description: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             });
         };
 
-        const fillItemDetails = (item: Item) => {
-            const selected = itemOptions.value.find((opt) => opt.value === item.itemCode);
-            if (selected) {
-                item.description = selected.description;
-                item.uom = selected.uom;
+        const removeItem = (index: number) => items.value.splice(index, 1);
+
+        const fillItemDetails = (item: BudgetChangeItem) => {
+            const opt = itemOptions.value.find((o) => o.value === item.ItemCode);
+            if (opt) {
+                item.Description = opt.description;
+                item.Uom = opt.uom;
+                item.UnitPrice = opt.unitPrice;
+                item.Name = opt.label;
             }
         };
 
-        const getItemLabel = (value: string): string => {
-            const selected = itemOptions.value.find((opt) => opt.value === value);
-            return selected ? selected.label : value;
+        const computeExceededPct = (it: BudgetChangeItem) => {
+            const ordered = Number(it.OrderedQty) || 0;
+            const newOrder = Number(it.NewOrder) || 0;
+            if (ordered === 0) return 0;
+            return (((newOrder - ordered) / ordered) * 100).toFixed(2);
         };
 
-        const totalVarianceAmount = computed(() => {
-            return items.value.reduce((sum, item) => sum + (item.varianceAmount || 0), 0);
-        });
+        const computeEstimatedExceed = (it: BudgetChangeItem) => {
+            const unit = Number(it.UnitPrice) || 0;
+            const ordered = Number(it.OrderedQty) || 0;
+            const newOrder = Number(it.NewOrder) || 0;
+            return (Math.max(0, newOrder - ordered) * unit).toFixed(2);
+        };
 
-        const isAttachmentValid = ref(true);
+        const totalVarianceAmount = computed(() => items.value.reduce((sum, it) => sum + (Number(it.UnitPrice) || 0) * (Number(it.NewOrder) || 0), 0));
+
+        const submitRequest = async () => {
+            const payload: BudgetChangeRequest = {
+                Id: singleBudgetChangeRequest.value?.Id ?? 0,
+                ProjectId: singleBudgetChangeRequest.value?.ProjectId ?? 0,
+                DocNo: roNumber.value,
+                RequestDate: requestDate.value,
+                RequestedBy: requestBy.value,
+                Reason: reason.value,
+                Department: singleBudgetChangeRequest.value?.Department ?? '',
+                Remark: singleBudgetChangeRequest.value?.Remark ?? '',
+                TotalAmount: totalVarianceAmount.value,
+                Attachment: singleBudgetChangeRequest.value?.Attachment ?? '',
+                Status: singleBudgetChangeRequest.value?.Status ?? '',
+                CreatedBy: singleBudgetChangeRequest.value?.CreatedBy ?? null,
+                CreatedAt: singleBudgetChangeRequest.value?.CreatedAt ?? '',
+                UpdatedAt: singleBudgetChangeRequest.value?.UpdatedAt ?? '',
+                UpdatedBy: singleBudgetChangeRequest.value?.UpdatedBy ?? null,
+                BudgetChangeItem: items.value
+            };
+            const isSuccess = await store.editBudgetChangeRequest(payload, payload.Id);
+
+            if (isSuccess) router.push('/bcr');
+        };
+
+        const calcExceedQty = (it: BudgetChangeItem): number => {
+            return Number(it.NewOrder || 0) - Number(it.OrderedQty || 0);
+        };
+
+        const calcExceedPercent = (it: BudgetChangeItem): number => {
+            const ordered = Number(it.OrderedQty) || 0;
+            if (ordered === 0) return 0;
+            return (calcExceedQty(it) / ordered) * 100;
+        };
+
+        const calcEstimatedExceed = (it: BudgetChangeItem): number => {
+            const unit = Number(it.UnitPrice) || 0;
+            return calcExceedQty(it) * unit;
+        };
+
+        const getColorClass = (val: number): string => {
+            if (val > 0) return 'text-red-600 font-bold';
+            if (val < 0) return 'text-green-600 font-bold';
+            return 'text-gray-700';
+        };
 
         return {
+            loading,
             roNumber,
             requestBy,
             requestDate,
+            reason,
             reasonOptions,
             items,
-            addItem,
             itemOptions,
+            addItem,
+            removeItem,
             fillItemDetails,
-            getItemLabel,
+            computeExceededPct,
+            computeEstimatedExceed,
             totalVarianceAmount,
-            isAttachmentValid,
-            goBack: () => router.push({ name: 'bcr' }),
-            active: ref('0')
+            submitRequest,
+            calcExceedQty,
+            calcExceedPercent,
+            calcEstimatedExceed,
+            getColorClass,
+            goBack: () => router.push('/bcr')
         };
     }
 });

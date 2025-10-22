@@ -44,7 +44,7 @@ export interface BudgetChangeRequest {
     Id: number;
     ProjectId: number;
     DocNo: string;
-    RequestDate: string;
+    RequestDate: string | Date | null;
     RequestedBy: string;
     Department: string;
     Remark: string;
@@ -63,6 +63,12 @@ export interface BudgetChangeRequestResponse {
     success: boolean;
     message?: string;
     data?: BudgetChangeRequest[];
+}
+
+export interface SingleBudgetChangeRequestResponse {
+    success: boolean;
+    message?: string;
+    data?: BudgetChangeRequest;
 }
 
 export interface BudgetChangeItemPayload {

@@ -37,7 +37,7 @@ export default defineComponent({
         const budgetChangeRequestData = computed(() => {
             return budgetStore.budgetChangeRequestList.map((item) => ({
                 ...item,
-                actions: ['view', 'edit', 'comment']
+                actions: item.Status === 'Approved' ? ['view'] : ['view', 'edit']
             }));
         });
 
@@ -61,11 +61,6 @@ export default defineComponent({
 
         const showCommentModal = ref(false);
         const selectedRequestNo = ref<string | null>(null);
-
-        function handleCommentSubmit(requestNo: string, comment: string) {
-            console.log('💬 Comment submitted:', requestNo, comment);
-            showCommentModal.value = false;
-        }
 
         const filteredRequests = computed(() =>
             budgetChangeRequestData.value.filter((r) => {
@@ -110,14 +105,11 @@ export default defineComponent({
 
         const router = useRouter();
 
-        function handleActionClick(type: 'edit' | 'view' | 'comment', rowData: BudgetChangeRequest) {
+        function handleActionClick(type: 'edit' | 'view', rowData: BudgetChangeRequest) {
             if (type === 'edit') {
-                router.push(`/bcr/edit/${rowData.DocNo}`);
+                router.push(`/bcr/edit/${rowData.Id}`);
             } else if (type === 'view') {
-                router.push(`/bcr/view/${rowData.DocNo}`);
-            } else if (type === 'comment') {
-                selectedRequestNo.value = rowData.DocNo;
-                showCommentModal.value = true;
+                router.push(`/bcr/view/${rowData.Id}`);
             }
         }
 
@@ -132,10 +124,8 @@ export default defineComponent({
             handleSearch,
             handleFilterChange,
             handleActionClick,
-
             showCommentModal,
             selectedRequestNo,
-            handleCommentSubmit,
             BudgetChangeRequestSummaryData
         };
     }

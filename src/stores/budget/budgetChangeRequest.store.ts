@@ -1,17 +1,19 @@
 import { budgetService } from '@/services/budgetService.service';
-import type { BudgetChangeRequest } from '@/types/bcr.type';
+import type { BudgetChangeRequest,BudgetChangeRequestPayload } from '@/types/bcr.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
 interface State {
     loading: boolean;
     budgetChangeRequestList: BudgetChangeRequest[];
+    singleBudgetChangeRequest: BudgetChangeRequest | null;
 }
 
 export const useBudgetStore = defineStore('budgetStore', {
     state: (): State => ({
         loading: false,
-        budgetChangeRequestList: []
+        budgetChangeRequestList: [],
+        singleBudgetChangeRequest: null
     }),
 
     actions: {
@@ -49,6 +51,45 @@ export const useBudgetStore = defineStore('budgetStore', {
                 return true;
             } catch (error: any) {
                 showError(error, 'Failed to create budget change request.');
+                return false;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async getSingleBudgetChange(bcrId: number) {
+            this.loading = true;
+            try {
+                const response = await budgetService.getSingleBudgetChangeRequest(bcrId);
+
+                if (!response.success || !response.data) {
+                    showError('Budget change request not found.');
+                    this.singleBudgetChangeRequest = null;
+                    return;
+                }
+
+                this.singleBudgetChangeRequest = response.data;
+            } catch (error) {
+                showError(error, 'Failed to fetch budget change request.');
+                this.singleBudgetChangeRequest = null;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async editBudgetChangeRequest(payload: BudgetChangeRequestPayload, bcrId: number) {
+            this.loading = true;
+            try {
+                const response = await budgetService.editBudgetChangeRequest(payload, bcrId);
+
+                if (!response.success) {
+                    showError(response.message || 'Failed to update Budget Change Request.');
+                    return false;
+                }
+
+                showSuccess(response.message || 'Budget Change Request updated successfully.');
+                await this.fetchBudgetChangesRequestList();
+                return true;
+            } catch (error: any) {
+                showError(error?.message || 'Failed to update budget change request.');
                 return false;
             } finally {
                 this.loading = false;
