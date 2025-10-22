@@ -30,12 +30,15 @@
                             <ReusableTable
                                 :value="filteredOrders"
                                 :columns="tableColumns"
-                                :loading="false"
+                                :loading="store.loading"
                                 :showCreate="false"
                                 :showImportFile="false"
                                 :onActionClick="handleActionClick"
                                 :extraFilters="tableFilters"
                                 :onFilterChange="handleFilterChange"
+                                :pagination="store.pagination"
+                                :onPageChange="handlePageChange"
+                                :onPageSizeChange="handlePageSizeChange"
                                 emptyTitle="No request orders found"
                             >
                                 <!-- Numbering Slot -->

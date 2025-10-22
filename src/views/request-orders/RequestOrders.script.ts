@@ -78,7 +78,12 @@ export default defineComponent({
         store.fetchOrders();
         watch(activeTab, (tab) => {
             store.filters.status = tab === 'all' ? '' : tab.charAt(0).toUpperCase() + tab.slice(1);
+            store.pagination.page = 1;
             store.fetchOrders();
+        });
+
+        const startingIndex = computed(() => {
+            return (store.pagination.page - 1) * store.pagination.pageSize;
         });
 
         const filteredOrders = computed(() =>
@@ -249,7 +254,16 @@ export default defineComponent({
             store.filters.search = filters.search ?? '';
             store.filters.startDate = filters.startDate ?? '';
             store.filters.endDate = filters.endDate ?? '';
+            store.pagination.page = 1;
             store.fetchOrders();
+        }
+
+        function handlePageChange(page: number): void {
+            store.setPage(page);
+        }
+
+        function handlePageSizeChange(pageSize: number): void {
+            store.setPageSize(pageSize);
         }
 
         return {
@@ -277,7 +291,9 @@ export default defineComponent({
             showDraftModal,
             draftCount,
             confirm: useConfirm(),
-            toast: useToast()
+            toast: useToast(),
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });
