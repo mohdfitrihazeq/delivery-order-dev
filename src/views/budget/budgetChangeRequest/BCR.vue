@@ -25,8 +25,6 @@
                     <span class="font-semibold">{{ data.TotalAmount }}</span>
                 </template>
             </ReusableTable>
-
-            <CommentBCR v-model:visible="showCommentModal" :requestNo="selectedRequestNo" @submit="handleCommentSubmit" />
         </div>
     </Motion>
 </template>

@@ -1,5 +1,5 @@
+import type { BudgetChangeItem } from '@/types/bcr.type';
 import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
@@ -7,10 +7,11 @@ import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, ref, watch } from 'vue';
-import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
+
+type FilterOption = { label: string; value: string | null };
 
 export default defineComponent({
-    name: 'CreateROModal',
+    name: 'BudgetItemModal',
     components: {
         Dialog,
         DataTable,
@@ -18,245 +19,260 @@ export default defineComponent({
         Button,
         InputText,
         Dropdown,
-        Checkbox,
         Tag
     },
     props: {
         visible: {
             type: Boolean,
-            default: false
+            required: true
         }
     },
-    emits: ['update:visible', 'items-selected'],
+    emits: ['update:visible', 'material-selected'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
         watch(
             () => props.visible,
-            (val) => {
-                localVisible.value = val;
-            }
+            (val) => (localVisible.value = val)
         );
+        watch(localVisible, (val) => emit('update:visible', val));
 
-        // Emit changes to parent
-        watch(localVisible, (val) => {
-            emit('update:visible', val);
-        });
-        const modalTitle = ref('Add Bulk Items from Budget');
+        const modalTitle = ref('Add Items from Budget');
         const loading = ref(false);
 
         const searchTerm = ref('');
         const selectedLocation = ref<string | null>(null);
         const selectedElement = ref<string | null>(null);
-        const selectedItemType = ref<string | null>(null);
 
-        const selectedItems = ref<BudgetItem[]>([]);
-        const selectAll = ref(false);
+        const selectedItems = ref<BudgetChangeItem[]>([]);
 
-        const budgetItems = ref<BudgetItem[]>([
+        const budgetItems = ref<BudgetChangeItem[]>([
             {
-                itemCode: 'STL-001',
-                description: 'Steel reinforcement bars Grade 60',
-                location: 'Building A > Level 1-5',
-                element: 'Structure > Foundation > Reinforcement',
-                itemType: 'Materials',
-                uom: 'kg',
-                quantity: 2500,
-                price: 5.5
+                Id: 1,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'STL-001',
+                Name: 'Steel reinforcement bars Grade 60',
+                Description: '',
+                Uom: 'kg',
+                UnitPrice: '5.50',
+                OrderedQty: '2500',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             },
             {
-                itemCode: 'CON-002',
-                description: 'Ready mix concrete C25/30',
-                location: 'Building A > Level 1-3',
-                element: 'Structure > Foundation > Concrete',
-                itemType: 'Materials',
-                uom: 'm³',
-                quantity: 180,
-                price: 250
+                Id: 2,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'CON-002',
+                Name: 'Ready mix concrete C25/30',
+                Description: '',
+                Uom: 'm³',
+                UnitPrice: '250',
+                OrderedQty: '180',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             },
             {
-                itemCode: 'LAB-001',
-                description: 'Excavation work including disposal',
-                location: 'Building A > Site Area',
-                element: 'Earthworks > Excavation > Manual',
-                itemType: 'Labour',
-                uom: 'm³',
-                quantity: 450,
-                price: 40
+                Id: 3,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'BRK-003',
+                Name: 'Clay bricks standard size',
+                Description: '',
+                Uom: 'pcs',
+                UnitPrice: '0.45',
+                OrderedQty: '10000',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             },
             {
-                itemCode: 'STL-002',
-                description: 'Structural steel beams H-section',
-                location: 'Building A > Level 6-10',
-                element: 'Structure > Columns > Steel Beams',
-                itemType: 'Materials',
-                uom: 'kg',
-                quantity: 1800,
-                price: 6
+                Id: 4,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'PLS-004',
+                Name: 'PVC water pipes Ø50mm',
+                Description: '',
+                Uom: 'm',
+                UnitPrice: '1.80',
+                OrderedQty: '500',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             },
             {
-                itemCode: 'EQP-001',
-                description: 'Tower crane rental monthly',
-                location: 'Building A > All Levels',
-                element: 'Equipment > Lifting > Tower Crane',
-                itemType: 'Equipment',
-                uom: 'month',
-                quantity: 12,
-                price: 15000
+                Id: 5,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'ELC-005',
+                Name: 'Electrical copper cables 4mm²',
+                Description: '',
+                Uom: 'm',
+                UnitPrice: '2.20',
+                OrderedQty: '300',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             },
             {
-                itemCode: 'INS-001',
-                description: 'Electrical panel installation',
-                location: 'Building B > Level 1-8',
-                element: 'Infrastructure > Electrical > Panel',
-                itemType: 'Installation',
-                uom: 'unit',
-                quantity: 24,
-                price: 1200
+                Id: 6,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'WOD-006',
+                Name: 'Plywood sheets 18mm',
+                Description: '',
+                Uom: 'sheet',
+                UnitPrice: '22',
+                OrderedQty: '150',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
+            },
+            {
+                Id: 7,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'GLS-007',
+                Name: 'Tempered glass panels 10mm',
+                Description: '',
+                Uom: 'm²',
+                UnitPrice: '45',
+                OrderedQty: '80',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
+            },
+            {
+                Id: 8,
+                BudgetChangeId: 1,
+                BudgetItemId: 2,
+                ItemCode: 'PNT-008',
+                Name: 'Exterior wall paint',
+                Description: '',
+                Uom: 'litre',
+                UnitPrice: '12',
+                OrderedQty: '200',
+                NewOrder: '',
+                ExceededQty: '',
+                Remark: '',
+                CreatedAt: '',
+                CreatedBy: null,
+                UpdatedAt: '',
+                UpdatedBy: null,
+                location: '',
+                element: ''
             }
         ]);
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0));
 
-        const locationOptions = computed<FilterOption[]>(() => {
-            const locations = [...new Set(budgetItems.value.map((item) => item.location))];
-            return locations.map((location) => ({ label: location, value: location }));
-        });
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (parseFloat(item.UnitPrice) || 0) * (parseFloat(item.OrderedQty) || 0), 0));
 
-        const elementOptions = computed<FilterOption[]>(() => {
-            const elements = [...new Set(budgetItems.value.map((item) => item.element))];
-            return elements.map((element) => ({ label: element, value: element }));
-        });
+        const locationOptions = computed<FilterOption[]>(() =>
+            [...new Set(budgetItems.value.map((i) => i.location))].map((l) => ({
+                label: l || 'N/A',
+                value: l
+            }))
+        );
+        const elementOptions = computed<FilterOption[]>(() =>
+            [...new Set(budgetItems.value.map((i) => i.element))].map((l) => ({
+                label: l || 'N/A',
+                value: l
+            }))
+        );
 
-        const itemTypeOptions = computed<FilterOption[]>(() => {
-            const types = [...new Set(budgetItems.value.map((item) => item.itemType))];
-            return types.map((type) => ({ label: type, value: type }));
-        });
-
-        const filteredItems = computed<BudgetItem[]>(() => {
+        const filteredItems = computed(() => {
             let items = [...budgetItems.value];
-
             if (searchTerm.value) {
-                const search = searchTerm.value.toLowerCase();
-                items = items.filter((item) => item.itemCode.toLowerCase().includes(search) || item.description.toLowerCase().includes(search));
+                const s = searchTerm.value.toLowerCase();
+                items = items.filter((item) => item.ItemCode.toLowerCase().includes(s) || item.Name.toLowerCase().includes(s));
             }
-
-            if (selectedLocation.value) {
-                items = items.filter((item) => item.location === selectedLocation.value);
-            }
-
-            if (selectedElement.value) {
-                items = items.filter((item) => item.element === selectedElement.value);
-            }
-
-            if (selectedItemType.value) {
-                items = items.filter((item) => item.itemType === selectedItemType.value);
-            }
-
+            if (selectedLocation.value) items = items.filter((i) => i.location === selectedLocation.value);
+            if (selectedElement.value) items = items.filter((i) => i.element === selectedElement.value);
             return items;
         });
 
-        const hasActiveFilters = computed(() => {
-            return !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value);
-        });
-
-        watch(
-            selectedItems,
-            (newSelection) => {
-                selectAll.value = newSelection.length === filteredItems.value.length && filteredItems.value.length > 0;
-            },
-            { deep: true }
-        );
-
-        watch(filteredItems, (newFiltered) => {
-            if (newFiltered.length === 0) {
-                selectAll.value = false;
-            } else {
-                selectAll.value = selectedItems.value.length === newFiltered.length;
-            }
-        });
-
-        const closeModal = () => {
-            emit('update:visible', false);
-            resetModal();
-        };
-
-        const resetModal = () => {
-            selectedItems.value = [];
-            selectAll.value = false;
-            clearFilters();
-        };
+        const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value));
 
         const clearFilters = () => {
             searchTerm.value = '';
             selectedLocation.value = null;
             selectedElement.value = null;
-            selectedItemType.value = null;
         };
 
-        const toggleSelectAll = () => {
-            if (selectAll.value) {
-                selectedItems.value = [...filteredItems.value];
-            } else {
-                selectedItems.value = [];
-            }
+        const closeModal = () => {
+            emit('update:visible', false);
+            selectedItems.value = [];
+            clearFilters();
         };
 
         const addSelectedItems = () => {
             if (selectedItems.value.length > 0) {
-                emit('items-selected', [...selectedItems.value]);
+                console.log('✅ Selected Items:', selectedItems.value);
+                emit('material-selected', [...selectedItems.value]);
                 closeModal();
             }
         };
 
-        const getItemTypeSeverity = (itemType: string): string => {
-            const severityMap: Record<string, string> = {
-                Materials: 'info',
-                Labour: 'warning',
-                Equipment: 'success',
-                Installation: 'secondary'
-            };
-            return severityMap[itemType] || 'info';
-        };
-
-        const loadBudgetItems = async () => {
-            loading.value = true;
-            try {
-                await new Promise((resolve) => setTimeout(resolve, 500));
-            } catch (error) {
-                console.error('Error loading budget items:', error);
-            } finally {
-                loading.value = false;
-            }
-        };
-
-        loadBudgetItems();
-
         return {
-            // Data
+            localVisible,
             modalTitle,
             loading,
             searchTerm,
             selectedLocation,
             selectedElement,
-            selectedItemType,
             selectedItems,
-            selectAll,
             budgetItems,
-            localVisible,
             grandTotal,
-
-            // Computed
             locationOptions,
             elementOptions,
-            itemTypeOptions,
             filteredItems,
             hasActiveFilters,
-
-            // Methods
-            closeModal,
             clearFilters,
-            toggleSelectAll,
-            addSelectedItems,
-            getItemTypeSeverity
+            closeModal,
+            addSelectedItems
         };
     }
 });

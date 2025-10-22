@@ -7,6 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Accordion: typeof import('primevue/accordion')['default']
+    AccordionContent: typeof import('primevue/accordioncontent')['default']
+    AccordionHeader: typeof import('primevue/accordionheader')['default']
+    AccordionPanel: typeof import('primevue/accordionpanel')['default']
     Badge: typeof import('primevue/badge')['default']
     BaseSpinner: typeof import('./src/components/spinner/BaseSpinner.vue')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
@@ -29,6 +33,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
+    RadioButton: typeof import('primevue/radiobutton')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

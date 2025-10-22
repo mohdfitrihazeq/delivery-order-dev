@@ -5,132 +5,117 @@
         <BreadcrumbList />
 
         <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-2xl font-bold">Edit Budget Change Request</h1>
-                <p class="text-gray-500">Project: MKT</p>
-            </div>
-
+            <h1 class="text-2xl font-bold">Edit Budget Change Request</h1>
             <div class="flex gap-2">
-                <Button label="Cancel" @click="$router.push('/bcr')" outlined />
-                <Button label="Save as Draft" severity="secondary" outlined />
-                <Button label="Submit Request" :disabled="!isAttachmentValid" />
+                <Button label="Cancel" @click="goBack" outlined />
+                <Button label="Submit Request" @click="submitRequest" />
             </div>
         </div>
 
+        <!-- Header -->
         <div class="card p-4 mb-6 shadow">
             <h3 class="text-lg font-semibold mb-4">Header Information</h3>
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                    <label class="block text-gray-600 mb-1">Request No</label>
-                    <InputText v-model="roNumber" type="text" class="w-full text-sm" />
+                    <label>Request No</label>
+                    <InputText v-model="roNumber" class="w-full" />
                 </div>
                 <div>
-                    <label class="block text-gray-600 mb-1">Requested By</label>
-                    <InputText v-model="requestBy" type="text" class="w-full text-sm" />
+                    <label>Requested By</label>
+                    <InputText v-model="requestBy" class="w-full" />
                 </div>
                 <div>
-                    <label class="block text-gray-600 mb-1">Date Requested</label>
-                    <InputText v-model="requestDate" type="text" class="w-full text-sm" />
+                    <label>Date Requested</label>
+                    <Calendar v-model="requestDate" dateFormat="yy-mm-dd" class="w-full" showIcon />
                 </div>
                 <div>
-                    <label class="block text-gray-600 mb-1">Reason of Request</label>
-                    <Select :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full text-sm" />
+                    <label>Reason</label>
+                    <Dropdown v-model="reason" :options="reasonOptions" optionLabel="label" optionValue="value" class="w-full" />
                 </div>
             </div>
         </div>
 
-        <!-- Materials Section -->
-        <div class="card p-4 mb-6 shadow">
-            <div class="flex items-center justify-between mb-4">
+        <!-- Table -->
+        <div class="card p-4 shadow overflow-auto">
+            <div class="flex justify-between mb-4">
                 <h3 class="text-lg font-semibold">Materials</h3>
-                <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined />
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full rounded-lg border">
-                    <thead class="text-sm text-gray-600 bg-gray-50">
-                        <tr>
-                            <th class="px-3 py-2 text-left">Item Code</th>
-                            <th class="px-3 py-2 text-left">Description</th>
-                            <th class="px-3 py-2 text-left">Units</th>
-                            <th class="px-3 py-2 text-left">Unit Price</th>
-                            <th class="px-3 py-2 text-left">Budgeted Quantity</th>
-                            <th class="px-3 py-2 text-left">Ordered Quantity</th>
-                            <th class="px-3 py-2 text-left">New Order</th>
-                            <th class="px-3 py-2 text-left">Exceeded Quantity</th>
-                            <th class="px-3 py-2 text-left">Exceeded %</th>
-                            <th class="px-3 py-2 text-left">Estimated $ exceed</th>
-                            <th class="px-3 py-2 text-left">Remarks</th>
-                            <th class="px-3 py-2 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template v-for="(item, index) in items" :key="index">
-                            <tr class="border-t align-top">
-                                <td class="px-3 py-2">
-                                    <Dropdown v-model="item.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(item)">
-                                        <template #option="slotProps">
-                                            <div class="flex flex-col">
-                                                <span class="font-medium">{{ slotProps.option.label }}</span>
-                                                <span class="text-xs text-gray-500">{{ slotProps.option.description }}</span>
-                                            </div>
-                                        </template>
-                                        <template #value="slotProps">
-                                            <span v-if="slotProps.value">{{ getItemLabel(slotProps.value) }}</span>
-                                            <span v-else class="text-gray-400">Select item...</span>
-                                        </template>
-                                    </Dropdown>
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputText v-model="item.description" placeholder="Description" class="w-full" disabled />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputText v-model="item.uom" placeholder="Unit" class="w-full" disabled />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.unitPrice" placeholder="0.00" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.budgetQty" placeholder="0" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.orderedQty" placeholder="0" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.newOrder" placeholder="0" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.exceededQty" placeholder="0" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.exceededPct" placeholder="0%" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputNumber type="number" v-model="item.estimatedExceed" placeholder="0.00" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2">
-                                    <InputText v-model="item.remark" placeholder="Remark" class="w-full" />
-                                </td>
-
-                                <td class="px-3 py-2 text-center">
-                                    <Button icon="pi pi-trash" severity="danger" text @click="items.splice(index, 1)" />
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
+                <!-- <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined /> -->
             </div>
 
-            <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+            <DataTable :value="items" class="text-sm" style="min-width: 2000px">
+                <Column field="ItemCode" header="Item Code" style="min-width: 150px">
+                    <template #body="{ data }">
+                        <Dropdown v-model="data.ItemCode" :options="itemOptions" optionLabel="label" optionValue="value" @change="fillItemDetails(data)" class="w-full" />
+                    </template>
+                </Column>
+
+                <Column field="Description" header="Description" style="min-width: 200px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.Description" class="w-full" disabled />
+                    </template>
+                </Column>
+
+                <Column field="Uom" header="UOM" style="min-width: 100px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.Uom" disabled class="w-full" />
+                    </template>
+                </Column>
+
+                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.UnitPrice" type="number" class="w-full" />
+                    </template>
+                </Column>
+
+                <Column field="OrderedQty" header="Ordered Qty" style="min-width: 120px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.OrderedQty" type="number" class="w-full" />
+                    </template>
+                </Column>
+
+                <Column field="NewOrder" header="New Order Qty" style="min-width: 120px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.NewOrder" type="number" class="w-full" />
+                    </template>
+                </Column>
+
+                <!-- Exceeded Qty -->
+                <Column header="Exceeded Qty" style="min-width: 120px">
+                    <template #body="{ data }">
+                        <span :class="getColorClass(calcExceedQty(data))">
+                            {{ calcExceedQty(data) }}
+                        </span>
+                    </template>
+                </Column>
+
+                <!-- Exceeded % -->
+                <Column header="Exceeded %" style="min-width: 120px">
+                    <template #body="{ data }">
+                        <span :class="getColorClass(calcExceedQty(data))"> {{ calcExceedPercent(data).toFixed(1) }}% </span>
+                    </template>
+                </Column>
+
+                <!-- Estimated $ Exceed -->
+                <Column header="Estimated $ Exceed" style="min-width: 150px">
+                    <template #body="{ data }">
+                        <span :class="getColorClass(calcExceedQty(data))">
+                            {{ calcEstimatedExceed(data).toFixed(2) }}
+                        </span>
+                    </template>
+                </Column>
+                <Column field="Remark" header="Remark" style="min-width: 400px">
+                    <template #body="{ data }">
+                        <InputText v-model="data.Remark" class="w-full" />
+                    </template>
+                </Column>
+
+                <!-- <Column header="Action" style="min-width: 80px">
+                    <template #body="{ index }">
+                        <Button icon="pi pi-trash" severity="danger" text @click="removeItem(index)" />
+                    </template>
+                </Column> -->
+            </DataTable>
         </div>
+        <div class="text-right font-semibold mt-4">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
     </div>
 </template>
