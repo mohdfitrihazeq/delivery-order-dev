@@ -90,22 +90,59 @@ const deleteRequestOrder = async (id: number) => {
 };
 
 interface GetRequestOrdersParams {
+    projectId?: number;
     status?: string;
-    budgetType?: string;
     search?: string;
     startDate?: string;
     endDate?: string;
     page?: number;
-    limit?: number;
+    pageSize?: number;
 }
 
-const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<{ data: any[]; total?: number }> => {
+interface GetRequestOrdersResponse {
+    success: boolean;
+    data: any[];
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        pageSize: number;
+    };
+}
+
+const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetRequestOrdersResponse> => {
     try {
-        const response = await axiosInstance.get('/requestOrder', { params });
-        return { data: response.data.data, total: response.data.total };
+        const cleanParams = Object.entries(params || {}).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                acc[key] = value;
+            }
+            return acc;
+        }, {} as any);
+
+        const response = await axiosInstance.get('/requestOrder', { params: cleanParams });
+
+        return {
+            success: response.data.success,
+            data: response.data.data || [],
+            pagination: response.data.pagination || {
+                total: 0,
+                totalPages: 0,
+                page: 1,
+                pageSize: 10
+            }
+        };
     } catch (error: any) {
         showError(error, 'Failed to fetch request orders.');
-        return { data: [], total: 0 };
+        return {
+            success: false,
+            data: [],
+            pagination: {
+                total: 0,
+                totalPages: 0,
+                page: 1,
+                pageSize: 10
+            }
+        };
     }
 };
 

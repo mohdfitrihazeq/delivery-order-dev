@@ -17,25 +17,29 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         endDate: ''
     });
 
-    // pagination state
     const pagination = reactive({
         page: 1,
-        limit: 50, // default rows per page
-        total: 0
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
     });
 
     async function fetchOrders() {
         loading.value = true;
         try {
             const params = {
-                ...filters,
+                status: filters.status || undefined,
+                budgetType: filters.budgetType || undefined,
+                search: filters.search || undefined,
+                startDate: filters.startDate || undefined,
+                endDate: filters.endDate || undefined,
                 page: pagination.page,
-                limit: pagination.limit
+                pageSize: pagination.pageSize
             };
 
-            const { data, total } = await requestOrderService.getRequestOrders(params);
+            const response = await requestOrderService.getRequestOrders(params);
 
-            orders.value = data.map(
+            orders.value = response.data.map(
                 (output: any): Order => ({
                     id: output.Id,
                     roNumber: output.DocNo,
@@ -57,7 +61,12 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 })
             );
 
-            if (typeof total === 'number') pagination.total = total;
+            if (response.pagination) {
+                pagination.total = response.pagination.total;
+                pagination.totalPages = response.pagination.totalPages;
+                pagination.page = response.pagination.page;
+                pagination.pageSize = response.pagination.pageSize;
+            }
         } catch (error) {
             showError(error, 'Failed to fetch request orders');
         } finally {
@@ -133,11 +142,18 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         filters.startDate = '';
         filters.endDate = '';
         pagination.page = 1;
+        fetchOrders();
     }
 
     function setPage(page: number) {
         pagination.page = page;
-        fetchOrders(); // auto-fetch new page
+        fetchOrders();
+    }
+
+    function setPageSize(pageSize: number) {
+        pagination.pageSize = pageSize;
+        pagination.page = 1; // Reset to first page when changing page size
+        fetchOrders();
     }
 
     return {
@@ -150,6 +166,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         fetchOrderById,
         clearFilters,
         updateOrder,
-        setPage
+        setPage,
+        setPageSize
     };
 });
