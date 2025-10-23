@@ -117,7 +117,7 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
 
     menuItems.value = actions.map((actionType) => ({
         label: actionType.charAt(0).toUpperCase() + actionType.slice(1),
-        icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : actionType === 'delete' ? 'pi pi-trash' : 'pi pi-comment',
+        icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : actionType === 'delete' ? 'pi pi-trash' : actionType === 'approve' ? 'pi pi-check-circle' : actionType === 'reject' ? 'pi pi-times-circle' : 'pi pi-comment',
         command: () => props.onActionClick?.(actionType, currentRow.value!)
     }));
 

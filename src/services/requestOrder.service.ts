@@ -1,13 +1,6 @@
-import type { CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
+import type { CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersResponse, GetRequestOrdersParams, AttachmentItem } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
-
-interface AttachmentItem {
-    filename: string;
-    path: string;
-    size?: number;
-    type?: string;
-}
 
 // Helper to append attachments to FormData
 function appendAttachmentsToFormData(formData: FormData, attachments?: Array<File | AttachmentItem>) {
@@ -89,26 +82,15 @@ const deleteRequestOrder = async (id: number) => {
     }
 };
 
-interface GetRequestOrdersParams {
-    projectId?: number;
-    status?: string;
-    search?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    pageSize?: number;
-}
-
-interface GetRequestOrdersResponse {
-    success: boolean;
-    data: any[];
-    pagination: {
-        total: number;
-        totalPages: number;
-        page: number;
-        pageSize: number;
-    };
-}
+const approveRejectRequestOrder = async (id: number | string, status: 'Approved' | 'Rejected') => {
+    try {
+        const response = await axiosInstance.put(`/requestOrder/${id}/approve/${status}`);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        showError(error, `Failed to ${status.toLowerCase()} request order.`);
+        return { success: false, message: error.response?.data?.message || `Failed to ${status.toLowerCase()} request order` };
+    }
+};
 
 const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetRequestOrdersResponse> => {
     try {
@@ -163,5 +145,6 @@ export const requestOrderService = {
     deleteRequestOrder,
     getRequestOrders,
     getRequestOrderById,
-    submitDraftRequestOrder
+    submitDraftRequestOrder,
+    approveRejectRequestOrder
 };

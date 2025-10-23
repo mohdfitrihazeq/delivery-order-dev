@@ -54,8 +54,6 @@ export function usePurchasingDashboard() {
     async function fetchRecentActivity() {
         try {
             await store.fetchOrders();
-            console.log('store.orders', store.orders);
-
             recentActivity.value = (store.orders || [])
                 .filter((o) => o.roNumber)
                 .sort((a, b) => {
@@ -71,10 +69,6 @@ export function usePurchasingDashboard() {
                     createdAt: o.requestedAt,
                     updatedAt: o.deliveryDate
                 }));
-
-            console.log('Recent activity value:', recentActivity.value);
-            console.log('Recent activity:', recentActivity);
-            console.log('Recent activity length:', recentActivity.value.length);
         } catch (err) {
             console.error('Failed to fetch recent activity:', err);
             recentActivity.value = [];
