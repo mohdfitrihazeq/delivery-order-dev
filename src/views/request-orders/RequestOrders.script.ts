@@ -248,6 +248,17 @@ export default defineComponent({
             }
         }
 
+        function handlePageChange(page: number): void {
+            store.pagination.page = page;
+            store.fetchOrders();
+        }
+
+        function handlePageSizeChange(pageSize: number): void {
+            store.pagination.pageSize = pageSize;
+            store.pagination.page = 1; // Reset to page 1 when changing page size
+            store.fetchOrders();
+        }
+
         function handleFilterChange(filters: Record<string, any>): void {
             store.filters.status = filters.status ?? '';
             store.filters.budgetType = filters.budgetType ?? '';
@@ -256,14 +267,6 @@ export default defineComponent({
             store.filters.endDate = filters.endDate ?? '';
             store.pagination.page = 1;
             store.fetchOrders();
-        }
-
-        function handlePageChange(page: number): void {
-            store.setPage(page);
-        }
-
-        function handlePageSizeChange(pageSize: number): void {
-            store.setPageSize(pageSize);
         }
 
         return {

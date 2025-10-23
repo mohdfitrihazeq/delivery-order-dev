@@ -124,13 +124,26 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
     menu.value.toggle(event);
 }
 
-function onPageChangeHandler(event: any) {
-    if (!props.pagination) return;
+function getPaginationNumbers(): number[] {
+    if (!props.pagination) return [];
 
-    const newPage = Math.floor(event.first / event.rows) + 1;
+    const totalPages = props.pagination.totalPages || 1;
+    const currentPage = props.pagination.page;
+    const maxVisible = 5;
+    const numbers: number[] = [];
 
-    props.onPageChange?.(newPage);
-    props.onPageSizeChange?.(event.rows);
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        numbers.push(i);
+    }
+
+    return numbers;
 }
 </script>
 
@@ -191,6 +204,7 @@ function onPageChangeHandler(event: any) {
             </Column>
         </DataTable>
 
+        <!-- Custom Pagination with Numbered Buttons -->
         <div v-if="isServerSidePagination && props.pagination" class="flex flex-col sm:flex-row items-center mt-4 px-4 py-3 border-t dark:border-gray-700 w-full">
             <div class="w-full sm:w-1/3 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
                 Showing
@@ -205,7 +219,18 @@ function onPageChangeHandler(event: any) {
                 <Button icon="pi pi-angle-double-left" text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(1)" title="First Page" />
                 <Button icon="pi pi-angle-left" text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(props.pagination.page - 1)" title="Previous Page" />
 
-                <span class="px-3"> Page {{ props.pagination.page }} of {{ props.pagination.totalPages || 1 }} </span>
+                <div class="flex gap-1">
+                    <Button
+                        v-for="pageNum in getPaginationNumbers()"
+                        :key="pageNum"
+                        :label="`${pageNum}`"
+                        :severity="pageNum === props.pagination.page ? 'primary' : 'secondary'"
+                        :text="pageNum !== props.pagination.page"
+                        @click="props.onPageChange?.(pageNum)"
+                        rounded
+                        class="w-8 h-8 p-0 flex items-center justify-center text-xs"
+                    />
+                </div>
 
                 <Button icon="pi pi-angle-right" text :disabled="props.pagination.page >= (props.pagination.totalPages || 1)" @click="props.onPageChange?.(props.pagination.page + 1)" title="Next Page" />
                 <Button icon="pi pi-angle-double-right" text :disabled="props.pagination.page >= (props.pagination.totalPages || 1)" @click="props.onPageChange?.(props.pagination.totalPages || 1)" title="Last Page" />
