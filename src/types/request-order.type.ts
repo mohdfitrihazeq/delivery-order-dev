@@ -207,3 +207,32 @@ export interface DraftRO {
     overallRemark?: string;
     attachments?: File[];
 }
+
+// in service file
+export interface AttachmentItem {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
+
+export interface GetRequestOrdersParams {
+    projectId?: number;
+    status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    pageSize?: number;
+}
+
+export interface GetRequestOrdersResponse {
+    success: boolean;
+    data: any[];
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        pageSize: number;
+    };
+}
