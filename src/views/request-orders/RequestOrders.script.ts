@@ -397,7 +397,8 @@ export default defineComponent({
             handlePageChange,
             handlePageSizeChange,
             startingIndex,
-            totalCounts
+            totalCounts,
+            useDashboard
         };
     }
 });

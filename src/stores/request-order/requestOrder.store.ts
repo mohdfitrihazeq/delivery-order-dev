@@ -169,6 +169,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         clearFilters,
         updateOrder,
         setPage,
-        setPageSize
+        setPageSize,
+        totalCounts
     };
 });
