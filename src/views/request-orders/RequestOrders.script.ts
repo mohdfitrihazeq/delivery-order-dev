@@ -4,7 +4,7 @@ import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store'
 import type { TableColumn } from '@/types/table.type';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch, onMounted } from 'vue';
 import type { Order } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
@@ -39,6 +39,13 @@ export default defineComponent({
         const showEditModal = ref(false);
         const selectedOrder = ref<Order | null>(null);
 
+        const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0 });
+
+        // badges and totals
+        const pendingCount = computed(() => totalCounts.value.pending);
+        const approvedCount = computed(() => totalCounts.value.approved);
+        const totalValue = computed(() => totalCounts.value.totalValue);
+
         // User role
         const user = localStorage.getItem('user');
         let userRole = '';
@@ -51,13 +58,8 @@ export default defineComponent({
             }
         }
         const isPurchasingRole = userRole.toLowerCase() === 'purchasing';
-        // Tabs
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
         const activeTab = ref('all');
-
-        const pendingCount = computed(() => store.orders.filter((o) => o.status === 'Pending').length);
-        const approvedCount = computed(() => store.orders.filter((o) => o.status === 'Approved').length);
-        const totalValue = computed(() => store.orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0));
 
         const tabItems = computed(() => {
             if (isPurchasingRole) {
@@ -77,7 +79,28 @@ export default defineComponent({
         });
 
         // Fetch orders on mount and whenever filters change
-        store.fetchOrders();
+        const fetchOrders = async () => {
+            await store.fetchOrders();
+        };
+
+        // fetch counts for badges
+        const fetchTotalCounts = async () => {
+            try {
+                const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
+                const orders = res.data;
+                totalCounts.value.pending = orders.filter((o) => o.Status === 'Pending').length;
+                totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
+                totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
+                totalCounts.value.totalValue = orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        onMounted(() => {
+            fetchOrders();
+            fetchTotalCounts();
+        });
         watch(activeTab, (tab) => {
             store.filters.status = tab === 'all' ? '' : tab.charAt(0).toUpperCase() + tab.slice(1);
             store.pagination.page = 1;
@@ -372,7 +395,9 @@ export default defineComponent({
             confirm: useConfirm(),
             toast: useToast(),
             handlePageChange,
-            handlePageSizeChange
+            handlePageSizeChange,
+            startingIndex,
+            totalCounts
         };
     }
 });
