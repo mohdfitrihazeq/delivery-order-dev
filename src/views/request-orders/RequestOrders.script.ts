@@ -52,7 +52,8 @@ export default defineComponent({
         }
         const isPurchasingRole = userRole.toLowerCase() === 'purchasing';
         // Tabs
-        const activeTab = ref(isPurchasingRole ? 'pending' : 'all');
+        // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
+        const activeTab = ref('all');
 
         const pendingCount = computed(() => store.orders.filter((o) => o.status === 'Pending').length);
         const approvedCount = computed(() => store.orders.filter((o) => o.status === 'Approved').length);
@@ -61,8 +62,8 @@ export default defineComponent({
         const tabItems = computed(() => {
             if (isPurchasingRole) {
                 return [
-                    { label: 'Pending', value: 'pending', badge: pendingCount.value },
                     { label: 'All Orders', value: 'all' },
+                    { label: 'Pending', value: 'pending', badge: pendingCount.value },
                     { label: 'Approved', value: 'approved' },
                     { label: 'Rejected', value: 'rejected' }
                 ];
