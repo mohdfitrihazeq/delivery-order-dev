@@ -1,4 +1,4 @@
-import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store'; // 你自己的 Pinia Store
+import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store'; // 你自己的 Pinia Store
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
@@ -12,7 +12,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetStore();
+        const store = useBudgetChangeRequestStore();
         const projectName = ref<string>('');
         onMounted(async () => {
             if (route.params.requestNo) {

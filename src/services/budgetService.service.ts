@@ -1,4 +1,5 @@
 import axiosInstance from '@/services/backendAxiosInstance';
+import { BudgetResponse } from '@/types/budget.type';
 import type { BudgetChangeRequestPayload, BudgetChangeRequestResponse, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
 
@@ -71,9 +72,20 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
     }
 };
 
+const getBudget = async (params?: GetBudgetParams): Promise<BudgetResponse> => {
+    try {
+        const response = await axiosInstance.get<BudgetResponse>('/budget', { params });
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget.');
+        throw error;
+    }
+};
+
 export const budgetService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
     getSingleBudgetChangeRequest,
-    editBudgetChangeRequest
+    editBudgetChangeRequest,
+    getBudget
 };

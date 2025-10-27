@@ -9,7 +9,7 @@ interface State {
     singleBudgetChangeRequest: BudgetChangeRequest | null;
 }
 
-export const useBudgetStore = defineStore('budgetStore', {
+export const useBudgetChangeRequestStore = defineStore('budgetStore', {
     state: (): State => ({
         loading: false,
         budgetChangeRequestList: [],

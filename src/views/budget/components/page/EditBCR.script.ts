@@ -1,4 +1,4 @@
-import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
+import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import { storeToRefs } from 'pinia';
 import { computed, defineComponent, onMounted, ref } from 'vue';
@@ -9,7 +9,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetStore();
+        const store = useBudgetChangeRequestStore();
         const { singleBudgetChangeRequest, loading } = storeToRefs(store);
 
         const roNumber = ref('');
