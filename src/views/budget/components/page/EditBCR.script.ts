@@ -1,5 +1,5 @@
 import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/bcr.type';
+import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import { storeToRefs } from 'pinia';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

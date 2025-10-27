@@ -1,6 +1,6 @@
 // CreateBCR.script.ts
 import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeItem, BudgetChangeRequestPayload } from '@/types/bcr.type';
+import type { BudgetChangeItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';

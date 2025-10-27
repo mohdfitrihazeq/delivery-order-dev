@@ -1,4 +1,4 @@
-import type { BudgetChangeItem } from '@/types/bcr.type';
+import type { BudgetChangeItem } from '@/types/budgetChangeRequest.type';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';

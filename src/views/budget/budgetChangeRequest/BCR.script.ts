@@ -1,6 +1,6 @@
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeRequest } from '@/types/bcr.type';
+import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
 import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
