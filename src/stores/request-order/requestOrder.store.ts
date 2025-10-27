@@ -23,6 +23,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         total: 0,
         totalPages: 0
     });
+    const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0 });
 
     async function fetchOrders() {
         loading.value = true;
@@ -67,6 +68,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 pagination.page = response.pagination.page;
                 pagination.pageSize = response.pagination.pageSize;
             }
+            totalCounts.value = response.counts || { pending: 0, approved: 0, rejected: 0, totalValue: 0 };
         } catch (error) {
             showError(error, 'Failed to fetch request orders');
         } finally {
@@ -167,6 +169,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         clearFilters,
         updateOrder,
         setPage,
-        setPageSize
+        setPageSize,
+        totalCounts
     };
 });
