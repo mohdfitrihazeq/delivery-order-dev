@@ -1,7 +1,7 @@
 import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
 import type { TableColumn } from '@/types/table.type';
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
@@ -35,11 +35,6 @@ export default defineComponent({
         // ---------------------------
         // 1. Static Data
         // ---------------------------
-        const versions = ref<FilterVersion[]>([
-            { label: 'Version 1.0', value: '1.0' },
-            { label: 'Version 1.1', value: '1.1' },
-            { label: 'Version 2.0', value: '2.0', latest: true }
-        ]);
 
         const viewOptions = [
             { label: 'Overview', value: 'overview' },
@@ -63,8 +58,9 @@ export default defineComponent({
         // ---------------------------
         // 2. State
         // ---------------------------
+        const versions = ref<FilterVersion[]>([]);
+        const selectedVersion = ref<string>('');
         const budgetItems = ref<any[]>([]);
-        const selectedVersion = ref(versions.value.find((v) => v.latest)?.value || '');
         const viewMode = ref<'overview' | 'detail'>('overview');
         const search = ref('');
         const showImportModal = ref(false);
@@ -76,9 +72,27 @@ export default defineComponent({
         onMounted(async () => {
             await budgetStore.fetchBudgetList();
             budgetItems.value = budgetStore.budgetList[0]?.BudgetItems || [];
+            const list = budgetStore.budgetList || [];
+
+            versions.value = list.map((item) => ({
+                label: `Version ${item.VersionCode}`,
+                value: String(item.VersionCode),
+                latest: false
+            }));
+
+            const latestVersion = Math.max(...list.map((i) => Number(i.VersionCode)));
+            versions.value = versions.value.map((v) => (v.value === String(latestVersion) ? { ...v, latest: true } : v));
+
+            selectedVersion.value = String(latestVersion);
+
+            const latestBudget = list.find((i) => Number(i.VersionCode) === latestVersion);
+            budgetItems.value = latestBudget?.BudgetItems || [];
         });
 
-        console.log('Budget Item:', budgetItems);
+        watch(selectedVersion, (newValue) => {
+            const target = budgetStore.budgetList.find((i) => String(i.VersionCode) === newValue);
+            budgetItems.value = target?.BudgetItems || [];
+        });
 
         // ---------------------------
         // 4. Methods

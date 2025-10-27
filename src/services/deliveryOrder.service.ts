@@ -6,6 +6,7 @@ import { showError } from '@/utils/showNotification.utils';
 export interface GetDeliveryOrderParams {
     status?: string;
     search?: string;
+    projectId?: number;
 }
 
 const getDeliveryOrders = async (params?: GetDeliveryOrderParams): Promise<DeliveryOrderResponse> => {

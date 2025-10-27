@@ -13,12 +13,15 @@
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <Dropdown v-model="selectedVersion" :options="versions" optionLabel="label" optionValue="value" class="w-full md:w-64 h-10 rounded-lg" placeholder="Select Version">
+                        <!-- 自定义选项 -->
                         <template #option="slotProps">
                             <div class="flex items-center">
                                 <span>{{ slotProps.option.label }}</span>
                                 <Badge v-if="slotProps.option.latest" value="Latest" severity="primary" class="ml-2" />
                             </div>
                         </template>
+
+                        <!-- 选中显示的内容 -->
                         <template #value="slotProps">
                             <div class="flex items-center" v-if="slotProps.value">
                                 <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
