@@ -10,6 +10,11 @@ import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import { requestOrderService } from '@/services/requestOrder.service';
+import { showError } from '@/utils/showError.utils';
+import { useDashboard } from '@/composables/useDashboard';
 
 export default defineComponent({
     name: 'RequestOrders',
@@ -24,6 +29,8 @@ export default defineComponent({
         ViewDraftRo
     },
     setup() {
+        const confirm = useConfirm();
+        const toast = useToast();
         const store = useRequestOrderStore();
 
         const draftCount = ref(0);
@@ -44,7 +51,6 @@ export default defineComponent({
             }
         }
         const isPurchasingRole = userRole.toLowerCase() === 'purchasing';
-
         // Tabs
         const activeTab = ref(isPurchasingRole ? 'pending' : 'all');
 
@@ -73,7 +79,12 @@ export default defineComponent({
         store.fetchOrders();
         watch(activeTab, (tab) => {
             store.filters.status = tab === 'all' ? '' : tab.charAt(0).toUpperCase() + tab.slice(1);
+            store.pagination.page = 1;
             store.fetchOrders();
+        });
+
+        const startingIndex = computed(() => {
+            return (store.pagination.page - 1) * store.pagination.pageSize;
         });
 
         const filteredOrders = computed(() =>
@@ -84,17 +95,27 @@ export default defineComponent({
         );
 
         // Table config
-        const tableColumns = computed<TableColumn[]>(() => [
-            { field: 'rowIndex', header: '#', sortable: true },
-            { field: 'roNumber', header: 'RO Number', sortable: true },
-            { field: 'requestedBy', header: 'Requested By', sortable: true },
-            { field: 'roDate', header: 'RO Date', sortable: true },
-            { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-            { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
-            { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
-            { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
-            { field: 'actions', header: 'Actions', action: true, actions: ['view', 'edit'] }
-        ]);
+        const tableColumns = computed<TableColumn[]>(() => {
+            const baseActions = ['view', 'edit'];
+            const actions = isPurchasingRole ? [...baseActions, 'approve', 'reject', 'delete'] : baseActions;
+
+            return [
+                { field: 'rowIndex', header: '#', sortable: true },
+                { field: 'roNumber', header: 'RO Number', sortable: true },
+                { field: 'requestedBy', header: 'Requested By', sortable: true },
+                { field: 'roDate', header: 'RO Date', sortable: true },
+                { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
+                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+                { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
+                { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
+                {
+                    field: 'actions',
+                    header: 'Actions',
+                    action: true,
+                    actions
+                }
+            ];
+        });
 
         const tableFilters = computed(() => [
             {
@@ -159,6 +180,47 @@ export default defineComponent({
                 });
         }
 
+        async function deleteOrder(order: Order): Promise<void> {
+            confirm.require({
+                message: `Are you sure you want to delete order ${order.roNumber}?`,
+                header: 'Confirm Delete',
+                icon: 'pi pi-exclamation-triangle',
+                acceptClass: 'p-button-danger',
+                rejectClass: 'p-button-secondary',
+                acceptLabel: 'Yes, Delete',
+                rejectLabel: 'Cancel',
+
+                accept: async () => {
+                    try {
+                        await requestOrderService.deleteRequestOrder(order.id);
+
+                        toast.add({
+                            severity: 'success',
+                            summary: 'Order Deleted',
+                            detail: `Order ${order.id} deleted successfully.`,
+                            life: 3000
+                        });
+
+                        await store.fetchOrders(); // refresh list
+                    } catch (error) {
+                        showError(error, `Failed to delete order ${order.id}.`);
+                    } finally {
+                        confirm.close();
+                    }
+                },
+
+                reject: () => {
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Cancelled',
+                        detail: 'Order deletion cancelled.',
+                        life: 2500
+                    });
+                    confirm.close();
+                }
+            });
+        }
+
         function handleSaveOrder(formData: any): void {
             if (selectedOrder.value) {
                 Object.assign(selectedOrder.value, formData);
@@ -183,7 +245,65 @@ export default defineComponent({
             }
         }
 
-        function handleActionClick(type: 'edit' | 'view' | 'delete', rowData: Order): void {
+        function approveOrder(order: Order) {
+            confirm.require({
+                message: `Approve RO ${order.roNumber}?`,
+                header: 'Confirm Approval',
+                icon: 'pi pi-check-circle',
+                acceptClass: 'p-button-success',
+                acceptLabel: 'Yes, Approve',
+                rejectLabel: 'Cancel',
+                accept: () => {
+                    confirm.close();
+
+                    (async () => {
+                        try {
+                            await requestOrderService.approveRejectRequestOrder(order.id, 'Approved');
+                            toast.add({
+                                severity: 'success',
+                                summary: 'Approved',
+                                detail: 'Request order approved.',
+                                life: 3000
+                            });
+                            await store.fetchOrders();
+                        } catch (err) {
+                            showError(err);
+                        }
+                    })();
+                }
+            });
+        }
+
+        function rejectOrder(order: Order) {
+            confirm.require({
+                message: `Reject RO ${order.roNumber}?`,
+                header: 'Confirm Rejection',
+                icon: 'pi pi-times-circle',
+                acceptClass: 'p-button-danger',
+                acceptLabel: 'Yes, Reject',
+                rejectLabel: 'Cancel',
+                accept: () => {
+                    confirm.close();
+
+                    (async () => {
+                        try {
+                            await requestOrderService.approveRejectRequestOrder(order.id, 'Rejected');
+                            toast.add({
+                                severity: 'warn',
+                                summary: 'Rejected',
+                                detail: 'Request order rejected.',
+                                life: 3000
+                            });
+                            await store.fetchOrders();
+                        } catch (err) {
+                            showError(err);
+                        }
+                    })();
+                }
+            });
+        }
+
+        function handleActionClick(type: 'edit' | 'view' | 'delete' | 'approve' | 'reject', rowData: Order): void {
             switch (type) {
                 case 'view':
                     openOrderDetails(rowData);
@@ -191,7 +311,27 @@ export default defineComponent({
                 case 'edit':
                     editOrder(rowData);
                     break;
+                case 'delete':
+                    deleteOrder(rowData);
+                    break;
+                case 'approve':
+                    approveOrder(rowData);
+                    break;
+                case 'reject':
+                    rejectOrder(rowData);
+                    break;
             }
+        }
+
+        function handlePageChange(page: number): void {
+            store.pagination.page = page;
+            store.fetchOrders();
+        }
+
+        function handlePageSizeChange(pageSize: number): void {
+            store.pagination.pageSize = pageSize;
+            store.pagination.page = 1; // Reset to page 1 when changing page size
+            store.fetchOrders();
         }
 
         function handleFilterChange(filters: Record<string, any>): void {
@@ -200,6 +340,7 @@ export default defineComponent({
             store.filters.search = filters.search ?? '';
             store.filters.startDate = filters.startDate ?? '';
             store.filters.endDate = filters.endDate ?? '';
+            store.pagination.page = 1;
             store.fetchOrders();
         }
 
@@ -226,7 +367,11 @@ export default defineComponent({
             handleActionClick,
             handleFilterChange,
             showDraftModal,
-            draftCount
+            draftCount,
+            confirm: useConfirm(),
+            toast: useToast(),
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });

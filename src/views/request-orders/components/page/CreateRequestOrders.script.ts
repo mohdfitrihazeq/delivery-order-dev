@@ -52,27 +52,69 @@ export default defineComponent({
         const files = ref<File[]>([]);
         const overallRemark = ref('');
         const MAX_FILE_SIZE = 1_000_000;
-        const attachments = ref<File[]>([]);
+        const attachments = ref<Array<File | AttachmentItem>>([]); // unified array
+        const newAttachments = ref<File[]>([]);
+        const existingAttachments = ref<AttachmentItem[]>([]);
         const isAttachmentValid = ref(true);
 
         // Load draft data if coming from draft modal
-        onMounted(() => {
-            if (route.query.mode === 'edit-draft' && history.state.draftData) {
-                const draft = history.state.draftData;
-                roNumber.value = draft.roNumber;
-                budgetType.value = draft.budgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
-                items.value = draft.items;
-                overallRemark.value = draft.overallRemark || '';
-                if (draft.roDate) {
-                    calendarValue.value = new Date(draft.roDate);
-                }
+        onMounted(async () => {
+            if (route.query.mode === 'edit-draft' && route.query.draftId) {
+                const draftId = route.query.draftId as string;
 
-                toast.add({
-                    severity: 'info',
-                    summary: 'Draft Loaded',
-                    detail: `Loaded draft ${draft.draftId}`,
-                    life: 3000
-                });
+                try {
+                    const res = await requestOrderService.getRequestOrderById(draftId);
+                    console.log('Fetch draft response:', res);
+                    const draft = res.data;
+                    console.log('Loaded Draft:', draft);
+                    if (!draft) return;
+
+                    // Basic fields
+                    roNumber.value = draft.DocNo;
+                    budgetType.value = draft.PrType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+                    overallRemark.value = draft.Remark || '';
+                    if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
+
+                    // Items
+                    items.value = (draft.RequestOrderItems || []).map((item: any) => ({
+                        itemCode: item.ItemCode || '',
+                        description: item.Description || '',
+                        location: item.Location || '',
+                        uom: item.Uom || '',
+                        quantity: item.Quantity?.toString() || '',
+                        price: item.Rate || 0,
+                        deliveryDate: item.DeliveryDate || null,
+                        notes: item.Notes || '',
+                        remark: item.Remark || '',
+                        showNotes: false,
+                        showRemark: false
+                    }));
+
+                    if (draft.Attachment) {
+                        const parsedAttachments = JSON.parse(draft.Attachment);
+                        existingAttachments.value = parsedAttachments.map((att: any) => ({
+                            filename: att.filename,
+                            path: att.path.replace(/\\/g, '/'),
+                            size: att.size,
+                            type: att.type
+                        }));
+                        attachments.value = [...existingAttachments.value];
+                    }
+
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Draft Loaded',
+                        detail: `Loaded draft ${draft.DocNo} with ${attachments.value.length} attachment(s)`,
+                        life: 3000
+                    });
+                } catch (error) {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Failed to Load Draft',
+                        detail: 'Could not fetch draft data. Please try again.',
+                        life: 5000
+                    });
+                }
             }
         });
 
@@ -208,6 +250,26 @@ export default defineComponent({
             });
         };
 
+        function removeAttachment(index: number) {
+            const removed = attachments.value.splice(index, 1)[0];
+
+            // If it's an existing attachment, also remove from existingAttachments
+            if ('path' in removed) {
+                existingAttachments.value = existingAttachments.value.filter((att) => att.path !== removed.path);
+            } else {
+                newAttachments.value = newAttachments.value.filter((f) => f !== removed);
+            }
+
+            console.log('Attachments after removal:', attachments.value);
+        }
+
+        // Preview/download existing attachment
+        function previewAttachment(file: AttachmentItem) {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://103.16.42.51:9001';
+            const url = `${baseUrl}/${file.path}`;
+            window.open(url, '_blank');
+        }
+
         const onSelectedFiles = (event) => {
             attachments.value = event.files;
             let totalSizeTemp = 0;
@@ -290,14 +352,26 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
-        async function submitRequestOrder() {
+        const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
             try {
-                const formatDateToAPI = (date: Date | null): string => {
-                    if (!date) return new Date().toISOString().split('T')[0];
-                    return date.toISOString().split('T')[0];
-                };
+                const stored = localStorage.getItem('selectedProject');
+                if (stored) return JSON.parse(stored);
+            } catch (error) {
+                console.error('Error loading project from localStorage:', error);
+            }
+            console.log('stored', stored);
+            return null;
+        };
+
+        const submitRequestOrder = async () => {
+            try {
+                const formatDateToAPI = (date: Date | null) => (date ? new Date(date).toISOString() : null);
+
+                const project = loadProjectFromStorage();
+                const projectId = project?.ProjectId || 0;
 
                 const payload: CreateRequestOrderPayload = {
+                    ProjectId: projectId,
                     DocNo: roNumber.value,
                     DebtorId: 1,
                     RequestOrderDate: formatDateToAPI(calendarValue.value),
@@ -317,10 +391,21 @@ export default defineComponent({
                     }))
                 };
 
-                const result = await requestOrderService.createRequestOrder(payload, attachments.value.length > 0 ? attachments.value : undefined);
+                const isDraft = !!route.query.draftId; // check if editing a draft
+                const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
+
+                let result: CreateRequestOrderResponse;
+
+                if (isDraft) {
+                    // update existing draft
+                    result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachments.value.length > 0 ? attachments.value : undefined);
+                } else {
+                    // Create new RO
+                    result = await requestOrderService.createRequestOrder(payload, attachmentsToSend);
+                }
 
                 if (result.success) {
-                    toast.add({
+                    toastBus.add({
                         severity: 'success',
                         summary: 'Request Order Submitted',
                         detail: `RO ${roNumber.value} has been submitted successfully`,
@@ -331,7 +416,7 @@ export default defineComponent({
                         router.push('/request-orders');
                     }, 1000);
                 } else {
-                    toast.add({
+                    toastBus.add({
                         severity: 'error',
                         summary: 'Submission Failed',
                         detail: result.message || 'Failed to submit request order',
@@ -340,34 +425,71 @@ export default defineComponent({
                 }
             } catch (error: any) {
                 console.error('Submit failed:', error);
-                toast.add({
+                toastBus.add({
                     severity: 'error',
                     summary: 'Submission Error',
                     detail: error.message || 'An unexpected error occurred',
                     life: 5000
                 });
             }
-        }
+        };
 
-        function saveDraft() {
-            const draftData = {
-                draftId: `DRAFT-RO-${Date.now()}`,
-                roNumber: roNumber.value,
-                budgetType: budgetType.value,
-                roDate: calendarValue.value,
-                items: items.value,
-                overallRemark: overallRemark.value,
-                attachments: attachments.value
-            };
+        async function saveDraft() {
+            try {
+                const formatDateToAPI = (date: Date | null): string => {
+                    if (!date) return new Date().toISOString().split('T')[0];
+                    return date.toISOString().split('T')[0];
+                };
+                const project = loadProjectFromStorage();
+                const projectId = project?.ProjectId || 0;
 
-            console.log('Saving draft:', draftData);
+                const payload: CreateRequestOrderPayload = {
+                    ProjectId: projectId,
+                    DocNo: roNumber.value,
+                    DebtorId: 1,
+                    RequestOrderDate: formatDateToAPI(calendarValue.value),
+                    Terms: 'Net 30',
+                    RefDoc: '',
+                    BudgetType: budgetType.value === 'Budgeted Item' ? 'Budgeted' : 'NonBudgeted',
+                    Type: 'requestOrder',
+                    Remark: overallRemark.value || '',
+                    Items: items.value.map((item) => ({
+                        BudgetItemId: budgetType.value === 'Budgeted Item' ? 1 : null,
+                        NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
+                        Description: item.description,
+                        Uom: item.uom,
+                        Quantity: parseFloat(item.quantity) || 0,
+                        Rate: item.price || 0,
+                        DeliveryDate: formatDateToAPI(item.deliveryDate)
+                    }))
+                };
 
-            toast.add({
-                severity: 'success',
-                summary: 'Draft Saved',
-                detail: 'Your request order has been saved as draft',
-                life: 3000
-            });
+                const result = await requestOrderService.createRequestOrderDraft(payload, attachments.value.length > 0 ? attachments.value : undefined);
+
+                if (result.success) {
+                    toast.add({
+                        severity: 'success',
+                        summary: 'Draft Saved',
+                        detail: `RO ${roNumber.value} has been saved as draft successfully`,
+                        life: 3000
+                    });
+                } else {
+                    toast.add({
+                        severity: 'error',
+                        summary: 'Save Draft Failed',
+                        detail: result.message || 'Failed to save request order as draft',
+                        life: 5000
+                    });
+                }
+            } catch (error: any) {
+                console.error('Save draft failed:', error);
+                toast.add({
+                    severity: 'error',
+                    summary: 'Save Draft Error',
+                    detail: error.message || 'An unexpected error occurred while saving draft',
+                    life: 5000
+                });
+            }
         }
 
         return {
@@ -406,7 +528,12 @@ export default defineComponent({
             onClearTemplatingUpload,
             isAttachmentValid,
             attachments,
-            overallRemark
+            overallRemark,
+            removeAttachment,
+            newAttachments,
+            existingAttachments,
+            MAX_FILE_SIZE,
+            previewAttachment
         };
     }
 });

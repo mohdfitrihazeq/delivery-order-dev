@@ -18,7 +18,8 @@
                     <Button label="+ New Request Order" @click="$router.push('/request-orders/create')" />
                 </div>
             </div>
-            <ViewDraftRo v-model:visible="showDraftModal" @update:count="draftCount = $event" />
+            <ViewDraftRo :visible="showDraftModal" @update:visible="showDraftModal = $event" @update:count="draftCount = $event" />
+
             <RoSummary :pendingCount="pendingCount" :approvedCount="approvedCount" :totalValue="totalValue" />
 
             <!-- Tabs -->
@@ -29,12 +30,15 @@
                             <ReusableTable
                                 :value="filteredOrders"
                                 :columns="tableColumns"
-                                :loading="false"
+                                :loading="store.loading"
                                 :showCreate="false"
                                 :showImportFile="false"
                                 :onActionClick="handleActionClick"
                                 :extraFilters="tableFilters"
                                 :onFilterChange="handleFilterChange"
+                                :pagination="store.pagination"
+                                :onPageChange="handlePageChange"
+                                :onPageSizeChange="handlePageSizeChange"
                                 emptyTitle="No request orders found"
                             >
                                 <!-- Numbering Slot -->

@@ -4,7 +4,7 @@ import { Motion } from '@motionone/vue';
 import { onMounted } from 'vue';
 
 import GeneralDashboard from './GeneralDashboard.vue';
-import PurchasingDashboard from './PurchasingDashboard.vue';
+import PurchasingDashboard from './purchasing/PurchasingDashboard.vue';
 
 const { isPurchasingRole, loadUserRole } = useDashboard();
 

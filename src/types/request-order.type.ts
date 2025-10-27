@@ -193,3 +193,46 @@ export interface EditForm {
     items: EditFormItem[];
     attachments: (File | AttachmentItem)[];
 }
+
+export interface DraftRO {
+    draftId: string;
+    project: string;
+    budgetType: string;
+    requestedBy: string;
+    itemsCount: number;
+    lastModified: string;
+    roNumber: string;
+    roDate: string;
+    items: any[];
+    overallRemark?: string;
+    attachments?: File[];
+}
+
+// in service file
+export interface AttachmentItem {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
+
+export interface GetRequestOrdersParams {
+    projectId?: number;
+    status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    pageSize?: number;
+}
+
+export interface GetRequestOrdersResponse {
+    success: boolean;
+    data: any[];
+    pagination: {
+        total: number;
+        totalPages: number;
+        page: number;
+        pageSize: number;
+    };
+}
