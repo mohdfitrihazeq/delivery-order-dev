@@ -103,7 +103,7 @@ export default defineComponent({
             { field: 'no', header: '#', sortable: false, bodySlot: 'no' },
             { field: 'poNumber', header: 'PO Number', sortable: true },
             { field: 'supplier', header: 'Supplier', sortable: false },
-            { field: 'date', header: 'Date', sortable: true },
+            { field: 'poDate', header: 'Date', sortable: true },
             { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
             { field: 'status', header: 'Status', sortable: false, bodySlot: 'status' },
             { field: 'action', header: 'Action', bodySlot: 'action', sortable: false }
@@ -113,7 +113,7 @@ export default defineComponent({
             { field: 'no', header: '#', sortable: false, bodySlot: 'no' },
             { field: 'poNumber', header: 'PO Number', sortable: true },
             { field: 'supplier', header: 'Supplier', sortable: true },
-            { field: 'date', header: 'Date', sortable: true },
+            { field: 'poDate', header: 'Date', sortable: true },
             { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
         ];
 
@@ -121,7 +121,7 @@ export default defineComponent({
             { field: 'no', header: '#', sortable: false, bodySlot: 'no' },
             { field: 'doNumber', header: 'DO Number', sortable: true },
             { field: 'poNumber', header: 'PO Number', sortable: true },
-            { field: 'date', header: 'Date', sortable: true },
+            { field: 'poDate', header: 'Date', sortable: true },
             { field: 'receivedBy', header: 'Received By', sortable: true },
             { field: 'discrepancyType', header: 'Discrepancy Type', sortable: true, bodySlot: 'discrepancyType' },
             { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
