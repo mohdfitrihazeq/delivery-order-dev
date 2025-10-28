@@ -51,7 +51,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             };
 
             const response = await purchaseService.getPurchaseOrders(params);
-            console.log('Purchase Orders Response:', response);
 
             purchaseOrders.value = response.data.map(
                 (output: any): PurchaseOrder => ({
