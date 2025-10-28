@@ -37,7 +37,6 @@ declare module 'vue' {
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Select: typeof import('primevue/select')['default']
     SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
