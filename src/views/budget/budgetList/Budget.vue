@@ -47,6 +47,8 @@
                     :search="search"
                     @search="onSearchWrapper"
                     @action="handleAction"
+                    :showImportFile="true"
+                    :onImportFile="handleImportClick"
                 >
                     <template #rate="{ data }"> ${{ data.Rate }} </template>
                     <template #amount="{ data }"> ${{ data.Amount }} </template>
