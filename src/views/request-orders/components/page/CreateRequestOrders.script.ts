@@ -56,6 +56,7 @@ export default defineComponent({
         const newAttachments = ref<File[]>([]);
         const existingAttachments = ref<AttachmentItem[]>([]);
         const isAttachmentValid = ref(true);
+        const showValidation = ref(false);
 
         // Load draft data if coming from draft modal
         onMounted(async () => {
@@ -312,7 +313,12 @@ export default defineComponent({
         });
 
         const canSubmit = computed(() => {
-            return items.value.length > 0 && isAttachmentValid.value && roNumber.value.trim() !== '';
+            const hasItems = items.value.length > 0;
+            const hasRoNumber = roNumber.value.trim() !== '';
+            const hasRoDate = calendarValue.value !== null;
+            const hasBudgetType = budgetType.value !== '';
+
+            return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
         });
 
         const previewSummary = computed<PreviewSummary>(() => ({
@@ -341,14 +347,31 @@ export default defineComponent({
 
         function openPreviewModal() {
             if (!canSubmit.value) {
+                showValidation.value = true;
+
+                let errorMessage = 'Please ensure all required fields are filled before previewing:';
+                if (items.value.length === 0) {
+                    errorMessage += ' At least one item is required.';
+                }
+                if (!roNumber.value.trim()) {
+                    errorMessage += ' RO Number is required.';
+                }
+                if (!budgetType.value) {
+                    errorMessage += ' Budget Type is required.';
+                }
+                if (!calendarValue.value) {
+                    errorMessage += ' RO Date is required.';
+                }
+
                 toast.add({
                     severity: 'warn',
                     summary: 'Validation Error',
-                    detail: 'Please ensure all required fields are filled and at least one item is added',
-                    life: 3000
+                    detail: errorMessage,
+                    life: 4000
                 });
                 return;
             }
+            showValidation.value = false;
             showPreviewModal.value = true;
         }
 
@@ -435,6 +458,34 @@ export default defineComponent({
         };
 
         async function saveDraft() {
+            if (!canSubmit.value) {
+                showValidation.value = true;
+
+                let errorMessage = 'Please ensure all required fields are filled before saving as draft:';
+                if (items.value.length === 0) {
+                    errorMessage += ' At least one item is required.';
+                }
+                if (!roNumber.value.trim()) {
+                    errorMessage += ' RO Number is required.';
+                }
+                if (!budgetType.value) {
+                    errorMessage += ' Budget Type is required.';
+                }
+                if (!calendarValue.value) {
+                    errorMessage += ' RO Date is required.';
+                }
+
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Validation Error',
+                    detail: errorMessage,
+                    life: 4000
+                });
+                return;
+            }
+
+            showValidation.value = false;
+
             try {
                 const formatDateToAPI = (date: Date | null): string => {
                     if (!date) return new Date().toISOString().split('T')[0];
@@ -533,7 +584,8 @@ export default defineComponent({
             newAttachments,
             existingAttachments,
             MAX_FILE_SIZE,
-            previewAttachment
+            previewAttachment,
+            showValidation
         };
     }
 });
