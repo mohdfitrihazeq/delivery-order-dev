@@ -14,17 +14,31 @@
             <div class="card p-4 mb-6 shadow">
                 <h2 class="text-lg font-semibold mb-4">Request Order Details</h2>
                 <div class="grid grid-cols-3 gap-4">
+                    <!-- RO Number -->
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">RO Number</label>
-                        <InputText v-model="roNumber" type="text" class="w-full" />
+                        <label class="block text-sm text-gray-600 mb-1"> RO Number <span class="text-red-600 font-bold">*</span> </label>
+                        <div class="flex flex-col gap-2">
+                            <InputText v-model="roNumber" type="text" class="w-full" :invalid="showValidation && !roNumber.trim()" placeholder="Enter RO Number" />
+                            <Message v-if="showValidation && !roNumber.trim()" severity="error" icon="pi pi-times-circle" text="RO Number is required">RO Number is required</Message>
+                        </div>
                     </div>
+
+                    <!-- Budget Type -->
                     <div>
-                        <label for="budgetType" class="block font-medium mb-1">Budget Type</label>
-                        <Select id="budgetType" v-model="budgetType" :options="budgetOptions" optionLabel="label" optionValue="value" placeholder="Select Budget Type" class="w-full" />
+                        <label for="budgetType" class="block font-medium mb-1"> Budget Type <span class="text-red-600 font-bold">*</span> </label>
+                        <div class="flex flex-col gap-2">
+                            <Select id="budgetType" v-model="budgetType" :options="budgetOptions" optionLabel="label" optionValue="value" placeholder="Select Budget Type" class="w-full" :invalid="showValidation && !budgetType" />
+                            <Message v-if="showValidation && !budgetType" severity="error" icon="pi pi-times-circle" text="Budget Type is required">Budget Type is required</Message>
+                        </div>
                     </div>
+
+                    <!-- RO Date -->
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">RO Date</label>
-                        <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue"></DatePicker>
+                        <label class="block text-sm text-gray-600 mb-1"> RO Date <span class="text-red-600 font-bold">*</span> </label>
+                        <div class="flex flex-col gap-2">
+                            <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue" :invalid="showValidation && !calendarValue" placeholder="Select Date"></DatePicker>
+                            <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle" text="RO Date is required">RO Date is required</Message>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -33,11 +47,14 @@
 
             <div class="card p-4 mb-6 shadow">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Order Items</h2>
+                    <h2 class="text-lg font-semibold">Order Items <span class="text-red-600 font-bold">*</span></h2>
                     <div class="flex gap-2">
                         <Button label="Add Bulk Items" icon="pi pi-box" outlined @click="openBulkItemModal" :disabled="budgetType !== 'Budgeted Item'" />
                         <Button label="+ Add Item" @click="addItem" />
                     </div>
+                </div>
+                <div v-if="showValidation && items.length === 0" class="mt-6">
+                    <Message severity="error" icon="pi pi-times-circle" text="At least one item is required">At least one item is required</Message>
                 </div>
 
                 <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500">
@@ -187,8 +204,8 @@
 
             <div class="flex justify-end gap-3">
                 <Button label="Cancel" @click="$router.push('/request-orders')" outlined />
-                <Button label="Save as Draft" severity="secondary" outlined @click="saveDraft" :disabled="!canSubmit" v-tooltip="'Save for later'" />
-                <Button label="Submit Request Order" @click="openPreviewModal" :disabled="!canSubmit" />
+                <Button label="Save as Draft" severity="secondary" outlined @click="saveDraft" v-tooltip="'Save for later'" />
+                <Button label="Submit Request Order" @click="openPreviewModal" />
             </div>
         </div>
 

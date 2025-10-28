@@ -76,7 +76,7 @@ function checkActiveRoute(item) {
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
-                <Badge v-if="item.badge" :value="item.badge" class="ml-2" />
+                <Badge v-if="item.badge" :value="item.badge" severity="warn" class="absolute right-0" />
             </span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </a>
@@ -85,7 +85,7 @@ function checkActiveRoute(item) {
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text flex justify-between items-center w-full">
                 <span>{{ item.label }}</span>
-                <Badge v-if="item.badge" :value="item.badge" class="ml-2" />
+                <Badge v-if="item.badge" :value="item.badge" severity="warn" class="absolute right-0" />
             </span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </router-link>
