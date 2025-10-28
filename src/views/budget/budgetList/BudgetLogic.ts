@@ -15,6 +15,13 @@ import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
 
+interface PaginationConfig {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+}
+
 export default defineComponent({
     name: 'BudgetManagement',
     components: {
@@ -33,9 +40,8 @@ export default defineComponent({
         const budgetStore = useBudgetStore();
 
         // ---------------------------
-        // 1. Static Data
+        // 1. Static
         // ---------------------------
-
         const viewOptions = [
             { label: 'Overview', value: 'overview' },
             { label: 'Detail', value: 'detail' }
@@ -61,42 +67,66 @@ export default defineComponent({
         const versions = ref<FilterVersion[]>([]);
         const selectedVersion = ref<string>('');
         const budgetItems = ref<any[]>([]);
+
+        const pagination = ref<PaginationConfig>({
+            total: 0,
+            totalPages: 1,
+            page: 1,
+            pageSize: 10
+        });
+
         const viewMode = ref<'overview' | 'detail'>('overview');
         const search = ref('');
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
 
         // ---------------------------
-        // 3. Lifecycle - Load API Data
+        // 3. Methods
         // ---------------------------
-        onMounted(async () => {
-            await budgetStore.fetchBudgetList();
-            budgetItems.value = budgetStore.budgetList[0]?.BudgetItems || [];
-            const list = budgetStore.budgetList || [];
+        const fetchBudgetList = async () => {
+            const projectId = JSON.parse(localStorage.getItem('selectedProject') || '{}')?.ProjectId;
+            if (!projectId) {
+                console.error('No valid projectId found in selectedProject');
+                return;
+            }
 
-            versions.value = list.map((item) => ({
-                label: `Version ${item.VersionCode}`,
-                value: String(item.VersionCode),
-                latest: false
-            }));
+            const version = selectedVersion.value || undefined;
+            const { page, pageSize } = pagination.value;
 
-            const latestVersion = Math.max(...list.map((i) => Number(i.VersionCode)));
-            versions.value = versions.value.map((v) => (v.value === String(latestVersion) ? { ...v, latest: true } : v));
+            const response = await budgetStore.fetchBudgetList(projectId, version, page, pageSize);
 
-            selectedVersion.value = String(latestVersion);
+            console.log('fetched budget list response', response);
+            if (!response) return;
 
-            const latestBudget = list.find((i) => Number(i.VersionCode) === latestVersion);
-            budgetItems.value = latestBudget?.BudgetItems || [];
-        });
+            const currentBudget = budgetStore.currentBudget;
+            budgetItems.value = currentBudget?.BudgetItems || [];
 
-        watch(selectedVersion, (newValue) => {
-            const target = budgetStore.budgetList.find((i) => String(i.VersionCode) === newValue);
-            budgetItems.value = target?.BudgetItems || [];
-        });
+            pagination.value.total = response.pagination?.totalBudgetItems ?? 0;
+            pagination.value.totalPages = response.pagination?.totalPages ?? 1;
 
-        // ---------------------------
-        // 4. Methods
-        // ---------------------------
+            if (versions.value.length === 0 && response.data?.length) {
+                versions.value = response.data.map((b) => ({
+                    label: `Version ${b.VersionCode}`,
+                    value: String(b.VersionCode),
+                    latest: b.Status === 'Approved'
+                }));
+
+                const latest = versions.value.find((v) => v.latest) || versions.value[0];
+                if (latest) selectedVersion.value = latest.value;
+            }
+        };
+
+        const handlePageChange = async (page: number) => {
+            pagination.value.page = page;
+            await fetchBudgetList();
+        };
+
+        const handlePageSizeChange = async (size: number) => {
+            pagination.value.pageSize = size;
+            pagination.value.page = 1;
+            await fetchBudgetList();
+        };
+
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };
@@ -115,6 +145,18 @@ export default defineComponent({
         }
 
         // ---------------------------
+        // 4. Lifecycle
+        // ---------------------------
+        onMounted(() => {
+            fetchBudgetList();
+        });
+
+        watch(selectedVersion, async () => {
+            pagination.value.page = 1;
+            await fetchBudgetList();
+        });
+
+        // ---------------------------
         // 5. Expose
         // ---------------------------
         return {
@@ -126,9 +168,13 @@ export default defineComponent({
             viewMode,
             search,
             showImportModal,
+            pagination,
+            filters,
             handleImportClick,
             handleAction,
-            onSearchWrapper: handleSearch
+            onSearchWrapper: handleSearch,
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });

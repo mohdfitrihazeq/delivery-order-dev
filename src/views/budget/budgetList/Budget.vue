@@ -13,7 +13,6 @@
 
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <Dropdown v-model="selectedVersion" :options="versions" optionLabel="label" optionValue="value" class="w-full md:w-64 h-10 rounded-lg" placeholder="Select Version">
-                        <!-- 自定义选项 -->
                         <template #option="slotProps">
                             <div class="flex items-center">
                                 <span>{{ slotProps.option.label }}</span>
@@ -21,7 +20,6 @@
                             </div>
                         </template>
 
-                        <!-- 选中显示的内容 -->
                         <template #value="slotProps">
                             <div class="flex items-center" v-if="slotProps.value">
                                 <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
@@ -38,9 +36,20 @@
                 <Overview class="col-span-12" />
             </div>
             <div v-else>
-                <ReusableTable :value="budgetItems" :columns="columns" emptyTitle="Budget List Data" :onSearch="onSearchWrapper" :show-import-file="true" :onImportFile="handleImportClick" :onActionClick="handleAction">
-                    <template #rate="{ data }"> ${{ data.rate }} </template>
-                    <template #amount="{ data }"> ${{ data.amount }} </template>
+                <ReusableTable
+                    :value="budgetItems"
+                    :columns="columns"
+                    emptyTitle="Budget List Data"
+                    :pagination="pagination"
+                    :onPageChange="handlePageChange"
+                    :onPageSizeChange="handlePageSizeChange"
+                    :filters="filters"
+                    :search="search"
+                    @search="onSearchWrapper"
+                    @action="handleAction"
+                >
+                    <template #rate="{ data }"> ${{ data.Rate }} </template>
+                    <template #amount="{ data }"> ${{ data.Amount }} </template>
                 </ReusableTable>
 
                 <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />

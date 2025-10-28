@@ -6,6 +6,9 @@ import { showError } from '@/utils/showNotification.utils';
 export interface GetBudgetParams {
     status?: string;
     search?: string;
+    page?: number;
+    pageSize?: number;
+    version?: string | undefined;
 }
 
 const getBudgetChangeRequests = async (params?: GetBudgetParams): Promise<BudgetChangeRequestResponse> => {

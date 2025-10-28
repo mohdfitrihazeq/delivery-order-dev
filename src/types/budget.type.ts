@@ -20,9 +20,9 @@ export interface BudgetItem {
     Location2?: string;
     Unit: string;
     Quantity: number | string;
+    Rate?: number | string;
     Amount: number | string;
     Wastage?: number | string;
-    Rate?: number | string;
     Status: string;
     CreatedAt: string;
     CreatedBy: string;
@@ -57,8 +57,19 @@ export interface Budget {
     BudgetItems: BudgetItem[];
 }
 
+export interface Pagination {
+    totalBudgetItems: number;
+    totalPages: number;
+    page: number;
+    pageSize: number;
+}
 export interface BudgetResponse {
     success: boolean;
     message?: string;
     data?: Budget[];
+    pagination?: Pagination;
+    versions?: {
+        VersionCode: string | number;
+        isLatest?: boolean;
+    }[];
 }
