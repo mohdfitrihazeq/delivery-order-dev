@@ -405,7 +405,7 @@ export default defineComponent({
                 }
 
                 if (result.success) {
-                    toastBus.add({
+                    toast.add({
                         severity: 'success',
                         summary: 'Request Order Submitted',
                         detail: `RO ${roNumber.value} has been submitted successfully`,
@@ -416,7 +416,7 @@ export default defineComponent({
                         router.push('/request-orders');
                     }, 1000);
                 } else {
-                    toastBus.add({
+                    toast.add({
                         severity: 'error',
                         summary: 'Submission Failed',
                         detail: result.message || 'Failed to submit request order',
@@ -425,7 +425,7 @@ export default defineComponent({
                 }
             } catch (error: any) {
                 console.error('Submit failed:', error);
-                toastBus.add({
+                toast.add({
                     severity: 'error',
                     summary: 'Submission Error',
                     detail: error.message || 'An unexpected error occurred',

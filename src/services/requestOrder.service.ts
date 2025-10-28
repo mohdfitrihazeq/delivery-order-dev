@@ -103,15 +103,24 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
 
         const response = await axiosInstance.get('/requestOrder', { params: cleanParams });
 
+        const orders = response.data.data || [];
+        const counts = {
+            pending: orders.filter((o: any) => o.Status === 'Pending').length,
+            approved: orders.filter((o: any) => o.Status === 'Approved').length,
+            rejected: orders.filter((o: any) => o.Status === 'Rejected').length,
+            totalValue: orders.reduce((sum: number, o: any) => sum + Number(o.TotalAmount || 0), 0)
+        };
+
         return {
             success: response.data.success,
-            data: response.data.data || [],
+            data: orders,
             pagination: response.data.pagination || {
                 total: 0,
                 totalPages: 0,
                 page: 1,
                 pageSize: 10
-            }
+            },
+            counts
         };
     } catch (error: any) {
         showError(error, 'Failed to fetch request orders.');
@@ -123,7 +132,8 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
                 totalPages: 0,
                 page: 1,
                 pageSize: 10
-            }
+            },
+            counts: { pending: 0, approved: 0, rejected: 0, totalValue: 0 }
         };
     }
 };
