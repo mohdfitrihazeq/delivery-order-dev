@@ -1,4 +1,4 @@
-import { usePurchaseOrderStore } from '@/stores/purchase-order/purchase-order.store';
+import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';

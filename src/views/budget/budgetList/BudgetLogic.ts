@@ -95,12 +95,10 @@ export default defineComponent({
 
             const response = await budgetStore.fetchBudgetList(projectId, version, page, pageSize);
 
-            console.log('fetched budget list response', response);
             if (!response) return;
 
             const currentBudget = budgetStore.currentBudget;
-            budgetItems.value = currentBudget?.BudgetItems || [];
-
+            budgetItems.value = currentBudget?.budgetitems || [];
             pagination.value.total = response.pagination?.totalBudgetItems ?? 0;
             pagination.value.totalPages = response.pagination?.totalPages ?? 1;
 

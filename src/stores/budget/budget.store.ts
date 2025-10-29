@@ -29,13 +29,13 @@ export const useBudgetStore = defineStore('budgetStore', {
             this.loading = true;
             try {
                 const params = { projectId, version, page, pageSize };
+
                 const response = await budgetService.getBudget(params);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget.');
                     return;
                 }
-
                 this.budgets = response.data || [];
                 this.currentBudget = this.budgets[0];
                 this.totalItems = response.pagination?.totalBudgetItems ?? 0;

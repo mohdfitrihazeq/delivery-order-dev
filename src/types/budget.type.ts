@@ -54,7 +54,7 @@ export interface Budget {
     ApproveAt?: string | null;
     RejectedBy?: string | null;
     RejectedAt?: string | null;
-    BudgetItems: BudgetItem[];
+    budgetitems: BudgetItem[];
 }
 
 export interface Pagination {
