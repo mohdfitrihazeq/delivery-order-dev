@@ -1,4 +1,4 @@
-import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store'; // 你自己的 Pinia Store
+import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
@@ -14,9 +14,12 @@ export default defineComponent({
         const route = useRoute();
         const store = useBudgetChangeRequestStore();
         const projectName = ref<string>('');
+        const singleBudgetChangeRequest = ref<BudgetChangeRequest | null>(null);
         onMounted(async () => {
             if (route.params.requestNo) {
-                await store.getSingleBudgetChange(Number(route.params.requestNo));
+                const data = await store.getSingleBudgetChange(Number(route.params.requestNo));
+
+                singleBudgetChangeRequest.value = data;
             }
 
             const projectStr = localStorage.getItem('selectedProject');
@@ -30,8 +33,6 @@ export default defineComponent({
             }
         });
 
-        const singleBudgetChangeRequest = computed<BudgetChangeRequest | null>(() => store.singleBudgetChangeRequest);
-
         const roNumber = computed(() => singleBudgetChangeRequest.value?.DocNo || '');
         const requestBy = computed(() => singleBudgetChangeRequest.value?.RequestedBy || '');
         const requestDate = computed(() => {
@@ -41,7 +42,7 @@ export default defineComponent({
         });
 
         const items = computed<BudgetChangeItem[]>(() => {
-            return singleBudgetChangeRequest.value?.BudgetChangeItem || [];
+            return singleBudgetChangeRequest.value?.budgetchangeitem || [];
         });
 
         const itemsWithCalc = computed(() => {

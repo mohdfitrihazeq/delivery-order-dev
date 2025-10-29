@@ -26,16 +26,19 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
 
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget change requests.');
-                    return;
+                    return [];
                 }
 
                 this.budgetChangeRequestList = response.data || [];
+                return this.budgetChangeRequestList;
             } catch (error: any) {
                 showError(error?.message || 'Failed to fetch budget change requests.');
+                return [];
             } finally {
                 this.loading = false;
             }
         },
+
         async createBudgetChangeRequest(formData: FormData) {
             this.loading = true;
             try {
@@ -43,19 +46,22 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Budget Change Request.');
-                    return false;
+                    return null;
                 }
 
                 showSuccess(response.message || 'Budget Change Request created successfully.');
+
                 await this.fetchBudgetChangesRequestList();
-                return true;
+
+                return response.data;
             } catch (error: any) {
                 showError(error, 'Failed to create budget change request.');
-                return false;
+                return null;
             } finally {
                 this.loading = false;
             }
         },
+
         async getSingleBudgetChange(bcrId: number) {
             this.loading = true;
             try {
@@ -64,17 +70,20 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
                 if (!response.success || !response.data) {
                     showError('Budget change request not found.');
                     this.singleBudgetChangeRequest = null;
-                    return;
+                    return null;
                 }
 
-                this.singleBudgetChangeRequest = response.data;
-            } catch (error) {
+                this.singleBudgetChangeRequest = { ...response.data };
+                return this.singleBudgetChangeRequest;
+            } catch (error: any) {
                 showError(error, 'Failed to fetch budget change request.');
                 this.singleBudgetChangeRequest = null;
+                return null;
             } finally {
                 this.loading = false;
             }
         },
+
         async editBudgetChangeRequest(payload: BudgetChangeRequestPayload, bcrId: number) {
             this.loading = true;
             try {
@@ -82,15 +91,16 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
 
                 if (!response.success) {
                     showError(response.message || 'Failed to update Budget Change Request.');
-                    return false;
+                    return null;
                 }
 
                 showSuccess(response.message || 'Budget Change Request updated successfully.');
                 await this.fetchBudgetChangesRequestList();
-                return true;
+
+                return response.data || true;
             } catch (error: any) {
                 showError(error?.message || 'Failed to update budget change request.');
-                return false;
+                return null;
             } finally {
                 this.loading = false;
             }

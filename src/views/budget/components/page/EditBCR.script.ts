@@ -57,7 +57,7 @@ export default defineComponent({
                 requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
                 reason.value = s.Reason ?? '';
 
-                items.value = (s.BudgetChangeItem ?? []).map((x) => ({
+                items.value = (s.budgetchangeitem ?? []).map((x) => ({
                     Id: x.Id ?? 0,
                     BudgetChangeId: x.BudgetChangeId ?? 0,
                     BudgetItemId: x.BudgetItemId ?? 0,
@@ -150,7 +150,7 @@ export default defineComponent({
                 CreatedAt: singleBudgetChangeRequest.value?.CreatedAt ?? '',
                 UpdatedAt: singleBudgetChangeRequest.value?.UpdatedAt ?? '',
                 UpdatedBy: singleBudgetChangeRequest.value?.UpdatedBy ?? null,
-                BudgetChangeItem: items.value
+                budgetchangeitem: items.value
             };
             const isSuccess = await store.editBudgetChangeRequest(payload as any, payload.Id);
 
