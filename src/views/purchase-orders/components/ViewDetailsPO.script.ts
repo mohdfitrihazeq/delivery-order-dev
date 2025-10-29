@@ -18,8 +18,6 @@ export default defineComponent({
         const isLoading = ref(false);
 
         const purchaseOrder = computed(() => store.selectedPurchaseOrder);
-        console.log('purchaseOrder', purchaseOrder.value);
-
         const project = ref<{ company: string; name: string } | null>(JSON.parse(localStorage.getItem('selectedProject') || 'null'));
 
         const supplier = computed(() => purchaseOrder.value?.supplierName || '');
