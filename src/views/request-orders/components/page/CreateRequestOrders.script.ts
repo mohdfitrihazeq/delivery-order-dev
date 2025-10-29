@@ -12,6 +12,7 @@ import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../typ
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
+import { getCurrentUsername, getCurrentProjectName, getCurrentProjectId } from '@/utils/contextHelper';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -325,10 +326,10 @@ export default defineComponent({
             totalItems: items.value.length,
             totalAmount: grandTotal.value,
             budgetType: budgetType.value,
-            project: 'MKT',
+            project: getCurrentProjectName() || '',
             roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
             roNumber: roNumber.value,
-            requestedBy: 'Current User',
+            requestedBy: getCurrentUsername() || 'Unknown User',
             items: items.value.map((item) => ({
                 itemCode: item.itemCode,
                 itemType: 'CO',
@@ -375,23 +376,11 @@ export default defineComponent({
             showPreviewModal.value = true;
         }
 
-        const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
-            try {
-                const stored = localStorage.getItem('selectedProject');
-                if (stored) return JSON.parse(stored);
-            } catch (error) {
-                console.error('Error loading project from localStorage:', error);
-            }
-            console.log('stored', stored);
-            return null;
-        };
-
         const submitRequestOrder = async () => {
             try {
                 const formatDateToAPI = (date: Date | null) => (date ? new Date(date).toISOString() : null);
 
-                const project = loadProjectFromStorage();
-                const projectId = project?.ProjectId || 0;
+                const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
                     ProjectId: projectId,
@@ -491,8 +480,7 @@ export default defineComponent({
                     if (!date) return new Date().toISOString().split('T')[0];
                     return date.toISOString().split('T')[0];
                 };
-                const project = loadProjectFromStorage();
-                const projectId = project?.ProjectId || 0;
+                const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
                     ProjectId: projectId,
