@@ -20,9 +20,9 @@ export interface BudgetItem {
     Location2?: string;
     Unit: string;
     Quantity: number | string;
+    Rate?: number | string;
     Amount: number | string;
     Wastage?: number | string;
-    Rate?: number | string;
     Status: string;
     CreatedAt: string;
     CreatedBy: string;
@@ -30,8 +30,46 @@ export interface BudgetItem {
     UpdatedBy?: string | null;
 }
 
-export interface BudgetItemResponse {
+export interface Budget {
+    Id: number;
+    ProjectId: number;
+    BudgetName: string;
+    VersionCode: number | string;
+    DocNo: string;
+    Date: string;
+    TotalAmount: number;
+    GstAmount: number;
+    Terms?: string;
+    RefDoc?: string;
+    Posting: string;
+    Currency: string;
+    Gst: string;
+    Remark?: string;
+    Status: string;
+    CreatedAt: string;
+    CreatedBy: string;
+    UpdatedAt?: string | null;
+    UpdatedBy?: string | null;
+    ApprovedBy?: string | null;
+    ApproveAt?: string | null;
+    RejectedBy?: string | null;
+    RejectedAt?: string | null;
+    budgetitems: BudgetItem[];
+}
+
+export interface Pagination {
+    totalBudgetItems: number;
+    totalPages: number;
+    page: number;
+    pageSize: number;
+}
+export interface BudgetResponse {
     success: boolean;
     message?: string;
-    data?: BudgetItem[];
+    data?: Budget[];
+    pagination?: Pagination;
+    versions?: {
+        VersionCode: string | number;
+        isLatest?: boolean;
+    }[];
 }

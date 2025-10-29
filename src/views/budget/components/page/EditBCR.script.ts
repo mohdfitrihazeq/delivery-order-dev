@@ -1,4 +1,4 @@
-import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
+import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import { storeToRefs } from 'pinia';
 import { computed, defineComponent, onMounted, ref } from 'vue';
@@ -9,7 +9,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetStore();
+        const store = useBudgetChangeRequestStore();
         const { singleBudgetChangeRequest, loading } = storeToRefs(store);
 
         const roNumber = ref('');
@@ -57,7 +57,7 @@ export default defineComponent({
                 requestDate.value = s.RequestDate ? new Date(s.RequestDate) : null;
                 reason.value = s.Reason ?? '';
 
-                items.value = (s.BudgetChangeItem ?? []).map((x) => ({
+                items.value = (s.budgetchangeitem ?? []).map((x) => ({
                     Id: x.Id ?? 0,
                     BudgetChangeId: x.BudgetChangeId ?? 0,
                     BudgetItemId: x.BudgetItemId ?? 0,
@@ -150,7 +150,7 @@ export default defineComponent({
                 CreatedAt: singleBudgetChangeRequest.value?.CreatedAt ?? '',
                 UpdatedAt: singleBudgetChangeRequest.value?.UpdatedAt ?? '',
                 UpdatedBy: singleBudgetChangeRequest.value?.UpdatedBy ?? null,
-                BudgetChangeItem: items.value
+                budgetchangeitem: items.value
             };
             const isSuccess = await store.editBudgetChangeRequest(payload as any, payload.Id);
 

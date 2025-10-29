@@ -19,6 +19,7 @@
                                 <Badge v-if="slotProps.option.latest" value="Latest" severity="primary" class="ml-2" />
                             </div>
                         </template>
+
                         <template #value="slotProps">
                             <div class="flex items-center" v-if="slotProps.value">
                                 <span>{{ versions.find((v) => v.value === slotProps.value)?.label }}</span>
@@ -35,9 +36,22 @@
                 <Overview class="col-span-12" />
             </div>
             <div v-else>
-                <ReusableTable :value="budgetItems" :columns="columns" emptyTitle="Budget List Data" :onSearch="onSearchWrapper" :show-import-file="true" :onImportFile="handleImportClick" :onActionClick="handleAction">
-                    <template #rate="{ data }"> ${{ data.rate }} </template>
-                    <template #amount="{ data }"> ${{ data.amount }} </template>
+                <ReusableTable
+                    :value="budgetItems"
+                    :columns="columns"
+                    emptyTitle="Budget List Data"
+                    :pagination="pagination"
+                    :onPageChange="handlePageChange"
+                    :onPageSizeChange="handlePageSizeChange"
+                    :filters="filters"
+                    :search="search"
+                    @search="onSearchWrapper"
+                    @action="handleAction"
+                    :showImportFile="true"
+                    :onImportFile="handleImportClick"
+                >
+                    <template #rate="{ data }"> ${{ data.Rate }} </template>
+                    <template #amount="{ data }"> ${{ data.Amount }} </template>
                 </ReusableTable>
 
                 <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />

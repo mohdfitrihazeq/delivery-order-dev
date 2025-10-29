@@ -8,6 +8,7 @@ interface State {
     incompletedList: DeliveryOrder[];
     completedList: DeliveryOrder[];
     search: string;
+    projectId: number;
     singleDelivery: DeliveryOrder | null;
 }
 
@@ -17,6 +18,7 @@ export const useDeliveryStore = defineStore('deliveryStore', {
         incompletedList: [],
         completedList: [],
         search: '',
+        projectId: 0,
         singleDelivery: null
     }),
 
@@ -24,14 +26,18 @@ export const useDeliveryStore = defineStore('deliveryStore', {
         async fetchDeliveryOrders() {
             this.loading = true;
             try {
+                const projectData = localStorage.getItem('selectedProject');
+                const projectId = projectData ? JSON.parse(projectData).ProjectId : null;
                 const [incompletedRes, completedRes] = await Promise.all([
                     deliveryOrderService.getDeliveryOrders({
                         status: 'Pending',
-                        search: this.search
+                        search: this.search,
+                        projectId: projectId
                     }),
                     deliveryOrderService.getDeliveryOrders({
                         status: 'Completed',
-                        search: this.search
+                        search: this.search,
+                        projectId: projectId
                     })
                 ]);
 

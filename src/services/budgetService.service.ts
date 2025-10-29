@@ -1,10 +1,14 @@
 import axiosInstance from '@/services/backendAxiosInstance';
+import { BudgetResponse } from '@/types/budget.type';
 import type { BudgetChangeRequestPayload, BudgetChangeRequestResponse, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
 
 export interface GetBudgetParams {
     status?: string;
     search?: string;
+    page?: number;
+    pageSize?: number;
+    version?: string | undefined;
 }
 
 const getBudgetChangeRequests = async (params?: GetBudgetParams): Promise<BudgetChangeRequestResponse> => {
@@ -71,9 +75,42 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
     }
 };
 
+const getBudget = async (params?: GetBudgetParams): Promise<BudgetResponse> => {
+    try {
+        const response = await axiosInstance.get<BudgetResponse>('/budget', { params });
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget.');
+        throw error;
+    }
+};
+
+async function createBudget(formData: FormData) {
+    try {
+        for (const [key, value] of formData.entries()) {
+            console.log('FormData =>', key, value);
+        }
+
+        console.log('formData payload', formData);
+
+        const response = await axiosInstance.post('/budget/import', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        console.error('Budget Upload Error:', error.response?.data || error);
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Upload failed'
+        };
+    }
+}
 export const budgetService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
     getSingleBudgetChangeRequest,
-    editBudgetChangeRequest
+    editBudgetChangeRequest,
+    getBudget,
+    createBudget
 };

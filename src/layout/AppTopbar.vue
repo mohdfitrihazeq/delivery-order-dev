@@ -59,7 +59,7 @@ const toggleProfileMenu = (event: Event) => {
 /* ================= 用户名 + 项目信息 ================= */
 const username = ref<string | null>(null);
 const showProjectDialog = ref(false);
-const selectedProject = ref<{ company: string; name: string } | null>(null);
+const selectedProject = ref<{ company: string; name: string; ProjectId: number } | null>(null);
 
 interface Project {
     ProjectId: number;
@@ -92,8 +92,16 @@ const companyProjects = ref<CompanyGroup[]>([
 
 const saveProjectToStorage = (project: { company: string; name: string; ProjectId: number } | null) => {
     try {
-        if (project) localStorage.setItem('selectedProject', JSON.stringify(project));
-        else localStorage.removeItem('selectedProject');
+        if (project) {
+            const dataToSave = {
+                company: project.company,
+                name: project.name,
+                ProjectId: project.ProjectId
+            };
+            localStorage.setItem('selectedProject', JSON.stringify(dataToSave));
+        } else {
+            localStorage.removeItem('selectedProject');
+        }
     } catch (error) {
         console.error('Error saving project to localStorage:', error);
     }
@@ -102,7 +110,12 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
 const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed.company && parsed.name && parsed.ProjectId) {
+                return parsed;
+            }
+        }
     } catch (error) {
         console.error('Error loading project from localStorage:', error);
     }

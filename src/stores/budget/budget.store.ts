@@ -1,96 +1,51 @@
 import { budgetService } from '@/services/budgetService.service';
-import type { BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
-import { showError, showSuccess } from '@/utils/showNotification.utils';
+import type { Budget, BudgetResponse } from '@/types/budget.type';
+import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
 interface State {
     loading: boolean;
-    budgetChangeRequestList: BudgetChangeRequest[];
-    singleBudgetChangeRequest: BudgetChangeRequest | null;
+    budgets: Budget[];
+    currentBudget?: Budget;
+    totalItems: number;
+    totalPages: number;
+    page: number;
+    pageSize: number;
 }
 
 export const useBudgetStore = defineStore('budgetStore', {
     state: (): State => ({
         loading: false,
-        budgetChangeRequestList: [],
-        singleBudgetChangeRequest: null
+        budgets: [],
+        currentBudget: undefined,
+        totalItems: 0,
+        totalPages: 1,
+        page: 1,
+        pageSize: 10
     }),
 
     actions: {
-        async fetchBudgetChangesRequestList() {
+        async fetchBudgetList(projectId: number, version?: string, page = 1, pageSize = 10): Promise<BudgetResponse | undefined> {
             this.loading = true;
-            this.budgetChangeRequestList = [];
-
             try {
-                const response = await budgetService.getBudgetChangeRequests();
+                const params = { projectId, version, page, pageSize };
+
+                const response = await budgetService.getBudget(params);
 
                 if (!response.success) {
-                    showError(response.message || 'Failed to fetch budget change requests.');
+                    showError(response.message || 'Failed to fetch budget.');
                     return;
                 }
+                this.budgets = response.data || [];
+                this.currentBudget = this.budgets[0];
+                this.totalItems = response.pagination?.totalBudgetItems ?? 0;
+                this.totalPages = response.pagination?.totalPages ?? 1;
+                this.page = response.pagination?.page ?? 1;
+                this.pageSize = response.pagination?.pageSize ?? pageSize;
 
-                this.budgetChangeRequestList = response.data || [];
+                return response;
             } catch (error: any) {
-                showError(error?.message || 'Failed to fetch budget change requests.');
-            } finally {
-                this.loading = false;
-            }
-        },
-        async createBudgetChangeRequest(formData: FormData) {
-            this.loading = true;
-            try {
-                const response = await budgetService.createBudgetChangeRequest(formData as any);
-
-                if (!response.success) {
-                    showError(response.message || 'Failed to create Budget Change Request.');
-                    return false;
-                }
-
-                showSuccess(response.message || 'Budget Change Request created successfully.');
-                await this.fetchBudgetChangesRequestList();
-                return true;
-            } catch (error: any) {
-                showError(error, 'Failed to create budget change request.');
-                return false;
-            } finally {
-                this.loading = false;
-            }
-        },
-        async getSingleBudgetChange(bcrId: number) {
-            this.loading = true;
-            try {
-                const response = await budgetService.getSingleBudgetChangeRequest(bcrId);
-
-                if (!response.success || !response.data) {
-                    showError('Budget change request not found.');
-                    this.singleBudgetChangeRequest = null;
-                    return;
-                }
-
-                this.singleBudgetChangeRequest = response.data;
-            } catch (error) {
-                showError(error, 'Failed to fetch budget change request.');
-                this.singleBudgetChangeRequest = null;
-            } finally {
-                this.loading = false;
-            }
-        },
-        async editBudgetChangeRequest(payload: BudgetChangeRequestPayload, bcrId: number) {
-            this.loading = true;
-            try {
-                const response = await budgetService.editBudgetChangeRequest(payload, bcrId);
-
-                if (!response.success) {
-                    showError(response.message || 'Failed to update Budget Change Request.');
-                    return false;
-                }
-
-                showSuccess(response.message || 'Budget Change Request updated successfully.');
-                await this.fetchBudgetChangesRequestList();
-                return true;
-            } catch (error: any) {
-                showError(error?.message || 'Failed to update budget change request.');
-                return false;
+                showError(error?.message || 'Failed to fetch budget.');
             } finally {
                 this.loading = false;
             }
