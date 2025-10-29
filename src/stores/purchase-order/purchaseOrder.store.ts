@@ -23,6 +23,21 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
         totalPages: 0
     });
 
+    const formatDate = (dateString: string | null): string => {
+        if (!dateString || dateString === '1970-01-01T00:00:00.000Z') {
+            return 'N/A';
+        }
+        try {
+            return new Date(dateString).toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        } catch (error) {
+            return 'N/A';
+        }
+    };
+
     async function fetchPurchaseOrders() {
         loading.value = true;
         try {
@@ -43,7 +58,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                     poNumber: output.DocNo,
                     supplierName: output.SupplierName,
                     createdBy: output.CreatedBy,
-                    poDate: output.PurchaseOrderDate,
+                    poDate: formatDate(output.PoDate),
                     totalAmount: output.TotalAmount,
                     status: output.Status,
                     createdAt: output.CreatedAt,
@@ -87,7 +102,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 poNumber: o.DocNo,
                 supplierName: o.SupplierName,
                 createdBy: o.CreatedBy,
-                poDate: o.PurchaseOrderDate,
+                poDate: formatDate(o.PoDate),
                 totalAmount: o.TotalAmount,
                 status: o.Status,
                 createdAt: o.CreatedAt,
@@ -99,7 +114,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                     price: item.UnitPrice || 0,
                     amount: item.Amount || 0,
                     deliveryDate: item.DeliveryDate || null,
-                    note: item.Notes || ''
+                    note: item.Notes || '',
+                    roNumber: item.RoDocNo || ''
                 })),
                 attachments: parsedAttachments
             };
