@@ -2,8 +2,8 @@
 export interface PurchaseOrderItem {
     Id: number;
     PurchaseOrderId: number;
-    RequestOrderItemId: number;
     SoDocNo?: string;
+    RoDocNo?: string;
     ItemCode: string;
     Name: string;
     Uom?: string;

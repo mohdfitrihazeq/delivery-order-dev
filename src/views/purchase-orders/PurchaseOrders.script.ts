@@ -140,9 +140,10 @@ export default defineComponent({
                 name: 'ViewDetailsPO',
                 params: { poNumber: po.poNumber },
                 query: {
+                    id: po.id,
                     supplier: po.supplier,
                     totalAmount: po.totalAmount,
-                    date: po.date,
+                    date: po.poDate,
                     status: po.status
                 }
             });

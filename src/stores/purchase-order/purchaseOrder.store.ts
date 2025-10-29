@@ -114,7 +114,8 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                     price: item.UnitPrice || 0,
                     amount: item.Amount || 0,
                     deliveryDate: item.DeliveryDate || null,
-                    note: item.Notes || ''
+                    note: item.Notes || '',
+                    roNumber: item.RoDocNo || ''
                 })),
                 attachments: parsedAttachments
             };
