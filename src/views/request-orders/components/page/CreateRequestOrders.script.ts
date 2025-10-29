@@ -397,12 +397,13 @@ export default defineComponent({
                         NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
                         Description: item.description,
                         Uom: item.uom,
+                        ItemCode: item.itemCode,
+                        ItemType: item.itemType || 'CO',
                         Quantity: parseFloat(item.quantity) || 0,
                         Rate: item.price || 0,
                         DeliveryDate: formatDateToAPI(item.deliveryDate)
                     }))
                 };
-
                 const isDraft = !!route.query.draftId; // check if editing a draft
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
@@ -499,7 +500,9 @@ export default defineComponent({
                         Uom: item.uom,
                         Quantity: parseFloat(item.quantity) || 0,
                         Rate: item.price || 0,
-                        DeliveryDate: formatDateToAPI(item.deliveryDate)
+                        DeliveryDate: formatDateToAPI(item.deliveryDate),
+                        ItemCode: item.itemCode,
+                        ItemType: item.itemType || 'CO'
                     }))
                 };
 

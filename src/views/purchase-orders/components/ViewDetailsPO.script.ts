@@ -14,33 +14,41 @@ export default defineComponent({
         const store = usePurchaseOrderStore();
 
         const poId = ref(route.query.id as string);
-        const poNumber = ref(route.params.poNumber || '');
         const isLoading = ref(false);
 
         const purchaseOrder = computed(() => store.selectedPurchaseOrder);
+
         const project = ref<{ company: string; name: string } | null>(JSON.parse(localStorage.getItem('selectedProject') || 'null'));
 
+        // --- Top section info ---
+        const poNumber = computed(() => purchaseOrder.value?.poNumber || '');
         const supplier = computed(() => purchaseOrder.value?.supplierName || '');
-        const totalAmount = computed(() => purchaseOrder.value?.totalAmount || '');
+        const totalAmount = computed(() => purchaseOrder.value?.totalAmount ?? 0);
         const date = computed(() => purchaseOrder.value?.poDate || '');
         const status = computed(() => purchaseOrder.value?.status || '');
         const createdBy = computed(() => purchaseOrder.value?.createdBy || '');
         const roNumber = computed(() => purchaseOrder.value?.items?.[0]?.roNumber || 'N/A');
 
+        // --- Table data ---
         const items = computed(() =>
-            (purchaseOrder.value?.items || []).map((item) => ({
-                code: item.code,
-                description: item.description,
-                ordered: item.qty,
-                unitPrice: item.price,
-                amount: item.amount,
-                roNumber: item.roNumber,
-                deliveryDate: item.deliveryDate,
-                note: item.note,
-                received: Math.floor(item.qty * 0.7),
-                remaining: Math.ceil(item.qty * 0.3),
-                status: Math.floor(item.qty * 0.7) === item.qty ? 'Completed' : 'Partial'
-            }))
+            (purchaseOrder.value?.items || []).map((item) => {
+                const received = Math.floor(item.qty * 0.7);
+                const remaining = item.qty - received;
+                return {
+                    no: 0,
+                    code: item.code,
+                    description: item.description,
+                    ordered: item.qty,
+                    received,
+                    remaining,
+                    unitPrice: item.price,
+                    amount: item.amount,
+                    roNumber: item.roNumber,
+                    deliveryDate: item.deliveryDate || 'N/A',
+                    note: item.note || '',
+                    status: received === item.qty ? 'Completed' : 'Partial'
+                };
+            })
         );
 
         const itemsWithNo = computed(() => items.value.map((item, i) => ({ ...item, no: i + 1 })));
@@ -53,6 +61,7 @@ export default defineComponent({
             { field: 'received', header: 'Received' },
             { field: 'remaining', header: 'Remaining' },
             { field: 'unitPrice', header: 'Unit Price' },
+            { field: 'amount', header: 'Amount' },
             { field: 'status', header: 'Status', bodySlot: 'status' }
         ]);
 
@@ -81,7 +90,6 @@ export default defineComponent({
             status,
             createdBy,
             project,
-            items,
             itemsWithNo,
             itemsColumns,
             activeTab,
