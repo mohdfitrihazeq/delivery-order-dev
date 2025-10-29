@@ -100,19 +100,19 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             const order: PurchaseOrder = {
                 id: o.Id,
                 poNumber: o.DocNo,
-                supplierName: o.SupplierName,
+                supplierName: o.SupplierName || 'N/A',
                 createdBy: o.CreatedBy,
                 poDate: formatDate(o.PoDate),
                 totalAmount: o.TotalAmount,
-                status: o.Status,
+                status: o.Status || 'Pending',
                 createdAt: o.CreatedAt,
-                items: (o.PurchaseOrderItems || []).map((item: any) => ({
+                items: (o.purchaseorderitems || []).map((item: any) => ({
                     code: item.ItemCode || '',
-                    description: item.Description || '',
-                    uom: item.Unit || '',
+                    description: item.Name || '',
+                    uom: item.Uom || '',
                     qty: Number(item.Quantity),
-                    price: item.UnitPrice || 0,
-                    amount: item.Amount || 0,
+                    price: item.Price || 0,
+                    amount: Number(item.Quantity) * (item.Price || 0),
                     deliveryDate: item.DeliveryDate || null,
                     note: item.Notes || '',
                     roNumber: item.RoDocNo || ''

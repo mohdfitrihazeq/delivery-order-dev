@@ -136,6 +136,8 @@ export interface CreateRequestOrderPayload {
         Notes: string;
         Reason: string;
         DeliveryDate: string;
+        ItemCode: string;
+        ItemType: string;
     }>;
 }
 

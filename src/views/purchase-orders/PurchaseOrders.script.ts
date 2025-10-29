@@ -47,11 +47,13 @@ export default defineComponent({
             isLoading.value = true;
             try {
                 await store.fetchPurchaseOrders();
-
                 // Assign a temporary status since DB has no status
                 const purchaseOrdersWithStatus = store.purchaseOrders.map((po) => ({
                     ...po,
-                    status: 'pending' // default all as pending
+                    poNumber: po.poNumber,
+                    supplier: po.supplier || '',
+                    totalAmount: po.purchaseorderitems?.reduce((sum, item) => sum + item.Quantity * item.Rate, 0) || 0,
+                    status: 'pending'
                 }));
 
                 pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending');
@@ -140,11 +142,7 @@ export default defineComponent({
                 name: 'ViewDetailsPO',
                 params: { poNumber: po.poNumber },
                 query: {
-                    id: po.id,
-                    supplier: po.supplier,
-                    totalAmount: po.totalAmount,
-                    date: po.poDate,
-                    status: po.status
+                    id: po.id
                 }
             });
         };
