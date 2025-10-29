@@ -77,7 +77,7 @@ export default defineComponent({
         });
 
         watch(searchTerm, async (val) => {
-            await purchaseStore.fetchPurchaseOrders({ search: val });
+            await purchaseStore.fetchPurchaseOrders();
         });
 
         // ---------------------------
