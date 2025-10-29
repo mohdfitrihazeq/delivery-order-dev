@@ -56,7 +56,7 @@ export interface BudgetChangeRequest {
     CreatedAt: string;
     UpdatedAt: string;
     UpdatedBy: string | null;
-    BudgetChangeItem: BudgetChangeItem[];
+    budgetchangeitem: BudgetChangeItem[];
 }
 
 export interface BudgetChangeRequestResponse {

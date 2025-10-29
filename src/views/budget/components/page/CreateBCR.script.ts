@@ -1,5 +1,5 @@
 // CreateBCR.script.ts
-import { useBudgetStore } from '@/stores/budget/budgetChangeRequest.store';
+import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
@@ -22,7 +22,7 @@ export default defineComponent({
     components: { Motion, MeterialModal },
     setup() {
         const router = useRouter();
-        const budgetStore = useBudgetStore();
+        const budgetStore = useBudgetChangeRequestStore();
 
         // --- Header ---
         const roNumber = ref('RO2025208757');

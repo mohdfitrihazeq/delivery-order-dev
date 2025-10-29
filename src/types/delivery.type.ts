@@ -34,6 +34,7 @@ export interface DeliveryOrder {
     CreatedBy: string;
     UpdatedAt?: string | null;
     UpdatedBy?: string | null;
+    ProjectId: number;
     DeliveryOrderItems?: DeliveryOrderItem[];
 }
 
