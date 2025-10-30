@@ -109,7 +109,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 refDoc: o.RefDoc ?? 'RQ-001',
                 currency: o.Currency ?? 'MYR',
                 attachments: parsedAttachments,
-                budgetType: o.PrType === 'Budgeted' ? 'Budget' : 'NonBudget'
+                budgetType: o.PrType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted'
             };
 
             selectedOrder.value = order;

@@ -56,7 +56,7 @@ export default defineComponent({
 
         const budgetTypeOptions = [
             { label: 'Budgeted', value: 'Budgeted' },
-            { label: 'Unbudgeted', value: 'Unbudgeted' }
+            { label: 'NonBudgeted', value: 'NonBudgeted' }
         ];
 
         const defaultForm = (): EditForm => ({
