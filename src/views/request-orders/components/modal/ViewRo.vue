@@ -47,7 +47,7 @@
                         <td class="p-2">{{ item.uom }}</td>
                         <td class="p-2">{{ item.qty }}</td>
                         <td class="p-2">{{ item.deliveryDate }}</td>
-                        <td class="p-2">{{ item.note }}</td>
+                        <td class="p-2">{{ item.description }}</td>
                     </tr>
                 </tbody>
             </table>

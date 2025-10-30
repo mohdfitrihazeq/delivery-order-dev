@@ -82,7 +82,6 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         try {
             const response = await requestOrderService.getRequestOrderById(id);
             if (!response?.data) return null;
-
             const o = response.data;
             const parsedAttachments = o.Attachment ? JSON.parse(o.Attachment) : [];
 
@@ -109,7 +108,8 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 terms: o.Terms ?? 'Net 30',
                 refDoc: o.RefDoc ?? 'RQ-001',
                 currency: o.Currency ?? 'MYR',
-                attachments: parsedAttachments
+                attachments: parsedAttachments,
+                budgetType: o.PrType === 'Budgeted' ? 'Budget' : 'NonBudget'
             };
 
             selectedOrder.value = order;
