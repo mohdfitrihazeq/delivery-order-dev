@@ -14,6 +14,8 @@ import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, PropType, ref, watch } from 'vue';
+import { formatDateToAPI } from '@/utils/dateHelper';
+
 export default defineComponent({
     name: 'EditRo',
     components: { Dialog, Button, InputText, InputNumber, DataTable, Column, FileUpload, ProgressBar, Menu },
@@ -81,13 +83,6 @@ export default defineComponent({
             return isNaN(d.getTime()) ? null : d;
         }
 
-        function formatDate(date: string | Date | null): string {
-            if (!date) return '';
-            const dateObj = typeof date === 'string' ? new Date(date) : date;
-            if (isNaN(dateObj.getTime())) return '';
-            return dateObj.toISOString().split('T')[0];
-        }
-
         watch(
             () => props.order,
             (newOrder) => {
@@ -99,8 +94,8 @@ export default defineComponent({
                 editForm.value = {
                     roNumber: newOrder.roNumber,
                     requestedBy: newOrder.requestedBy,
-                    roDate: newOrder.roDate ? new Date(newOrder.roDate) : null,
-                    deliveryDate: newOrder.deliveryDate ? new Date(newOrder.deliveryDate) : null,
+                    roDate: newOrder.roDate ? newOrder.roDate : null,
+                    deliveryDate: newOrder.deliveryDate ? newOrder.deliveryDate : null,
                     totalAmount: Number(newOrder.totalAmount),
                     budgetType: newOrder.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
                     remark: newOrder.remark || '',
@@ -113,7 +108,7 @@ export default defineComponent({
                         description: item.Description || item.description || '',
                         uom: item.Unit || item.uom || '',
                         qty: Number(item.Quantity ?? item.qty ?? 0),
-                        deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : item.deliveryDate ? new Date(item.deliveryDate) : null,
+                        deliveryDate: item.DeliveryDate ? item.DeliveryDate : item.deliveryDate ? item.deliveryDate : null,
                         notes: item.Notes ?? item.notes ?? item.note ?? '',
                         remark: item.Remark ?? item.remark ?? '',
                         budgetItemId: item.BudgetItemId ?? item.budgetItemId ?? null,
@@ -128,12 +123,6 @@ export default defineComponent({
         });
         async function handleSave(): Promise<void> {
             if (!props.order) return;
-
-            const formatDateToAPI = (date: Date | string | null | undefined): string => {
-                if (!date) return new Date().toISOString().split('T')[0];
-                const d = date instanceof Date ? date : new Date(date);
-                return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
-            };
 
             const existingAttachments = editForm.value.existingAttachments || [];
             const filesToUpload: File[] = Array.isArray(newAttachments.value) ? [...newAttachments.value] : [];
@@ -312,7 +301,6 @@ export default defineComponent({
             useRequestOrderStore,
             loading,
             previewAttachment,
-            formatDate,
             getAttachmentName,
             getAttachmentUrl,
             onRemoveTemplatingFile,

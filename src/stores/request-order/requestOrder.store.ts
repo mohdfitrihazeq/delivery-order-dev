@@ -3,6 +3,7 @@ import type { Order } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
+import { formatDate, formatDateTime } from '@/utils/dateHelper';
 
 export const useRequestOrderStore = defineStore('requestOrder', () => {
     const orders = ref<Order[]>([]);
@@ -45,18 +46,18 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                     id: output.Id,
                     roNumber: output.DocNo,
                     requestedBy: output.CreatedBy,
-                    roDate: output.RequestOrderDate,
-                    deliveryDate: output.RequestOrderItems?.[0]?.DeliveryDate || '',
+                    roDate: formatDate(output.RequestOrderDate),
+                    deliveryDate: formatDate(output.RequestOrderItems?.[0]?.DeliveryDate || ''),
                     totalAmount: output.TotalAmount,
                     budgetType: output.PrType,
                     status: output.Status,
-                    requestedAt: output.CreatedAt,
+                    requestedAt: formatDateTime(output.CreatedAt),
                     items: (output.RequestOrderItems || []).map((item: any) => ({
                         code: item.BudgetItemId || item.NonBudgetItemId || '',
                         description: item.Description,
                         uom: item.Uom,
                         qty: item.Quantity,
-                        deliveryDate: item.DeliveryDate,
+                        deliveryDate: formatDate(item.DeliveryDate),
                         note: item.Notes
                     }))
                 })
@@ -89,18 +90,15 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 id: o.Id,
                 roNumber: o.DocNo,
                 requestedBy: o.CreatedBy,
-                roDate: o.RequestOrderDate,
-                deliveryDate: o.RequestOrderItems?.[0]?.DeliveryDate || '',
-                totalAmount: o.TotalAmount,
-                budgetType: o.PrType,
-                status: o.Status,
-                requestedAt: o.CreatedAt,
-                items: (o.RequestOrderItems || []).map((item: any) => ({
+                roDate: formatDate(o.RequestOrderDate),
+                deliveryDate: formatDate(o.requestorderitems?.[0]?.DeliveryDate),
+                requestedAt: formatDateTime(o.CreatedAt),
+                items: (o.requestorderitems || o.RequestOrderItems || []).map((item: any) => ({
                     code: item.ItemCode || '',
                     description: item.Description || '',
                     uom: item.Unit || '',
                     qty: Number(item.Quantity),
-                    deliveryDate: item.DeliveryDate || null,
+                    deliveryDate: formatDate(item.DeliveryDate),
                     note: item.Notes || '',
                     remark: item.Remark || '',
                     budgetItemId: item.BudgetItemId ?? null,
