@@ -27,19 +27,16 @@
 
             <!-- Filter Dropdowns -->
             <div class="grid grid-cols-3 gap-4">
-                <!-- Location Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Location</label>
                     <Dropdown v-model="selectedLocation" :options="locationOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
 
-                <!-- Element Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Element</label>
                     <Dropdown v-model="selectedElement" :options="elementOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
 
-                <!-- Item Type Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Item Type</label>
                     <Dropdown v-model="selectedItemType" :options="itemTypeOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
@@ -48,45 +45,32 @@
         </div>
 
         <!-- Results Summary -->
-        <div class="mb-4 text-sm text-gray-600">Showing {{ filteredItems.length }} of {{ budgetItems.length }} items</div>
+        <div class="mb-4 text-sm text-gray-600">Showing {{ filteredItems?.length || 0 }} of {{ allBudgetItems?.length || 0 }} items</div>
 
-        <!-- Items Table -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden mb-4">
-            <DataTable
-                :value="filteredItems"
-                :paginator="filteredItems.length > 5"
-                :rows="5"
-                class="mb-4"
-                emptyMessage="No draft request orders found"
-                v-model:selection="selectedItems"
-                data-key="itemCode"
-                :scrollable="true"
-                scroll-height="400px"
-                :loading="loading"
-            >
-                <Column selection-mode="multiple" style="width: 3rem" />
-                <Column field="itemCode" header="Item Code" style="min-width: 120px" />
-                <Column field="description" header="Description" style="min-width: 250px" />
-                <Column field="location" header="Location" style="min-width: 150px" />
-                <Column field="element" header="Element" style="min-width: 200px" />
-                <Column field="itemType" header="Item Type" style="min-width: 100px">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.itemType" :severity="getItemTypeSeverity(slotProps.data.itemType)" />
-                    </template>
-                </Column>
-                <Column field="uom" header="UOM" style="min-width: 80px" />
-                <Column field="price" header="Price" style="min-width: 120px" class="text-right">
-                    <template #body="slotProps">
-                        {{ slotProps.data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                    </template>
-                </Column>
-                <Column header="Total" style="min-width: 150px" class="text-right">
-                    <template #body="slotProps">
-                        {{ (slotProps.data.price * slotProps.data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
+        <ReusableTable
+            :value="paginatedItems"
+            :columns="columns"
+            :loading="loading"
+            :pagination="pagination"
+            :onPageChange="handlePageChange"
+            :onPageSizeChange="handlePageSizeChange"
+            :selection-mode="'checkbox'"
+            v-model:selection="selectedItems"
+            emptyTitle="No budget items found"
+        >
+            <template #itemTypeSlot="{ data }">
+                <Tag :value="data.itemType" :severity="getItemTypeSeverity(data.itemType)" />
+            </template>
+
+            <template #priceSlot="{ data }">
+                {{ data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
+
+            <template #totalSlot="{ data }">
+                {{ (data.price * data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
+        </ReusableTable>
+
         <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
 
         <!-- Footer -->

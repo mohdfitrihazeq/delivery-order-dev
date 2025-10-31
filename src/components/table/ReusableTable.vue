@@ -7,12 +7,12 @@ import DataTable from 'primevue/datatable';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import ResultNotFound from '@/components/resulNotFound/ResultNotFound.vue';
 import BaseSpinner from '@/components/spinner/BaseSpinner.vue';
 
-type ActionType = 'edit' | 'view' | 'delete' | 'comment';
+type ActionType = 'edit' | 'view' | 'delete' | 'comment' | 'approve' | 'reject';
 
 type FilterOption = {
     type: 'select' | 'text' | 'date';
@@ -52,17 +52,25 @@ const props = defineProps<{
     pagination?: PaginationConfig;
     onPageChange?: (page: number) => void;
     onPageSizeChange?: (pageSize: number) => void;
+    // Checkbox support
+    selectionMode?: 'checkbox' | 'radio' | undefined;
+    selection?: TableRow[];
+}>();
+
+const emit = defineEmits<{
+    'update:selection': [value: TableRow[]];
 }>();
 
 const search = ref('');
 const activeFilters = ref<Record<string, any>>({});
 const hasLoadedOnce = ref(false);
+const selectedRows = ref<TableRow[]>(props.selection || []);
 
 const menu = ref();
 const currentRow = ref<TableRow | null>(null);
 const menuItems = ref<any[]>([]);
 
-const isServerSidePagination = props.pagination !== undefined;
+const isServerSidePagination = computed(() => props.pagination !== undefined);
 
 watch(
     () => props.value,
@@ -72,6 +80,23 @@ watch(
         }
     },
     { immediate: true }
+);
+
+watch(
+    () => props.selection,
+    (val) => {
+        if (val) {
+            selectedRows.value = val;
+        }
+    }
+);
+
+watch(
+    selectedRows,
+    (val) => {
+        emit('update:selection', val);
+    },
+    { deep: true }
 );
 
 function handleSearch() {
@@ -87,9 +112,10 @@ function handleExport() {
     props.onExport?.();
     if (!props.value || props.value.length === 0) return;
 
-    const columns = props.columns.map((c) => c.header);
+    const columns = props.columns.filter((c) => !c.action).map((c) => c.header);
     const rows = props.value.map((row) =>
         props.columns
+            .filter((c) => !c.action)
             .map((c) => {
                 const value = row[c.field!];
                 return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value;
@@ -145,6 +171,16 @@ function getPaginationNumbers(): number[] {
 
     return numbers;
 }
+
+const displayStart = computed(() => {
+    if (!props.pagination) return 0;
+    return (props.pagination.page - 1) * props.pagination.pageSize + 1;
+});
+
+const displayEnd = computed(() => {
+    if (!props.pagination) return 0;
+    return Math.min(props.pagination.page * props.pagination.pageSize, props.pagination.total);
+});
 </script>
 
 <template>
@@ -190,7 +226,10 @@ function getPaginationNumbers(): number[] {
     </div>
 
     <template v-else>
-        <DataTable :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem">
+        <DataTable v-model:selection="selectedRows" :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :selection-mode="props.selectionMode" data-key="itemCode">
+            <!-- Checkbox Column -->
+            <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
+
             <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
@@ -206,14 +245,7 @@ function getPaginationNumbers(): number[] {
 
         <!-- Custom Pagination with Numbered Buttons -->
         <div v-if="isServerSidePagination && props.pagination" class="flex flex-col sm:flex-row items-center mt-4 px-4 py-3 border-t dark:border-gray-700 w-full">
-            <div class="w-full sm:w-1/3 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
-                Showing
-                {{ Math.min((props.pagination.page - 1) * props.pagination.pageSize + 1, props.pagination.total) }}
-                –
-                {{ Math.min(props.pagination.page * props.pagination.pageSize, props.pagination.total) }}
-                of
-                {{ props.pagination.total }}
-            </div>
+            <div class="w-full sm:w-1/3 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">Showing {{ displayStart }} – {{ displayEnd }} of {{ props.pagination.total }}</div>
 
             <div class="w-full sm:w-1/3 flex justify-center items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
                 <Button icon="pi pi-angle-double-left" text :disabled="props.pagination.page === 1" @click="props.onPageChange?.(1)" title="First Page" />
