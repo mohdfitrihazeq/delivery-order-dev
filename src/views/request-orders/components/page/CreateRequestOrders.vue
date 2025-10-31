@@ -25,7 +25,7 @@
 
                     <!-- Budget Type -->
                     <div>
-                        <label for="budgetType" class="block font-medium mb-1"> Budget Type <span class="text-red-600 font-bold">*</span> </label>
+                        <label class="block text-sm text-gray-600 mb-1"> Budget Type <span class="text-red-600 font-bold">*</span> </label>
                         <div class="flex flex-col gap-2">
                             <Select id="budgetType" v-model="budgetType" :options="budgetOptions" optionLabel="label" optionValue="value" placeholder="Select Budget Type" class="w-full" :invalid="showValidation && !budgetType" />
                             <Message v-if="showValidation && !budgetType" severity="error" icon="pi pi-times-circle" text="Budget Type is required">Budget Type is required</Message>

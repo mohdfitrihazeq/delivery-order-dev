@@ -125,8 +125,6 @@ export default defineComponent({
         };
 
         const handleContinue = (draft: DraftRO) => {
-            console.log('Selected draft data:', draft.id);
-
             router.push({
                 path: '/request-orders/create',
                 query: { draftId: draft.id?.toString() ?? '', mode: 'edit-draft' }

@@ -66,9 +66,7 @@ export default defineComponent({
 
                 try {
                     const res = await requestOrderService.getRequestOrderById(draftId);
-                    console.log('Fetch draft response:', res);
                     const draft = res.data;
-                    console.log('Loaded Draft:', draft);
                     if (!draft) return;
 
                     // Basic fields
@@ -78,14 +76,14 @@ export default defineComponent({
                     if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
 
                     // Items
-                    items.value = (draft.RequestOrderItems || []).map((item: any) => ({
+                    items.value = (draft.requestorderitems || draft.RequestOrderItems || []).map((item: any) => ({
                         itemCode: item.ItemCode || '',
                         description: item.Description || '',
                         location: item.Location || '',
-                        uom: item.Uom || '',
+                        uom: item.Uom || item.Unit || '',
                         quantity: item.Quantity?.toString() || '',
-                        price: item.Rate || 0,
-                        deliveryDate: item.DeliveryDate || null,
+                        price: Number(item.Rate ?? 0),
+                        deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : null,
                         notes: item.Notes || '',
                         remark: item.Remark || '',
                         showNotes: false,

@@ -52,67 +52,37 @@
 
         <!-- Items Table -->
         <div class="border border-gray-200 rounded-lg overflow-hidden mb-4">
-            <DataTable :value="filteredItems" v-model:selection="selectedItems" data-key="itemCode" :scrollable="true" scroll-height="400px" class="w-full" :loading="loading">
-                <!-- <template #header>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 border-b">
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="selectAll" :binary="true" @change="toggleSelectAll" />
-                            <span class="font-medium">Select All</span>
-                        </div>
-                    </div>
-                </template> -->
-
+            <DataTable
+                :value="filteredItems"
+                :paginator="filteredItems.length > 5"
+                :rows="5"
+                class="mb-4"
+                emptyMessage="No draft request orders found"
+                v-model:selection="selectedItems"
+                data-key="itemCode"
+                :scrollable="true"
+                scroll-height="400px"
+                :loading="loading"
+            >
                 <Column selection-mode="multiple" style="width: 3rem" />
-
-                <Column field="itemCode" header="Item Code" style="min-width: 120px">
-                    <template #body="slotProps">
-                        <span class="font-medium">{{ slotProps.data.itemCode }}</span>
-                    </template>
-                </Column>
-
-                <Column field="description" header="Description" style="min-width: 250px">
-                    <template #body="slotProps">
-                        <span>{{ slotProps.data.description }}</span>
-                    </template>
-                </Column>
-
-                <Column field="location" header="Location" style="min-width: 150px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.location }}</span>
-                    </template>
-                </Column>
-
-                <Column field="element" header="Element" style="min-width: 200px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.element }}</span>
-                    </template>
-                </Column>
-
+                <Column field="itemCode" header="Item Code" style="min-width: 120px" />
+                <Column field="description" header="Description" style="min-width: 250px" />
+                <Column field="location" header="Location" style="min-width: 150px" />
+                <Column field="element" header="Element" style="min-width: 200px" />
                 <Column field="itemType" header="Item Type" style="min-width: 100px">
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.itemType" :severity="getItemTypeSeverity(slotProps.data.itemType)" />
                     </template>
                 </Column>
-
-                <Column field="uom" header="UOM" style="min-width: 80px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.uom }}</span>
-                    </template>
-                </Column>
-
+                <Column field="uom" header="UOM" style="min-width: 80px" />
                 <Column field="price" header="Price" style="min-width: 120px" class="text-right">
                     <template #body="slotProps">
-                        <span class="font-medium">
-                            {{ slotProps.data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                        </span>
+                        {{ slotProps.data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
                     </template>
                 </Column>
-
                 <Column header="Total" style="min-width: 150px" class="text-right">
                     <template #body="slotProps">
-                        <span class="font-bold">
-                            {{ (slotProps.data.price * slotProps.data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                        </span>
+                        {{ (slotProps.data.price * slotProps.data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
                     </template>
                 </Column>
             </DataTable>
