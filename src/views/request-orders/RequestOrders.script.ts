@@ -114,7 +114,7 @@ export default defineComponent({
         const filteredOrders = computed(() =>
             store.orders.map((order, i) => ({
                 ...order,
-                rowIndex: i + 1
+                rowIndex: (store.pagination.page - 1) * store.pagination.pageSize + i + 1
             }))
         );
 

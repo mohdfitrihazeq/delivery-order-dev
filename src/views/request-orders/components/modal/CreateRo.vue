@@ -27,19 +27,16 @@
 
             <!-- Filter Dropdowns -->
             <div class="grid grid-cols-3 gap-4">
-                <!-- Location Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Location</label>
                     <Dropdown v-model="selectedLocation" :options="locationOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
 
-                <!-- Element Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Element</label>
                     <Dropdown v-model="selectedElement" :options="elementOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
 
-                <!-- Item Type Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Item Type</label>
                     <Dropdown v-model="selectedItemType" :options="itemTypeOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
@@ -48,75 +45,32 @@
         </div>
 
         <!-- Results Summary -->
-        <div class="mb-4 text-sm text-gray-600">Showing {{ filteredItems.length }} of {{ budgetItems.length }} items</div>
+        <div class="mb-4 text-sm text-gray-600">Showing {{ filteredItems?.length || 0 }} of {{ allBudgetItems?.length || 0 }} items</div>
 
-        <!-- Items Table -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden mb-4">
-            <DataTable :value="filteredItems" v-model:selection="selectedItems" data-key="itemCode" :scrollable="true" scroll-height="400px" class="w-full" :loading="loading">
-                <!-- <template #header>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 border-b">
-                        <div class="flex items-center gap-2">
-                            <Checkbox v-model="selectAll" :binary="true" @change="toggleSelectAll" />
-                            <span class="font-medium">Select All</span>
-                        </div>
-                    </div>
-                </template> -->
+        <ReusableTable
+            :value="paginatedItems"
+            :columns="columns"
+            :loading="loading"
+            :pagination="pagination"
+            :onPageChange="handlePageChange"
+            :onPageSizeChange="handlePageSizeChange"
+            :selection-mode="'checkbox'"
+            v-model:selection="selectedItems"
+            emptyTitle="No budget items found"
+        >
+            <template #itemTypeSlot="{ data }">
+                <Tag :value="data.itemType" :severity="getItemTypeSeverity(data.itemType)" />
+            </template>
 
-                <Column selection-mode="multiple" style="width: 3rem" />
+            <template #priceSlot="{ data }">
+                {{ data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
 
-                <Column field="itemCode" header="Item Code" style="min-width: 120px">
-                    <template #body="slotProps">
-                        <span class="font-medium">{{ slotProps.data.itemCode }}</span>
-                    </template>
-                </Column>
+            <template #totalSlot="{ data }">
+                {{ (data.price * data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
+        </ReusableTable>
 
-                <Column field="description" header="Description" style="min-width: 250px">
-                    <template #body="slotProps">
-                        <span>{{ slotProps.data.description }}</span>
-                    </template>
-                </Column>
-
-                <Column field="location" header="Location" style="min-width: 150px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.location }}</span>
-                    </template>
-                </Column>
-
-                <Column field="element" header="Element" style="min-width: 200px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.element }}</span>
-                    </template>
-                </Column>
-
-                <Column field="itemType" header="Item Type" style="min-width: 100px">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.itemType" :severity="getItemTypeSeverity(slotProps.data.itemType)" />
-                    </template>
-                </Column>
-
-                <Column field="uom" header="UOM" style="min-width: 80px">
-                    <template #body="slotProps">
-                        <span class="text-sm">{{ slotProps.data.uom }}</span>
-                    </template>
-                </Column>
-
-                <Column field="price" header="Price" style="min-width: 120px" class="text-right">
-                    <template #body="slotProps">
-                        <span class="font-medium">
-                            {{ slotProps.data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                        </span>
-                    </template>
-                </Column>
-
-                <Column header="Total" style="min-width: 150px" class="text-right">
-                    <template #body="slotProps">
-                        <span class="font-bold">
-                            {{ (slotProps.data.price * slotProps.data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
-                        </span>
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
         <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
 
         <!-- Footer -->

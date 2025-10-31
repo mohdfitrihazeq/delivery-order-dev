@@ -1,46 +1,39 @@
+import { computed, defineComponent, ref, watch } from 'vue';
 import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
-import { computed, defineComponent, ref, watch } from 'vue';
+
+import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import ReusableTable from '@/components/table/ReusableTable.vue';
+import type { TableColumn } from '@/types/table.type';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 
 export default defineComponent({
     name: 'CreateROModal',
     components: {
         Dialog,
-        DataTable,
-        Column,
+        ReusableTable,
         Button,
         InputText,
         Dropdown,
-        Checkbox,
         Tag
     },
     props: {
-        visible: {
-            type: Boolean,
-            default: false
-        }
+        visible: { type: Boolean, default: false },
+        projectId: { type: Number, required: true },
+        version: { type: Number, required: true }
     },
     emits: ['update:visible', 'items-selected'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
         watch(
             () => props.visible,
-            (val) => {
-                localVisible.value = val;
-            }
+            (val) => (localVisible.value = val)
         );
+        watch(localVisible, (val) => emit('update:visible', val));
 
-        // Emit changes to parent
-        watch(localVisible, (val) => {
-            emit('update:visible', val);
-        });
         const modalTitle = ref('Add Bulk Items from Budget');
         const loading = ref(false);
 
@@ -49,104 +42,63 @@ export default defineComponent({
         const selectedElement = ref<string | null>(null);
         const selectedItemType = ref<string | null>(null);
 
+        // Selection
         const selectedItems = ref<BudgetItem[]>([]);
-        const selectAll = ref(false);
 
-        const budgetItems = ref<BudgetItem[]>([
-            {
-                itemCode: 'STL-001',
-                description: 'Steel reinforcement bars Grade 60',
-                location: 'Building A > Level 1-5',
-                element: 'Structure > Foundation > Reinforcement',
-                itemType: 'Materials',
-                uom: 'kg',
-                quantity: 2500,
-                price: 5.5
-            },
-            {
-                itemCode: 'CON-002',
-                description: 'Ready mix concrete C25/30',
-                location: 'Building A > Level 1-3',
-                element: 'Structure > Foundation > Concrete',
-                itemType: 'Materials',
-                uom: 'm³',
-                quantity: 180,
-                price: 250
-            },
-            {
-                itemCode: 'LAB-001',
-                description: 'Excavation work including disposal',
-                location: 'Building A > Site Area',
-                element: 'Earthworks > Excavation > Manual',
-                itemType: 'Labour',
-                uom: 'm³',
-                quantity: 450,
-                price: 40
-            },
-            {
-                itemCode: 'STL-002',
-                description: 'Structural steel beams H-section',
-                location: 'Building A > Level 6-10',
-                element: 'Structure > Columns > Steel Beams',
-                itemType: 'Materials',
-                uom: 'kg',
-                quantity: 1800,
-                price: 6
-            },
-            {
-                itemCode: 'EQP-001',
-                description: 'Tower crane rental monthly',
-                location: 'Building A > All Levels',
-                element: 'Equipment > Lifting > Tower Crane',
-                itemType: 'Equipment',
-                uom: 'month',
-                quantity: 12,
-                price: 15000
-            },
-            {
-                itemCode: 'INS-001',
-                description: 'Electrical panel installation',
-                location: 'Building B > Level 1-8',
-                element: 'Infrastructure > Electrical > Panel',
-                itemType: 'Installation',
-                uom: 'unit',
-                quantity: 24,
-                price: 1200
+        // Budget store
+        const budgetStore = useBudgetStore();
+
+        const pagination = ref({
+            page: 1,
+            pageSize: 10,
+            total: 0,
+            totalPages: 0
+        });
+
+        const fetchBudgetItems = async () => {
+            loading.value = true;
+            try {
+                await budgetStore.fetchBudgets(props.projectId, props.version);
+                // Update pagination with total count
+                const allItems = budgetStore.budgets.flatMap((b) => b.items);
+                pagination.value.total = allItems.length;
+                pagination.value.totalPages = Math.ceil(allItems.length / pagination.value.pageSize) || 1;
+            } catch (error) {
+                console.error('Error loading budget items:', error);
+            } finally {
+                loading.value = false;
             }
-        ]);
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0));
+        };
 
-        const locationOptions = computed<FilterOption[]>(() => {
-            const locations = [...new Set(budgetItems.value.map((item) => item.location))];
-            return locations.map((location) => ({ label: location, value: location }));
-        });
+        // All budget items from store
+        const allBudgetItems = computed(() =>
+            budgetStore.budgets.flatMap((b) =>
+                b.items.map((item: any) => ({
+                    itemCode: item.ItemCode,
+                    description: item.Description,
+                    location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
+                    element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
+                    itemType: item.ItemType,
+                    uom: item.Unit,
+                    quantity: Number(item.Quantity) || 0,
+                    price: Number(item.Rate) || 0
+                }))
+            )
+        );
 
-        const elementOptions = computed<FilterOption[]>(() => {
-            const elements = [...new Set(budgetItems.value.map((item) => item.element))];
-            return elements.map((element) => ({ label: element, value: element }));
-        });
-
-        const itemTypeOptions = computed<FilterOption[]>(() => {
-            const types = [...new Set(budgetItems.value.map((item) => item.itemType))];
-            return types.map((type) => ({ label: type, value: type }));
-        });
-
-        const filteredItems = computed<BudgetItem[]>(() => {
-            let items = [...budgetItems.value];
+        const filteredItems = computed(() => {
+            let items = [...allBudgetItems.value];
 
             if (searchTerm.value) {
                 const search = searchTerm.value.toLowerCase();
                 items = items.filter((item) => item.itemCode.toLowerCase().includes(search) || item.description.toLowerCase().includes(search));
             }
-
             if (selectedLocation.value) {
                 items = items.filter((item) => item.location === selectedLocation.value);
             }
-
             if (selectedElement.value) {
                 items = items.filter((item) => item.element === selectedElement.value);
             }
-
             if (selectedItemType.value) {
                 items = items.filter((item) => item.itemType === selectedItemType.value);
             }
@@ -154,25 +106,54 @@ export default defineComponent({
             return items;
         });
 
-        const hasActiveFilters = computed(() => {
-            return !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value);
+        // Apply pagination to filtered items
+        const paginatedItems = computed(() => {
+            const start = (pagination.value.page - 1) * pagination.value.pageSize;
+            const end = start + pagination.value.pageSize;
+            return filteredItems.value.slice(start, end).map((item, index) => ({
+                ...item,
+                rowIndex: start + index + 1
+            }));
         });
 
+        // Update pagination when filters change
         watch(
-            selectedItems,
-            (newSelection) => {
-                selectAll.value = newSelection.length === filteredItems.value.length && filteredItems.value.length > 0;
+            filteredItems,
+            (items) => {
+                pagination.value.total = items.length;
+                pagination.value.totalPages = Math.ceil(items.length / pagination.value.pageSize) || 1;
+                // Reset to page 1 if current page exceeds totalPages
+                if (pagination.value.page > pagination.value.totalPages) {
+                    pagination.value.page = 1;
+                }
             },
-            { deep: true }
+            { immediate: true }
         );
 
-        watch(filteredItems, (newFiltered) => {
-            if (newFiltered.length === 0) {
-                selectAll.value = false;
-            } else {
-                selectAll.value = selectedItems.value.length === newFiltered.length;
-            }
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
+
+        const locationOptions = computed<FilterOption[]>(() => {
+            const locations = [...new Set(allBudgetItems.value.map((item) => item.location))];
+            return locations.map((loc) => ({ label: loc, value: loc }));
         });
+
+        const elementOptions = computed<FilterOption[]>(() => {
+            const elements = [...new Set(allBudgetItems.value.map((item) => item.element))];
+            return elements.map((el) => ({ label: el, value: el }));
+        });
+
+        const itemTypeOptions = computed<FilterOption[]>(() => {
+            const types = [...new Set(allBudgetItems.value.map((item) => item.itemType))];
+            return types.map((type) => ({ label: type, value: type }));
+        });
+
+        const filterOptions = computed(() => [
+            { type: 'select' as const, field: 'location', placeholder: 'Filter by Location', options: locationOptions.value },
+            { type: 'select' as const, field: 'element', placeholder: 'Filter by Element', options: elementOptions.value },
+            { type: 'select' as const, field: 'itemType', placeholder: 'Filter by Item Type', options: itemTypeOptions.value }
+        ]);
+
+        const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value));
 
         const closeModal = () => {
             emit('update:visible', false);
@@ -181,7 +162,6 @@ export default defineComponent({
 
         const resetModal = () => {
             selectedItems.value = [];
-            selectAll.value = false;
             clearFilters();
         };
 
@@ -190,14 +170,7 @@ export default defineComponent({
             selectedLocation.value = null;
             selectedElement.value = null;
             selectedItemType.value = null;
-        };
-
-        const toggleSelectAll = () => {
-            if (selectAll.value) {
-                selectedItems.value = [...filteredItems.value];
-            } else {
-                selectedItems.value = [];
-            }
+            pagination.value.page = 1;
         };
 
         const addSelectedItems = () => {
@@ -217,46 +190,75 @@ export default defineComponent({
             return severityMap[itemType] || 'info';
         };
 
-        const loadBudgetItems = async () => {
-            loading.value = true;
-            try {
-                await new Promise((resolve) => setTimeout(resolve, 500));
-            } catch (error) {
-                console.error('Error loading budget items:', error);
-            } finally {
-                loading.value = false;
+        watch(localVisible, (visible) => {
+            if (visible) {
+                fetchBudgetItems();
             }
+        });
+
+        const handlePageChange = (page: number) => {
+            pagination.value.page = page;
         };
 
-        loadBudgetItems();
+        const handlePageSizeChange = (pageSize: number) => {
+            pagination.value.pageSize = pageSize;
+            pagination.value.page = 1; // Reset to page 1 when changing page size
+        };
+
+        const handleSearch = (value: string) => {
+            searchTerm.value = value;
+            pagination.value.page = 1;
+        };
+
+        const handleFilterChange = (filters: Record<string, any>) => {
+            selectedLocation.value = filters.location || null;
+            selectedElement.value = filters.element || null;
+            selectedItemType.value = filters.itemType || null;
+            pagination.value.page = 1;
+        };
+
+        // Define ReusableTable columns
+        const columns: TableColumn[] = [
+            { field: 'rowIndex', header: '#', sortable: false },
+            { field: 'itemCode', header: 'Item Code', sortable: true },
+            { field: 'description', header: 'Description', sortable: true },
+            { field: 'location', header: 'Location', sortable: false },
+            { field: 'element', header: 'Element', sortable: false },
+            { field: 'itemType', header: 'Item Type', sortable: true, bodySlot: 'itemTypeSlot' },
+            { field: 'uom', header: 'UOM', sortable: false },
+            { field: 'quantity', header: 'Quantity', sortable: true },
+            { field: 'price', header: 'Price', sortable: true, bodySlot: 'priceSlot' },
+            { field: 'total', header: 'Total', bodySlot: 'totalSlot' }
+        ];
 
         return {
-            // Data
             modalTitle,
             loading,
-            searchTerm,
-            selectedLocation,
-            selectedElement,
-            selectedItemType,
-            selectedItems,
-            selectAll,
-            budgetItems,
             localVisible,
-            grandTotal,
-
-            // Computed
+            paginatedItems,
+            filteredItems,
+            selectedItems,
+            allBudgetItems,
             locationOptions,
             elementOptions,
             itemTypeOptions,
-            filteredItems,
+            pagination,
+            filterOptions,
+            grandTotal,
             hasActiveFilters,
-
-            // Methods
             closeModal,
             clearFilters,
-            toggleSelectAll,
             addSelectedItems,
-            getItemTypeSeverity
+            getItemTypeSeverity,
+            handlePageChange,
+            handlePageSizeChange,
+            handleSearch,
+            handleFilterChange,
+            columns,
+            searchTerm,
+            selectedLocation,
+            selectedElement,
+            selectedItemType
         };
     }
 });
