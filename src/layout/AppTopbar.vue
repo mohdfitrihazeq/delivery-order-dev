@@ -184,25 +184,50 @@ onMounted(() => {
         </div>
 
         <!-- Right: profile -->
-        <div class="layout-topbar-actions flex items-center gap-3">
-            <div class="layout-topbar-menu hidden lg:flex items-center gap-4">
-                <div class="relative">
-                    <Button class="p-button-text p-button-plain p-button-sm flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 transition" @click="toggleProfileMenu">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-7 h-7 rounded-full object-cover" /><span class="font-medium">{{ username || 'PM User' }}</span>
-                    </Button>
-
-                    <Menu ref="profileMenuRef" :model="profileMenu" popup class="w-40">
-                        <template #item="{ item }">
-                            <div class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                                <i :class="item.icon" class="text-gray-600 dark:text-gray-200"></i>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-100">{{ item.label }}</span>
-                            </div>
-                        </template>
-                    </Menu>
-
-                    <Toast />
-                </div>
+        <div class="layout-topbar-actions flex items-center gap-3 relative">
+            <!-- Desktop: show avatar + username -->
+            <div class="hidden lg:flex items-center gap-2">
+                <Button class="p-button-text p-button-plain p-button-sm flex items-center gap-2 text-gray-700 dark:text-gray-200 hover:text-blue-500 transition" @click="toggleProfileMenu">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-7 h-7 rounded-full object-cover" />
+                    <span class="font-medium">{{ username || 'PM User' }}</span>
+                </Button>
             </div>
+
+            <!-- Mobile: show 3 dots -->
+            <div class="flex lg:hidden items-center relative">
+                <Button ref="mobileProfileButtonRef" icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-sm text-gray-700 dark:text-gray-200 hover:text-blue-500" @click="toggleProfileMenu" />
+            </div>
+
+            <!-- Shared dropdown menu -->
+            <Menu ref="profileMenuRef" :model="profileMenu" popup class="w-56 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900" :append-to="mobileProfileButtonRef">
+                <!-- Profile header only on mobile -->
+                <template #start>
+                    <div class="lg:hidden flex items-center gap-3 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar" class="w-8 h-8 rounded-full object-cover" />
+                        <span class="font-semibold text-gray-800 dark:text-gray-100">
+                            {{ username || 'PM User' }}
+                        </span>
+                    </div>
+                </template>
+
+                <template #item="{ item }">
+                    <Motion
+                        tag="div"
+                        class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                        :initial="{ opacity: 0, y: -5 }"
+                        :animate="{ opacity: 1, y: 0 }"
+                        :transition="{ duration: 0.2, ease: 'easeOut' }"
+                        @click="item.command && item.command($event)"
+                    >
+                        <i :class="item.icon" class="text-gray-600 dark:text-gray-200"></i>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-100">
+                            {{ item.label }}
+                        </span>
+                    </Motion>
+                </template>
+            </Menu>
+
+            <Toast />
         </div>
 
         <!-- Project Dialog -->
