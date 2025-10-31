@@ -41,9 +41,9 @@
                                 :onPageSizeChange="handlePageSizeChange"
                                 emptyTitle="No request orders found"
                             >
-                                <!-- Numbering Slot -->
-                                <template #no="{ index }">
-                                    {{ index + 1 }}
+                                <!-- Numbering Slot - Use rowIndex instead of index -->
+                                <template #rowIndex="{ data }">
+                                    {{ data.rowIndex }}
                                 </template>
 
                                 <!-- Status Badge Slot -->
