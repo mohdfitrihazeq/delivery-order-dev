@@ -213,4 +213,5 @@
         <CreateROModal v-model:visible="showBulkItemModal" @items-selected="handleSelectedItems" />
         <PreviewRo v-model:visible="showPreviewModal" :summaryData="previewSummary" @submit="submitRequestOrder" />
     </Motion>
+    <ConfirmDialog />
 </template>
