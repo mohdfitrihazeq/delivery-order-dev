@@ -214,7 +214,7 @@ onMounted(() => {
                     <Motion
                         tag="div"
                         class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                        :initial="{ opacity: 0, y: -5 }"
+                        :initial="{ opacity: 0, y: 1 }"
                         :animate="{ opacity: 1, y: 0 }"
                         :transition="{ duration: 0.2, ease: 'easeOut' }"
                         @click="item.command && item.command($event)"
