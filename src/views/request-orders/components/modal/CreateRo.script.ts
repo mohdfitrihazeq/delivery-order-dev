@@ -75,6 +75,7 @@ export default defineComponent({
             budgetStore.budgets.flatMap((b) =>
                 b.items.map((item: any) => ({
                     itemCode: item.ItemCode,
+                    itemType: item.ItemType,
                     description: item.Description,
                     location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
                     element: `${item.Category} > ${item.Element} > ${item.SubElement}`,

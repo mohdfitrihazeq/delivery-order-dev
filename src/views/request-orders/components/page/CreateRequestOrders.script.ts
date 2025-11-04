@@ -303,6 +303,7 @@ export default defineComponent({
         const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
             const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
                 itemCode: budgetItem.itemCode,
+                itemType: budgetItem.itemType,
                 description: budgetItem.description,
                 location: budgetItem.location,
                 uom: budgetItem.uom,
@@ -408,29 +409,33 @@ export default defineComponent({
             return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
         });
 
-        const previewSummary = computed<PreviewSummary>(() => ({
-            totalItems: items.value.length,
-            totalAmount: grandTotal.value,
-            budgetType: budgetType.value,
-            project: getCurrentProjectName() || '',
-            roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
-            roNumber: roNumber.value,
-            requestedBy: getCurrentUsername() || 'Unknown User',
-            items: items.value.map((item) => ({
-                itemCode: item.itemCode,
-                itemType: 'CO',
-                description: item.description,
-                uom: item.uom,
-                quantity: item.quantity,
-                price: item.price,
-                deliveryDate: item.deliveryDate,
-                location: item.location,
-                notes: item.notes,
-                remark: item.remark
-            })),
-            overallRemark: overallRemark.value,
-            attachmentsCount: attachments.value.length
-        }));
+        const previewSummary = computed<PreviewSummary>(() => {
+            const data = {
+                totalItems: items.value.length,
+                totalAmount: grandTotal.value,
+                budgetType: budgetType.value,
+                project: getCurrentProjectName() || '',
+                roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+                roNumber: roNumber.value,
+                requestedBy: getCurrentUsername() || 'Unknown User',
+                items: items.value.map((item) => ({
+                    itemCode: item.itemCode,
+                    itemType: item.itemType || '',
+                    description: item.description,
+                    uom: item.uom,
+                    quantity: item.quantity,
+                    price: item.price,
+                    deliveryDate: item.deliveryDate,
+                    location: item.location,
+                    notes: item.notes,
+                    remark: item.remark
+                })),
+                overallRemark: overallRemark.value,
+                attachmentsCount: attachments.value.length
+            };
+
+            return data;
+        });
 
         function openPreviewModal() {
             if (!canSubmit.value) {
@@ -458,6 +463,7 @@ export default defineComponent({
                 });
                 return;
             }
+
             showValidation.value = false;
             showPreviewModal.value = true;
         }
@@ -484,7 +490,7 @@ export default defineComponent({
                         Description: item.description,
                         Uom: item.uom,
                         ItemCode: item.itemCode,
-                        ItemType: item.itemType || 'CO',
+                        ItemType: item.itemType,
                         Quantity: parseFloat(item.quantity) || 0,
                         Rate: item.price || 0,
                         DeliveryDate: formatDateToAPI(item.deliveryDate)

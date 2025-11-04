@@ -1,5 +1,6 @@
 export interface Item {
     itemCode: string;
+    itemType: string;
     description: string;
     location: string;
     uom: string;
@@ -80,6 +81,7 @@ export interface Order {
         Remark?: string | null;
         DeliveryDate: string | Date | null;
         ItemCode: string;
+        ItemType: string;
     }>;
     debtorId?: number;
     remark?: string;
@@ -132,6 +134,9 @@ export interface CreateRequestOrderPayload {
         Description: string;
         Uom: string;
         Quantity: number;
+        OrgBgtQty: number;
+        BgtBalQty: number;
+        TOtalPOQty: number;
         Rate?: number;
         Notes: string;
         Reason: string;

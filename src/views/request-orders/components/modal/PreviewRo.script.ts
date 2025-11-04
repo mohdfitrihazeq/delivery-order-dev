@@ -27,7 +27,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
 
-        // Sync prop changes from parent
+        // Sync prop changes from parent, for modal visibility
         watch(
             () => props.visible,
             (newVal) => {
