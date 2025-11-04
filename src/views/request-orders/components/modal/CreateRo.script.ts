@@ -79,7 +79,6 @@ export default defineComponent({
                     description: item.Description,
                     location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
                     element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
-                    itemType: item.ItemType,
                     uom: item.Unit,
                     quantity: Number(item.Quantity) || 0,
                     price: Number(item.Rate) || 0

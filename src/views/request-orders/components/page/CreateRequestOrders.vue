@@ -16,10 +16,10 @@
                 <div class="grid grid-cols-3 gap-4">
                     <!-- RO Number -->
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1"> RO Number <span class="text-red-600 font-bold">*</span> </label>
+                        <label class="block text-sm text-gray-600 mb-1">RO Number <span class="text-red-600 font-bold">*</span></label>
                         <div class="flex flex-col gap-2">
                             <InputText v-model="roNumber" type="text" class="w-full" :invalid="showValidation && !roNumber.trim()" placeholder="Enter RO Number" />
-                            <Message v-if="showValidation && !roNumber.trim()" severity="error" icon="pi pi-times-circle" text="RO Number is required">RO Number is required</Message>
+                            <Message v-if="showValidation && !roNumber.trim()" severity="error" icon="pi pi-times-circle" text="RO Number is required"> RO Number is required </Message>
                         </div>
                     </div>
 
@@ -38,6 +38,14 @@
                         <div class="flex flex-col gap-2">
                             <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue" :invalid="showValidation && !calendarValue" placeholder="Select Date"></DatePicker>
                             <Message v-if="showValidation && !calendarValue" severity="error" icon="pi pi-times-circle" text="RO Date is required">RO Date is required</Message>
+                        </div>
+                    </div>
+                    <!-- Subcon AutoComplete for Unbudgeted Items -->
+                    <div v-if="budgetType === 'Unbudgeted Item'">
+                        <label class="block text-sm text-gray-600 mb-1"> Subcon <span class="text-red-600 font-bold">*</span> </label>
+                        <div class="flex flex-col gap-2">
+                            <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" @complete="handleSubconSearch" />
+                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle" text="Subcon is required for Unbudgeted Items"> Subcon is required for Unbudgeted Items </Message>
                         </div>
                     </div>
                 </div>
