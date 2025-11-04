@@ -47,7 +47,7 @@
 
                 <Column field="itemType" header="Item Type" style="min-width: 100px">
                     <template #body="{ data }">
-                        <span>{{ data.itemType || 'CO' }}</span>
+                        <span>{{ data.itemType }}</span>
                     </template>
                 </Column>
 

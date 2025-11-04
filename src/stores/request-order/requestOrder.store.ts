@@ -94,6 +94,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 requestedAt: formatDateTime(o.CreatedAt),
                 items: (o.requestorderitems || o.RequestOrderItems || []).map((item: any) => ({
                     code: item.ItemCode || '',
+                    itemType: item.ItemType || '',
                     description: item.Description || '',
                     uom: item.Unit || '',
                     qty: Number(item.Quantity),

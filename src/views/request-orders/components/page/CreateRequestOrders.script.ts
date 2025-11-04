@@ -6,13 +6,15 @@ import FileUpload from 'primevue/fileupload';
 import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
-import { ComponentPublicInstance, computed, defineComponent, onMounted, ref } from 'vue';
+import { ComponentPublicInstance, computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
 import { getCurrentUsername, getCurrentProjectName, getCurrentProjectId } from '@/utils/contextHelper';
+import { useConfirm } from 'primevue/useconfirm';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -58,6 +60,8 @@ export default defineComponent({
         const existingAttachments = ref<AttachmentItem[]>([]);
         const isAttachmentValid = ref(true);
         const showValidation = ref(false);
+        const confirm = useConfirm();
+        const budgetSwitching = ref(false);
 
         // Load draft data if coming from draft modal
         onMounted(async () => {
@@ -117,6 +121,90 @@ export default defineComponent({
                 }
             }
         });
+
+        watch(budgetType, (newType, oldType) => {
+            if (budgetSwitching.value || newType === oldType) return;
+
+            if (items.value.length === 0 && attachments.value.length === 0 && !overallRemark.value.trim()) {
+                resetFormForType(newType);
+                return;
+            }
+
+            budgetSwitching.value = true; // prevent re-triggering
+
+            confirm.require({
+                message: `Switching from "${oldType}" to "${newType}" will clear all filled data to avoid conflicts. Continue?`,
+                header: 'Confirm Type Change',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Yes, Reset',
+                rejectLabel: 'Cancel',
+                acceptClass: 'p-button-danger',
+                rejectClass: 'p-button-text',
+                accept: () => {
+                    confirm.close();
+                    resetFormForType(newType);
+                    toast.add({
+                        severity: 'info',
+                        summary: 'Form Reset',
+                        detail: `Form refreshed for ${newType}.`,
+                        life: 2500
+                    });
+                    budgetSwitching.value = false;
+                },
+                reject: () => {
+                    confirm.close();
+                    budgetSwitching.value = true;
+                    budgetType.value = oldType;
+                    setTimeout(() => {
+                        budgetSwitching.value = false;
+                    });
+                }
+            });
+        });
+
+        function resetFormForType(type: string) {
+            items.value = [];
+            attachments.value = [];
+            newAttachments.value = [];
+            existingAttachments.value = [];
+            overallRemark.value = '';
+
+            if (type === 'Budgeted Item') {
+                itemOptions.value = [
+                    {
+                        label: 'STL-01',
+                        value: 'STL-01',
+                        description: 'Steel reinforcement bar 60mm',
+                        location: 'Building A > Level 1-5',
+                        uom: 'Ton'
+                    },
+                    {
+                        label: 'CEM-02',
+                        value: 'CEM-02',
+                        description: 'Cement Portland Type I',
+                        location: 'Building B > Level 1-8',
+                        uom: 'Bag'
+                    }
+                ];
+            } else {
+                itemOptions.value = [
+                    {
+                        label: 'GEN-01',
+                        value: 'GEN-01',
+                        description: 'General unbudgeted material',
+                        location: '-',
+                        uom: 'Unit'
+                    },
+                    {
+                        label: 'OTH-02',
+                        value: 'OTH-02',
+                        description: 'Miscellaneous unbudgeted item',
+                        location: '-',
+                        uom: 'Unit'
+                    }
+                ];
+            }
+        }
 
         const onRemoveTemplatingFile = (file: File, removeFileCallback: (index: number) => void, index: number) => {
             removeFileCallback(index);
@@ -215,6 +303,7 @@ export default defineComponent({
         const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
             const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
                 itemCode: budgetItem.itemCode,
+                itemType: budgetItem.itemType,
                 description: budgetItem.description,
                 location: budgetItem.location,
                 uom: budgetItem.uom,
@@ -320,29 +409,33 @@ export default defineComponent({
             return hasItems && hasRoNumber && hasRoDate && hasBudgetType;
         });
 
-        const previewSummary = computed<PreviewSummary>(() => ({
-            totalItems: items.value.length,
-            totalAmount: grandTotal.value,
-            budgetType: budgetType.value,
-            project: getCurrentProjectName() || '',
-            roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
-            roNumber: roNumber.value,
-            requestedBy: getCurrentUsername() || 'Unknown User',
-            items: items.value.map((item) => ({
-                itemCode: item.itemCode,
-                itemType: 'CO',
-                description: item.description,
-                uom: item.uom,
-                quantity: item.quantity,
-                price: item.price,
-                deliveryDate: item.deliveryDate,
-                location: item.location,
-                notes: item.notes,
-                remark: item.remark
-            })),
-            overallRemark: overallRemark.value,
-            attachmentsCount: attachments.value.length
-        }));
+        const previewSummary = computed<PreviewSummary>(() => {
+            const data = {
+                totalItems: items.value.length,
+                totalAmount: grandTotal.value,
+                budgetType: budgetType.value,
+                project: getCurrentProjectName() || '',
+                roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+                roNumber: roNumber.value,
+                requestedBy: getCurrentUsername() || 'Unknown User',
+                items: items.value.map((item) => ({
+                    itemCode: item.itemCode,
+                    itemType: item.itemType || '',
+                    description: item.description,
+                    uom: item.uom,
+                    quantity: item.quantity,
+                    price: item.price,
+                    deliveryDate: item.deliveryDate,
+                    location: item.location,
+                    notes: item.notes,
+                    remark: item.remark
+                })),
+                overallRemark: overallRemark.value,
+                attachmentsCount: attachments.value.length
+            };
+
+            return data;
+        });
 
         function openPreviewModal() {
             if (!canSubmit.value) {
@@ -370,6 +463,7 @@ export default defineComponent({
                 });
                 return;
             }
+
             showValidation.value = false;
             showPreviewModal.value = true;
         }
@@ -396,7 +490,7 @@ export default defineComponent({
                         Description: item.description,
                         Uom: item.uom,
                         ItemCode: item.itemCode,
-                        ItemType: item.itemType || 'CO',
+                        ItemType: item.itemType,
                         Quantity: parseFloat(item.quantity) || 0,
                         Rate: item.price || 0,
                         DeliveryDate: formatDateToAPI(item.deliveryDate)

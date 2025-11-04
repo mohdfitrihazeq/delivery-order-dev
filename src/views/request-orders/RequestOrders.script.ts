@@ -58,6 +58,7 @@ export default defineComponent({
             }
         }
         const isPurchasingRole = userRole.toLowerCase() === 'purchasing';
+        const isPmPdRole = userRole.toLowerCase() === 'pm' || userRole.toLowerCase() === 'pd';
         // const activeTab = ref(isPurchasingRole ? 'all' : 'all');
         const activeTab = ref('all');
 
@@ -120,8 +121,16 @@ export default defineComponent({
 
         // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            const baseActions = ['view', 'edit'];
-            const actions = isPurchasingRole ? [...baseActions, 'approve', 'reject', 'delete'] : baseActions;
+            const baseActions = ['view'];
+            let actions = [...baseActions];
+
+            if (isPurchasingRole) {
+                actions = [...actions, 'approve', 'reject', 'delete'];
+            }
+
+            if (isPmPdRole) {
+                actions = [...actions, 'edit'];
+            }
 
             return [
                 { field: 'rowIndex', header: '#', sortable: true },
@@ -378,6 +387,7 @@ export default defineComponent({
             approvedCount,
             totalValue,
             isPurchasingRole,
+            isPmPdRole,
             showDetailsModal,
             showEditModal,
             selectedOrder,
