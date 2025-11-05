@@ -1,4 +1,4 @@
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch, onMounted } from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
@@ -55,14 +55,17 @@ export default defineComponent({
             totalPages: 0
         });
 
+        onMounted(() => {
+            budgetStore.fetchBudgets();
+            budgetStore.fetchBudgetItems();
+        });
+
         const fetchBudgetItems = async () => {
             loading.value = true;
             try {
-                await budgetStore.fetchBudgets(props.projectId, props.version);
-                // Update pagination with total count
-                const allItems = budgetStore.budgets.flatMap((b) => b.items);
-                pagination.value.total = allItems.length;
-                pagination.value.totalPages = Math.ceil(allItems.length / pagination.value.pageSize) || 1;
+                await budgetStore.fetchBudgetItems(pagination.value.page, pagination.value.pageSize);
+                pagination.value.total = budgetStore.pagination.total;
+                pagination.value.totalPages = budgetStore.pagination.totalPages;
             } catch (error) {
                 console.error('Error loading budget items:', error);
             } finally {
@@ -71,20 +74,7 @@ export default defineComponent({
         };
 
         // All budget items from store
-        const allBudgetItems = computed(() =>
-            budgetStore.budgets.flatMap((b) =>
-                b.items.map((item: any) => ({
-                    itemCode: item.ItemCode,
-                    itemType: item.ItemType,
-                    description: item.Description,
-                    location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
-                    element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
-                    uom: item.Unit,
-                    quantity: Number(item.Quantity) || 0,
-                    price: Number(item.Rate) || 0
-                }))
-            )
-        );
+        const allBudgetItems = computed(() => budgetStore.budgetItems);
 
         const filteredItems = computed(() => {
             let items = [...allBudgetItems.value];
@@ -108,27 +98,17 @@ export default defineComponent({
 
         // Apply pagination to filtered items
         const paginatedItems = computed(() => {
-            const start = (pagination.value.page - 1) * pagination.value.pageSize;
-            const end = start + pagination.value.pageSize;
-            return filteredItems.value.slice(start, end).map((item, index) => ({
+            return allBudgetItems.value.map((item, index) => ({
                 ...item,
-                rowIndex: start + index + 1
+                rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
             }));
         });
 
         // Update pagination when filters change
-        watch(
-            filteredItems,
-            (items) => {
-                pagination.value.total = items.length;
-                pagination.value.totalPages = Math.ceil(items.length / pagination.value.pageSize) || 1;
-                // Reset to page 1 if current page exceeds totalPages
-                if (pagination.value.page > pagination.value.totalPages) {
-                    pagination.value.page = 1;
-                }
-            },
-            { immediate: true }
-        );
+        watch([searchTerm, selectedLocation, selectedElement, selectedItemType], () => {
+            // Optionally reset page to 1 for local filters
+            pagination.value.page = 1;
+        });
 
         const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
 
@@ -196,13 +176,15 @@ export default defineComponent({
             }
         });
 
-        const handlePageChange = (page: number) => {
+        const handlePageChange = async (page: number) => {
             pagination.value.page = page;
+            await budgetStore.fetchBudgetItems(page, pagination.value.pageSize);
         };
 
-        const handlePageSizeChange = (pageSize: number) => {
+        const handlePageSizeChange = async (pageSize: number) => {
             pagination.value.pageSize = pageSize;
-            pagination.value.page = 1; // Reset to page 1 when changing page size
+            pagination.value.page = 1;
+            await budgetStore.fetchBudgetItems(1, pageSize);
         };
 
         const handleSearch = (value: string) => {

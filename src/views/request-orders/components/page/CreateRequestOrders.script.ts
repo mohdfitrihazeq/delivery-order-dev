@@ -83,6 +83,7 @@ export default defineComponent({
                     // Items
                     items.value = (draft.requestorderitems || draft.RequestOrderItems || []).map((item: any) => ({
                         itemCode: item.ItemCode || '',
+                        budgetId: item.BudgetItemId || item.BudgetItemID || '',
                         description: item.Description || '',
                         location: item.Location || '',
                         uom: item.Uom || item.Unit || '',
@@ -123,6 +124,7 @@ export default defineComponent({
             }
         });
 
+        // budget switching
         // subcon dropdown part
         const subconList = ref<{ id: number; name: string }[]>([]);
         const filteredSubconList = ref<{ id: number; name: string }[]>([]);
@@ -301,6 +303,7 @@ export default defineComponent({
         const addItem = () => {
             items.value.push({
                 itemCode: '',
+                budgetItemId: 0,
                 description: '',
                 location: '',
                 uom: '',
@@ -368,6 +371,7 @@ export default defineComponent({
                 description: budgetItem.description,
                 location: budgetItem.location,
                 uom: budgetItem.uom,
+                budgetItemId: budgetItem.budgetId,
                 quantity: budgetItem.quantity.toString(),
                 deliveryDate: null,
                 notes: '',
@@ -482,6 +486,7 @@ export default defineComponent({
                 items: items.value.map((item) => ({
                     itemCode: item.itemCode,
                     itemType: item.itemType || '',
+                    budgetItemId: item.budgetItemId,
                     description: item.description,
                     uom: item.uom,
                     quantity: item.quantity,
@@ -494,7 +499,6 @@ export default defineComponent({
                 overallRemark: overallRemark.value,
                 attachmentsCount: attachments.value.length
             };
-
             return data;
         });
 
@@ -546,13 +550,15 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     Items: items.value.map((item) => ({
-                        BudgetItemId: budgetType.value === 'Budgeted Item' ? 1 : null,
-                        NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
+                        BudgetItemId: item.budgetItemId,
+                        NonBudgetItemId: item.budgetItemId || null,
                         Description: item.description,
                         Uom: item.uom,
                         ItemCode: item.itemCode,
                         ItemType: item.itemType,
                         Quantity: parseFloat(item.quantity) || 0,
+                        OrgBgtQty: parseFloat(item.OrgBgtQty) || 0,
+                        BgtBalQty: parseFloat(item.BgtBalQty) || 0,
                         Rate: item.price || 0,
                         DeliveryDate: formatDateToAPI(item.deliveryDate)
                     }))
