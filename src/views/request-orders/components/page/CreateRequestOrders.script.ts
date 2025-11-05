@@ -15,6 +15,7 @@ import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
 import { getCurrentUsername, getCurrentProjectName, getCurrentProjectId } from '@/utils/contextHelper';
 import { useConfirm } from 'primevue/useconfirm';
 import ConfirmDialog from 'primevue/confirmdialog';
+import AutoComplete from 'primevue/autocomplete';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -124,6 +125,66 @@ export default defineComponent({
         });
 
         // budget switching
+        // subcon dropdown part
+        const subconList = ref<{ id: number; name: string }[]>([]);
+        const filteredSubconList = ref<{ id: number; name: string }[]>([]);
+        const selectedSubcon = ref<{ id: number; name: string } | null>(null);
+        const searchSubcon = ref('');
+
+        const allMockSubcons = [
+            { id: 1, name: 'Alpha Construction' },
+            { id: 2, name: 'Beta Engineering' },
+            { id: 3, name: 'Citra Builders' },
+            { id: 4, name: 'Delta Subcontractor' },
+            { id: 5, name: 'Evergreen Infra' },
+            { id: 6, name: 'Falcon Civil Works' },
+            { id: 7, name: 'Gamma Industries' },
+            { id: 8, name: 'Helix Builders' },
+            { id: 9, name: 'Icon Engineering' },
+            { id: 10, name: 'Jade Construction' },
+            { id: 11, name: 'Kinetic Engineering' },
+            { id: 12, name: 'Lighthouse Infra' },
+            { id: 13, name: 'Metro Builders' },
+            { id: 14, name: 'Nova Contractors' },
+            { id: 15, name: 'Omega Structures' },
+            { id: 16, name: 'Prime Engineering' },
+            { id: 17, name: 'Quantum Infra' },
+            { id: 18, name: 'Radiant Builders' },
+            { id: 19, name: 'Summit Contractors' },
+            { id: 20, name: 'Titan Engineering' }
+        ];
+
+        const subconId = computed(() => selectedSubcon.value?.id || null);
+
+        // Handle AutoComplete search
+        const handleSubconSearch = async (event: { query: string }) => {
+            const query = event.query || '';
+            // Simulate network delay
+            await new Promise((resolve) => setTimeout(resolve, 300));
+
+            if (!query.trim()) {
+                filteredSubconList.value = allMockSubcons;
+            } else {
+                filteredSubconList.value = allMockSubcons.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+            }
+        };
+
+        watch(
+            budgetType,
+            async (newType) => {
+                if (newType === 'Unbudgeted Item') {
+                    // Show all subcons initially
+                    filteredSubconList.value = allMockSubcons;
+                    selectedSubcon.value = null;
+                } else {
+                    selectedSubcon.value = null;
+                    filteredSubconList.value = [];
+                    subconList.value = [];
+                }
+            },
+            { immediate: true }
+        );
+
         watch(budgetType, (newType, oldType) => {
             if (budgetSwitching.value || newType === oldType) return;
 
@@ -674,7 +735,13 @@ export default defineComponent({
             existingAttachments,
             MAX_FILE_SIZE,
             previewAttachment,
-            showValidation
+            showValidation,
+            AutoComplete,
+            searchSubcon,
+            selectedSubcon,
+            filteredSubconList,
+            subconId,
+            handleSubconSearch
         };
     }
 });
