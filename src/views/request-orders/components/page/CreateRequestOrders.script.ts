@@ -83,7 +83,7 @@ export default defineComponent({
                     // Items
                     items.value = (draft.requestorderitems || draft.RequestOrderItems || []).map((item: any) => ({
                         itemCode: item.ItemCode || '',
-                        budgetId: item.BudgetItemId || item.BudgetItemID || '',
+                        budgetId: item.Id || 0,
                         description: item.Description || '',
                         location: item.Location || '',
                         uom: item.Uom || item.Unit || '',
@@ -371,7 +371,7 @@ export default defineComponent({
                 description: budgetItem.description,
                 location: budgetItem.location,
                 uom: budgetItem.uom,
-                budgetItemId: budgetItem.budgetId,
+                budgetItemId: budgetItem.id,
                 quantity: budgetItem.quantity.toString(),
                 deliveryDate: null,
                 notes: '',
@@ -486,7 +486,7 @@ export default defineComponent({
                 items: items.value.map((item) => ({
                     itemCode: item.itemCode,
                     itemType: item.itemType || '',
-                    budgetItemId: item.budgetItemId,
+                    budgetItemId: item.budgetItemId ?? null,
                     description: item.description,
                     uom: item.uom,
                     quantity: item.quantity,
@@ -550,7 +550,7 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId,
+                        BudgetItemId: item.budgetItemId || null,
                         NonBudgetItemId: item.budgetItemId || null,
                         Description: item.description,
                         Uom: item.uom,
@@ -653,8 +653,8 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     Items: items.value.map((item) => ({
-                        BudgetItemId: budgetType.value === 'Budgeted Item' ? 1 : null,
-                        NonBudgetItemId: budgetType.value === 'Budgeted Item' ? null : 1,
+                        BudgetItemId: item.budgetItemId || null,
+                        NonBudgetItemId: item.budgetItemId || null,
                         Description: item.description,
                         Uom: item.uom,
                         Quantity: parseFloat(item.quantity) || 0,
