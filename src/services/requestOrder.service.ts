@@ -1,6 +1,7 @@
 import type { CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersResponse, GetRequestOrdersParams, AttachmentItem } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
+import { isRef, unref } from 'vue';
 
 // Helper to append attachments to FormData
 function appendAttachmentsToFormData(formData: FormData, attachments?: Array<File | AttachmentItem>) {
@@ -148,6 +149,48 @@ const getRequestOrderById = async (id: string) => {
     }
 };
 
+const getAttachmentUrl = (file: AttachmentItem) => {
+    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    return `${baseUrl}/${file.path.replace(/\\/g, '/')}`;
+};
+
+const previewAttachment = (file: AttachmentItem | any) => {
+    const rawFile = isRef(file) ? unref(file) : file;
+    const url = getAttachmentUrl(rawFile);
+    console.log('Preview URL:', url);
+    window.open(url, '_blank');
+};
+
+const downloadAttachment = async (file: AttachmentItem | any) => {
+    const rawFile = isRef(file) ? unref(file) : file;
+    try {
+        const url = getAttachmentUrl(rawFile);
+        const response = await axiosInstance.get(url, { responseType: 'blob' });
+
+        const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.setAttribute('download', rawFile.filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error: any) {
+        showError(error, `Failed to download attachment ${rawFile.filename}`);
+    }
+};
+
+const getAttachmentsByROId = async (requestOrderId: number | string): Promise<AttachmentItem[]> => {
+    try {
+        const response = await axiosInstance.get(`/requestOrder/${requestOrderId}/attachments`);
+        return response.data.data || [];
+    } catch (error: any) {
+        showError(error, `Failed to fetch attachments for RO ${requestOrderId}`);
+        return [];
+    }
+};
+
 export const requestOrderService = {
     createRequestOrder,
     updateRequestOrder,
@@ -156,5 +199,9 @@ export const requestOrderService = {
     getRequestOrders,
     getRequestOrderById,
     submitDraftRequestOrder,
-    approveRejectRequestOrder
+    approveRejectRequestOrder,
+    getAttachmentUrl,
+    downloadAttachment,
+    previewAttachment,
+    getAttachmentsByROId
 };

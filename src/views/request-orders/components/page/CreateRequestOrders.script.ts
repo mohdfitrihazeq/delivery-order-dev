@@ -419,9 +419,13 @@ export default defineComponent({
 
         // Preview/download existing attachment
         function previewAttachment(file: AttachmentItem) {
-            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://103.16.42.51:9001';
-            const url = `${baseUrl}/${file.path}`;
+            // URL in a new tab
+            const url = requestOrderService.getAttachmentUrl(file);
             window.open(url, '_blank');
+        }
+
+        function downloadAttachment(file: AttachmentItem) {
+            requestOrderService.downloadAttachment(file);
         }
 
         const onSelectedFiles = (event) => {
@@ -741,7 +745,8 @@ export default defineComponent({
             selectedSubcon,
             filteredSubconList,
             subconId,
-            handleSubconSearch
+            handleSubconSearch,
+            downloadAttachment
         };
     }
 });

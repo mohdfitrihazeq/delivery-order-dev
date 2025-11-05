@@ -238,19 +238,15 @@ export default defineComponent({
         }
 
         function previewAttachment(file: File | AttachmentItem) {
-            if (file instanceof File) {
-                const blobUrl = URL.createObjectURL(file);
-                window.open(blobUrl, '_blank');
-                return;
+            if (!(file instanceof File)) {
+                requestOrderService.previewAttachment(file);
             }
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://103.16.42.51:9001';
-            const fileUrl = `${backendUrl}/${file.path.replace(/\\/g, '/')}`;
-            window.open(fileUrl, '_blank');
         }
 
-        function getAttachmentUrl(file: AttachmentItem) {
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-            return `${backendUrl}/${file.path.replace(/\\/g, '/')}`;
+        function downloadAttachment(file: File | AttachmentItem) {
+            if (!(file instanceof File)) {
+                requestOrderService.downloadAttachment(file);
+            }
         }
 
         const onRemoveTemplatingFile = (file: File, removeFileCallback: (index: number) => void, index: number) => {
@@ -302,7 +298,6 @@ export default defineComponent({
             loading,
             previewAttachment,
             getAttachmentName,
-            getAttachmentUrl,
             onRemoveTemplatingFile,
             onClearTemplatingUpload,
             uploadEvent,
@@ -321,7 +316,8 @@ export default defineComponent({
             removeNewAttachment,
             removeExistingAttachment,
             onSelectedFiles,
-            filesToUpload
+            filesToUpload,
+            downloadAttachment
         };
     }
 });
