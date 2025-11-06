@@ -72,6 +72,7 @@ export default defineComponent({
                 try {
                     const res = await requestOrderService.getRequestOrderById(draftId);
                     const draft = res.data;
+                    console.log('Loaded draft data:', draft);
                     if (!draft) return;
 
                     // Basic fields
@@ -83,7 +84,7 @@ export default defineComponent({
                     // Items
                     items.value = (draft.requestorderitems || draft.RequestOrderItems || []).map((item: any) => ({
                         itemCode: item.ItemCode || '',
-                        budgetId: item.Id || 0,
+                        budgetId: item.BudgetItemId || 0,
                         description: item.Description || '',
                         location: item.Location || '',
                         uom: item.Uom || item.Unit || '',
@@ -124,7 +125,6 @@ export default defineComponent({
             }
         });
 
-        // budget switching
         // subcon dropdown part
         const subconList = ref<{ id: number; name: string }[]>([]);
         const filteredSubconList = ref<{ id: number; name: string }[]>([]);
@@ -490,7 +490,7 @@ export default defineComponent({
                 items: items.value.map((item) => ({
                     itemCode: item.itemCode,
                     itemType: item.itemType || '',
-                    budgetItemId: item.budgetItemId ?? null,
+                    budgetItemId: item.budgetItemId ?? item.budgetId ?? null,
                     description: item.description,
                     uom: item.uom,
                     quantity: item.quantity,
@@ -554,8 +554,8 @@ export default defineComponent({
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
                     Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId || null,
-                        NonBudgetItemId: item.budgetItemId || null,
+                        BudgetItemId: item.budgetItemId ?? item.budgetId ?? null,
+                        NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
                         Uom: item.uom,
                         ItemCode: item.itemCode,
@@ -573,10 +573,8 @@ export default defineComponent({
                 let result: CreateRequestOrderResponse;
 
                 if (isDraft) {
-                    // update existing draft
                     result = await requestOrderService.submitDraftRequestOrder(route.query.draftId as string, payload, attachments.value.length > 0 ? attachments.value : undefined);
                 } else {
-                    // Create new RO
                     result = await requestOrderService.createRequestOrder(payload, attachmentsToSend);
                 }
 

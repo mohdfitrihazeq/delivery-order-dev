@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AutoComplete: typeof import('primevue/autocomplete')['default']
-    Avatar: typeof import('primevue/avatar')['default']
     Badge: typeof import('primevue/badge')['default']
     BaseSpinner: typeof import('./src/components/spinner/BaseSpinner.vue')['default']
     BaseTab: typeof import('./src/components/tab/BaseTab.vue')['default']
@@ -38,6 +37,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Select: typeof import('primevue/select')['default']
+    SelectButton: typeof import('primevue/selectbutton')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
     Tag: typeof import('primevue/tag')['default']
