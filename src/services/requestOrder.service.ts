@@ -65,11 +65,15 @@ const submitDraftRequestOrder = async (draftId: string, payload: CreateRequestOr
         formData.append('data', JSON.stringify(payload));
         appendAttachmentsToFormData(formData, attachments);
 
-        const response = await axiosInstance.put(`/requestOrder/${draftId}/Draft`, formData);
+        const response = await axiosInstance.put(`/requestOrder/${draftId}/submit`, formData);
+
         return { success: true, data: response.data };
     } catch (error: any) {
         showError(error, 'Failed to submit draft request order.');
-        return { success: false, message: error.response?.data?.message || 'Failed to submit draft request order' };
+        return {
+            success: false,
+            message: error.response?.data?.message || 'Failed to submit draft request order'
+        };
     }
 };
 
