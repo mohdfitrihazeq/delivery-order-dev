@@ -46,7 +46,6 @@
                     :filters="filters"
                     :search="search"
                     @search="onSearchWrapper"
-                    @action="handleAction"
                     :showImportFile="true"
                     :onImportFile="handleImportClick"
                 >
@@ -55,6 +54,7 @@
                 </ReusableTable>
 
                 <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />
+                <ConfirmPopup />
             </div>
         </div>
     </Motion>
