@@ -44,7 +44,7 @@ const props = defineProps<{
     onImportFile?: () => void;
     onRefresh?: () => void;
     onExport?: () => void;
-    onActionClick?: (type: ActionType, rowData: TableRow) => void;
+    onActionClick?: (type: ActionType, rowData: TableRow, event?: Event) => void;
     emptyTitle?: string;
     extraFilters?: FilterOption[];
     onFilterChange?: (filters: Record<string, any>) => void;
@@ -144,7 +144,7 @@ function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
     menuItems.value = actions.map((actionType) => ({
         label: actionType.charAt(0).toUpperCase() + actionType.slice(1),
         icon: actionType === 'edit' ? 'pi pi-pencil' : actionType === 'view' ? 'pi pi-eye' : actionType === 'delete' ? 'pi pi-trash' : actionType === 'approve' ? 'pi pi-check-circle' : actionType === 'reject' ? 'pi pi-times-circle' : 'pi pi-comment',
-        command: () => props.onActionClick?.(actionType, currentRow.value!)
+        command: (menuEvent: Event) => props.onActionClick?.(actionType, currentRow.value!, menuEvent)
     }));
 
     menu.value.toggle(event);

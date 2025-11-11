@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 interface State {
     loading: boolean;
     budgets: Budget[];
-    currentBudget?: Budget;
+    budgetVersionList: Budget[];
     totalItems: number;
     totalPages: number;
     page: number;
@@ -17,7 +17,7 @@ export const useBudgetStore = defineStore('budgetStore', {
     state: (): State => ({
         loading: false,
         budgets: [],
-        currentBudget: undefined,
+        budgetVersionList: [],
         totalItems: 0,
         totalPages: 1,
         page: 1,
@@ -25,19 +25,37 @@ export const useBudgetStore = defineStore('budgetStore', {
     }),
 
     actions: {
-        async fetchBudgetList(projectId: number, version?: string, page = 1, pageSize = 10): Promise<BudgetResponse | undefined> {
+        async fetchBudgetVersionList(projectId: number): Promise<Budget[] | undefined> {
             this.loading = true;
             try {
-                const params = { projectId, version, page, pageSize };
+                const params = { projectId };
+                const response = await budgetService.getBudgetVersion(params);
 
+                if (!response.success) {
+                    showError(response.message || 'Failed to fetch budget version list.');
+                    return;
+                }
+
+                this.budgetVersionList = response.data || [];
+                return this.budgetVersionList;
+            } catch (error: any) {
+                showError(error?.message || 'Failed to fetch budget version list.');
+            } finally {
+                this.loading = false;
+            }
+        },
+        async fetchBudgetList(budgetId: number, page = 1, pageSize = 10): Promise<BudgetResponse | undefined> {
+            this.loading = true;
+            try {
+                const params = { budgetId, page, pageSize };
                 const response = await budgetService.getBudget(params);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget.');
                     return;
                 }
+
                 this.budgets = response.data || [];
-                this.currentBudget = this.budgets[0];
                 this.totalItems = response.pagination?.totalBudgetItems ?? 0;
                 this.totalPages = response.pagination?.totalPages ?? 1;
                 this.page = response.pagination?.page ?? 1;

@@ -2,6 +2,7 @@ export interface FilterVersion {
     label: string;
     value: string;
     latest?: boolean;
+    id?: number;
 }
 
 export interface BudgetItem {

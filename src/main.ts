@@ -7,6 +7,7 @@ import { createPinia } from 'pinia';
 import 'primeicons/primeicons.css';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
+
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue';

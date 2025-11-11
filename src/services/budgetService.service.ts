@@ -5,12 +5,19 @@ import { showError } from '@/utils/showNotification.utils';
 
 export interface GetBudgetParams {
     status?: string;
-    search?: string;
     page?: number;
     pageSize?: number;
     version?: string | undefined;
+    projectId?: number;
 }
 
+export interface GetBudgetListParams {
+    page?: number;
+    pageSize?: number;
+    budgetId?: number;
+}
+
+// BUDGET CHANGE REQUEST
 const getBudgetChangeRequests = async (params?: GetBudgetParams): Promise<BudgetChangeRequestResponse> => {
     try {
         const response = await axiosInstance.get<BudgetChangeRequestResponse>('/budgetChange', { params });
@@ -75,12 +82,25 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
     }
 };
 
-const getBudget = async (params?: GetBudgetParams): Promise<BudgetResponse> => {
+// BUDGET
+const getBudgetVersion = async (params?: GetBudgetParams): Promise<BudgetResponse> => {
     try {
         const response = await axiosInstance.get<BudgetResponse>('/budget', { params });
         return response.data;
     } catch (error) {
-        showError(error, 'Failed to fetch budget.');
+        showError(error, 'Failed to fetch budget version list.');
+        throw error;
+    }
+};
+
+const getBudget = async (params?: GetBudgetListParams): Promise<BudgetResponse> => {
+    try {
+        const response = await axiosInstance.get<BudgetResponse>('/budget/items', { params });
+        console.log('response', response);
+        console.log('params', params);
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget list.');
         throw error;
     }
 };
@@ -111,6 +131,7 @@ export const budgetService = {
     createBudgetChangeRequest,
     getSingleBudgetChangeRequest,
     editBudgetChangeRequest,
+    getBudgetVersion,
     getBudget,
     createBudget
 };
