@@ -1,18 +1,9 @@
-// @media screen and (min-width: 1960px) {
-//     .layout-main,
-//     .landing-wrapper {
-//         width: 1504px;
-//         margin-left: auto !important;
-//         margin-right: auto !important;
-//     }
-// }
-
 @media (min-width: 992px) {
     .layout-wrapper {
         &.layout-overlay {
             .layout-main-container {
                 margin-left: 0;
-                padding-left: 2rem;
+                padding-left: 0;
             }
 
             .layout-sidebar {
@@ -40,8 +31,23 @@
         }
 
         &.layout-static {
-            .layout-main-container {
-                margin-left: 21rem;
+            .layout-wrapper {
+                display: flex;
+            }
+
+            .layout-sidebar {
+                position: fixed;
+                width: 19rem;
+                height: 100vh;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                transform: translateX(0);
+            }
+
+            .layout-right-section {
+                margin-left: 19rem;
+                flex: 1;
             }
 
             &.layout-static-inactive {
@@ -50,9 +56,8 @@
                     left: 0;
                 }
 
-                .layout-main-container {
+                .layout-right-section {
                     margin-left: 0;
-                    padding-left: 2rem;
                 }
             }
         }
@@ -71,7 +76,7 @@
     .layout-wrapper {
         .layout-main-container {
             margin-left: 0;
-            padding-left: 2rem;
+            padding-left: 1rem;
         }
 
         .layout-sidebar {
@@ -79,6 +84,7 @@
             left: 0;
             top: 0;
             height: 100vh;
+            width: 20rem;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             transition:
