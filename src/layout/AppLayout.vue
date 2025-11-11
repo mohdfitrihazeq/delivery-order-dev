@@ -68,13 +68,18 @@ function isOutsideClicked(event: Event) {
 
 <template>
     <div class="layout-wrapper" :class="containerClass">
-        <app-topbar></app-topbar>
+        <!-- LEFT: Sidebar -->
         <app-sidebar></app-sidebar>
 
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <!-- Page Content -->
-                <router-view></router-view>
+        <!-- RIGHT: Topbar + Content -->
+        <div class="layout-right-section">
+            <app-topbar></app-topbar>
+
+            <div class="layout-main-container">
+                <div class="layout-main">
+                    <!-- Page Content -->
+                    <router-view></router-view>
+                </div>
             </div>
         </div>
 
@@ -82,3 +87,64 @@ function isOutsideClicked(event: Event) {
     </div>
     <Toast />
 </template>
+
+<style scoped lang="scss">
+.layout-wrapper {
+    width: 100%;
+    height: 100vh;
+}
+
+.layout-sidebar {
+    flex-shrink: 0;
+    width: 18rem;
+    position: relative;
+    z-index: 998;
+}
+
+.layout-right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+
+    margin-right: -2rem;
+    margin-top: -1.5rem;
+}
+
+.layout-main-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+
+    scroll-behavior: smooth;
+}
+
+.layout-main {
+    padding: 0rem 1.5rem;
+}
+
+.layout-mask {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 998;
+    width: 100%;
+    height: 100%;
+}
+
+.animate-fadein {
+    animation: fadeIn 0.15s linear;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+</style>

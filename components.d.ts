@@ -27,6 +27,8 @@ declare module 'vue' {
     Dropdown: typeof import('primevue/dropdown')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
+    GlossyConfirm: typeof import('./src/components/modal/GlossyConfirm.vue')['default']
+    GlossyDialogue: typeof import('./src/components/modal/GlossyDialogue.vue')['default']
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
