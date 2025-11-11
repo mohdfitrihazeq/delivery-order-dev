@@ -205,7 +205,7 @@ onMounted(() => {
         </div>
     </Motion>
     <!-- Project Dialog -->
-    <Dialog v-model:visible="showProjectDialog" header="Select Project">
+    <Dialog v-model:visible="showProjectDialog" header="Select Project" :style="{ width: '40rem', maxWidth: '90vw' }">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
             <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">{{ group.company }}</h3>
             <div class="space-y-3">
