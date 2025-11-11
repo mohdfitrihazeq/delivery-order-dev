@@ -10,7 +10,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import Badge from 'primevue/badge';
-import GlossyDialog from '@/components/modal/GlossyDialogue.vue';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -206,7 +205,7 @@ onMounted(() => {
         </div>
     </Motion>
     <!-- Project Dialog -->
-    <GlossyDialog v-model:visible="showProjectDialog" header="Select Project">
+    <Dialog v-model:visible="showProjectDialog" header="Select Project">
         <div v-for="group in companyProjects" :key="group.company" class="mb-6">
             <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">{{ group.company }}</h3>
             <div class="space-y-3">
@@ -225,5 +224,5 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </GlossyDialog>
+    </Dialog>
 </template>
