@@ -17,14 +17,15 @@ declare module 'vue' {
     Card: typeof import('primevue/card')['default']
     Chart: typeof import('primevue/chart')['default']
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
-    Dialog: typeof import('primevue/dialog')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
+    ProgressSpinner: typeof import('primevue/progressspinner')['default']
     ResultNotFound: typeof import('./src/components/resulNotFound/ResultNotFound.vue')['default']
     ReusableTable: typeof import('./src/components/table/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
+    Tag: typeof import('primevue/tag')['default']
     Toast: typeof import('primevue/toast')['default']
   }
 }
