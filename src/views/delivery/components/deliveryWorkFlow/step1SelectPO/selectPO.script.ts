@@ -19,87 +19,41 @@ interface PurchaseOrderCard {
 
 export default defineComponent({
     name: 'SelectPO',
-    components: {
-        AutoComplete,
-        Card,
-        Button,
-        Message,
-        Toast,
-        Form,
-        Badge
-    },
+    components: { AutoComplete, Card, Button, Message, Toast, Form, Badge },
     emits: ['update', 'next-step', 'prev-step'],
     setup(_, { emit }) {
         const toast = useToast();
-        const selectedCard = ref<PurchaseOrderCard | null>(null);
-        const suggestions = ref<PurchaseOrderCard[]>([]);
-        const searchTerm = ref('');
-        const allCards = ref<PurchaseOrderCard[]>([]);
-        const filteredCards = ref<PurchaseOrderCard[]>([]);
         const purchaseStore = usePurchaseOrderStore();
 
-        // Fetch POs on mount
-        onMounted(async () => {
-            await purchaseStore.fetchPurchaseOrders();
+        const selectedCard = ref<PurchaseOrderCard | null>(null);
+        const allCards = ref<PurchaseOrderCard[]>([]);
+        const filteredCards = ref<PurchaseOrderCard[]>([]);
+        const searchTerm = ref('');
 
+        // computed wrapper for reactive pagination
+        const pagination = computed(() => purchaseStore.pagination);
+        console.log('Pagination in SelectPO:', pagination.value);
+
+        // Fetch POs on mount
+        const fetchPage = async () => {
+            await purchaseStore.fetchPurchaseOrders();
             allCards.value = purchaseStore.purchaseOrders.map((po) => ({
                 id: po.id?.toString() ?? '',
                 title: po.poNumber ?? '',
                 content: `${po.items?.length ?? 0} items`,
-                badges: po.items?.map((i: any) => i.ItemCode ?? '').filter(Boolean) ?? [],
+                badges: po.items?.map((i: any) => i.code ?? '').filter(Boolean) ?? [],
                 icon: 'pi-box'
             }));
-
-            // Initially, show all cards
             filteredCards.value = [...allCards.value];
-        });
+        };
 
-        // Map API data to card structure
-        const mappedCards = computed<PurchaseOrderCard[]>(() =>
-            purchaseStore.purchaseOrders.map((po) => ({
-                id: po.Id?.toString() ?? '',
-                title: po.DocNo ?? '',
-                content: `${po.purchaseorderitems?.length ?? 0} items`,
-                badges: po.purchaseorderitems?.map((i: any) => i.ItemCode ?? '').filter(Boolean) ?? [],
-                icon: 'pi-box'
-            }))
-        );
+        onMounted(fetchPage);
 
         const handlePOSearch = async (event: { query: string }) => {
             const query = (event.query || '').trim().toLowerCase();
-
-            // Optional network delay
             await new Promise((resolve) => setTimeout(resolve, 200));
-
-            if (!query) {
-                filteredCards.value = [...allCards.value];
-            } else {
-                filteredCards.value = allCards.value.filter((c) => c.title.toLowerCase().includes(query) || c.badges.some((b) => b.toLowerCase().includes(query)));
-            }
-
-            console.log('Search query:', query, 'Filtered Cards:', filteredCards.value);
-        };
-
-        // Form submit
-        const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (!event.valid || !selectedCard.value) return;
-
-            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id?.toString() === selectedCard.value?.id);
-            if (!fullPO) return;
-
-            emit('update', {
-                purchaseOrderId: fullPO.Id,
-                DocNo: fullPO.DocNo,
-                PurchaseOrderItems: fullPO.purchaseorderitems
-            });
-
-            emit('next-step');
-            toast.add({
-                severity: 'info',
-                summary: 'Purchase Order Confirmed',
-                detail: `Selected PO: ${fullPO.DocNo}`,
-                life: 2000
-            });
+            if (!query) filteredCards.value = [...allCards.value];
+            else filteredCards.value = allCards.value.filter((c) => c.title.toLowerCase().includes(query) || c.badges.some((b) => b.toLowerCase().includes(query)));
         };
 
         const toggleSelect = (card: PurchaseOrderCard) => {
@@ -107,31 +61,69 @@ export default defineComponent({
         };
 
         const removeCard = (card: PurchaseOrderCard) => {
-            if (selectedCard.value?.id === card.id) {
-                selectedCard.value = null;
-                // Restore full cards list
-                filteredCards.value = [...allCards.value];
-                searchTerm.value = '';
-            }
+            if (selectedCard.value?.id === card.id) selectedCard.value = null;
         };
 
         const isSelected = (card: PurchaseOrderCard) => selectedCard.value?.id === card.id;
 
-        const goBack = () => emit('prev-step');
+        const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
+            if (!event.valid || !selectedCard.value) return;
+
+            const fullPO = purchaseStore.purchaseOrders.find((po) => po.id?.toString() === selectedCard.value?.id);
+            if (!fullPO) return;
+
+            emit('update', {
+                purchaseOrderId: fullPO.id,
+                DocNo: fullPO.poNumber,
+                PurchaseOrderItems: fullPO.items
+            });
+
+            emit('next-step');
+            toast.add({
+                severity: 'info',
+                summary: 'Purchase Order Confirmed',
+                detail: `Selected PO: ${fullPO.poNumber}`,
+                life: 2000
+            });
+        };
+
+        const displayStart = computed(() => {
+            const page = purchaseStore.pagination?.page ?? 1;
+            const pageSize = purchaseStore.pagination?.pageSize ?? 10;
+            return (page - 1) * pageSize + 1;
+        });
+
+        const displayEnd = computed(() => {
+            const page = purchaseStore.pagination?.page ?? 1;
+            const pageSize = purchaseStore.pagination?.pageSize ?? 10;
+            const total = purchaseStore.pagination?.total ?? 0;
+            return Math.min(page * pageSize, total);
+        });
+
+        const setPage = (page: number) => {
+            purchaseStore.setPage(page);
+        };
+
+        const setPageSize = (pageSize: number) => {
+            purchaseStore.setPageSize(pageSize);
+        };
 
         return {
             selectedCard,
-            suggestions,
+            allCards,
             filteredCards,
-            onFormSubmit,
+            searchTerm,
+            handlePOSearch,
             toggleSelect,
             removeCard,
             isSelected,
-            goBack,
-            searchTerm,
-            handlePOSearch,
-            allCards,
-            mappedCards
+            onFormSubmit,
+            pagination,
+            setPage,
+            setPageSize,
+            displayStart,
+            displayEnd,
+            purchaseStore
         };
     }
 });

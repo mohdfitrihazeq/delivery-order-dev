@@ -8,7 +8,7 @@
             Select the Purchase Order that corresponds to this delivery. You can search by PO number or item name.
         </Message>
 
-        <!-- Search Card -->
+        <!-- Search + Cards -->
         <Card class="mt-6 border">
             <template #title>
                 <div class="flex items-center gap-2">
@@ -51,6 +51,29 @@
                                 </div>
                             </template>
                         </Card>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div class="flex justify-between items-center mt-4 gap-2" v-if="purchaseStore.pagination">
+                        <div class="flex items-center gap-2">
+                            <span>Rows per page:</span>
+                            <select :value="purchaseStore.pagination?.pageSize ?? 10" @change="setPageSize(Number($event.target.value))" class="border rounded px-2 py-1">
+                                <option v-for="size in [10, 25, 50, 100]" :key="size" :value="size">{{ size }}</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <Button icon="pi pi-angle-double-left" text :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage(1)" />
+                            <Button icon="pi pi-angle-left" text :disabled="(purchaseStore.pagination?.page ?? 1) <= 1" @click="setPage((purchaseStore.pagination?.page ?? 1) - 1)" />
+                            <span> Page {{ purchaseStore.pagination?.page ?? 1 }} / {{ purchaseStore.pagination?.totalPages ?? 1 }} </span>
+                            <Button icon="pi pi-angle-right" text :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage((purchaseStore.pagination?.page ?? 1) + 1)" />
+                            <Button icon="pi pi-angle-double-right" text :disabled="(purchaseStore.pagination?.page ?? 1) >= (purchaseStore.pagination?.totalPages ?? 1)" @click="setPage(purchaseStore.pagination?.totalPages ?? 1)" />
+                        </div>
+
+                        <div>
+                            Showing
+                            {{ displayStart }} – {{ displayEnd }} of {{ purchaseStore.pagination?.total ?? 0 }}
+                        </div>
                     </div>
 
                     <!-- Navigation Buttons -->
