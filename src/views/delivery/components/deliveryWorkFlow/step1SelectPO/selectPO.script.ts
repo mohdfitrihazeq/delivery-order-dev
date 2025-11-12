@@ -1,23 +1,18 @@
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
+import AutoComplete from 'primevue/autocomplete';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
-import FileUpload from 'primevue/fileupload';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
-import ProgressBar from 'primevue/progressbar';
-import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import { computed, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 
 interface PurchaseOrderCard {
     id: string;
     title: string;
     content: string;
-    item: string;
     badges: string[];
     icon: string;
 }
@@ -25,81 +20,80 @@ interface PurchaseOrderCard {
 export default defineComponent({
     name: 'SelectPO',
     components: {
+        AutoComplete,
         Card,
-        InputText,
         Button,
         Message,
         Toast,
         Form,
-        Calendar,
-        Textarea,
-        FileUpload,
-        ProgressBar,
         Badge
     },
     emits: ['update', 'next-step', 'prev-step'],
     setup(_, { emit }) {
-        // ---------------------------
-        // 1. STATE
-        // ---------------------------
         const toast = useToast();
-        const toastRef = ref<InstanceType<typeof Toast> | null>(null);
-        const searchTerm = ref('');
         const selectedCard = ref<PurchaseOrderCard | null>(null);
-
+        const suggestions = ref<PurchaseOrderCard[]>([]);
+        const searchTerm = ref('');
+        const allCards = ref<PurchaseOrderCard[]>([]);
+        const filteredCards = ref<PurchaseOrderCard[]>([]);
         const purchaseStore = usePurchaseOrderStore();
 
-        // ---------------------------
-        // 2. FETCH DATA
-        // ---------------------------
+        // Fetch POs on mount
         onMounted(async () => {
             await purchaseStore.fetchPurchaseOrders();
+
+            allCards.value = purchaseStore.purchaseOrders.map((po) => ({
+                id: po.id?.toString() ?? '',
+                title: po.poNumber ?? '',
+                content: `${po.items?.length ?? 0} items`,
+                badges: po.items?.map((i: any) => i.ItemCode ?? '').filter(Boolean) ?? [],
+                icon: 'pi-box'
+            }));
+
+            // Initially, show all cards
+            filteredCards.value = [...allCards.value];
         });
 
-        // ---------------------------
-        // 3. COMPUTED
-        // ---------------------------
-        const cards = computed<PurchaseOrderCard[]>(() =>
+        // Map API data to card structure
+        const mappedCards = computed<PurchaseOrderCard[]>(() =>
             purchaseStore.purchaseOrders.map((po) => ({
-                id: po.Id.toString(),
-                title: po.DocNo,
-                content: `${po.PurchaseOrderItems?.length ?? 0} items`,
-                item: po.PurchaseOrderItems?.length?.toString() ?? '0',
-                badges: po.PurchaseOrderItems?.map((i) => i.ItemCode) ?? [],
+                id: po.Id?.toString() ?? '',
+                title: po.DocNo ?? '',
+                content: `${po.purchaseorderitems?.length ?? 0} items`,
+                badges: po.purchaseorderitems?.map((i: any) => i.ItemCode ?? '').filter(Boolean) ?? [],
                 icon: 'pi-box'
             }))
         );
 
-        const filteredCards = computed(() => {
-            if (!searchTerm.value) return cards.value;
-            const term = searchTerm.value.toLowerCase();
-            return cards.value.filter((c) => c.id.toLowerCase().includes(term) || c.title.toLowerCase().includes(term) || c.content.toLowerCase().includes(term) || c.badges.some((b) => b.toLowerCase().includes(term)));
-        });
+        const handlePOSearch = async (event: { query: string }) => {
+            const query = (event.query || '').trim().toLowerCase();
 
-        watch(searchTerm, async (val) => {
-            await purchaseStore.fetchPurchaseOrders();
-        });
+            // Optional network delay
+            await new Promise((resolve) => setTimeout(resolve, 200));
 
-        // ---------------------------
-        // 4. METHODS
-        // ---------------------------
+            if (!query) {
+                filteredCards.value = [...allCards.value];
+            } else {
+                filteredCards.value = allCards.value.filter((c) => c.title.toLowerCase().includes(query) || c.badges.some((b) => b.toLowerCase().includes(query)));
+            }
+
+            console.log('Search query:', query, 'Filtered Cards:', filteredCards.value);
+        };
+
+        // Form submit
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (!event.valid) return;
+            if (!event.valid || !selectedCard.value) return;
 
-            if (!selectedCard.value) return;
-
-            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === selectedCard.value?.id);
-
+            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id?.toString() === selectedCard.value?.id);
             if (!fullPO) return;
 
             emit('update', {
                 purchaseOrderId: fullPO.Id,
                 DocNo: fullPO.DocNo,
-                PurchaseOrderItems: fullPO.PurchaseOrderItems
+                PurchaseOrderItems: fullPO.purchaseorderitems
             });
 
             emit('next-step');
-
             toast.add({
                 severity: 'info',
                 summary: 'Purchase Order Confirmed',
@@ -108,49 +102,32 @@ export default defineComponent({
             });
         };
 
-        const goBack = () => emit('prev-step');
-
         const toggleSelect = (card: PurchaseOrderCard) => {
-            if (selectedCard.value?.id === card.id) {
-                selectedCard.value = null;
-            } else {
-                const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === card.id);
-                if (!fullPO) return;
-
-                selectedCard.value = card;
-                emit('update', {
-                    purchaseOrderId: fullPO.Id,
-                    DocNo: fullPO.DocNo,
-                    PurchaseOrderItems: fullPO.PurchaseOrderItems
-                });
-
-                emit('next-step');
-                toast.add({
-                    severity: 'info',
-                    summary: 'PO Selected',
-                    detail: `Selected PO: ${card.title}`,
-                    life: 2000
-                });
-            }
+            selectedCard.value = selectedCard.value?.id === card.id ? null : card;
         };
 
-        const removeCard = (card: PurchaseOrderCard) => (selectedCard.value = selectedCard.value?.id === card.id ? null : selectedCard.value);
+        const removeCard = (card: PurchaseOrderCard) => {
+            if (selectedCard.value?.id === card.id) selectedCard.value = null;
+            filtered;
+        };
+
         const isSelected = (card: PurchaseOrderCard) => selectedCard.value?.id === card.id;
 
-        // ---------------------------
-        // 5. RETURN
-        // ---------------------------
+        const goBack = () => emit('prev-step');
+
         return {
-            toastRef,
-            searchTerm,
             selectedCard,
+            suggestions,
             filteredCards,
             onFormSubmit,
-            goBack,
             toggleSelect,
             removeCard,
             isSelected,
-            loading: purchaseStore.loading
+            goBack,
+            searchTerm,
+            handlePOSearch,
+            allCards,
+            mappedCards
         };
     }
 });
