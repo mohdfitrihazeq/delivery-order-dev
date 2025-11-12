@@ -139,9 +139,18 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     breadcrumb: [{ label: 'Project List', route: '/projectList' }, { label: 'Project Detail' }]
                 }
+            },
+            {
+                path: '/ui-kit-test',
+                name: 'ui-kit-test',
+                component: () => import('@/views/ui-kit-test/UiKitTest.vue'),
+                meta: {
+                    breadcrumb: [{ label: 'UI Kit Test', route: '/ui-kit-test' }]
+                }
             }
         ]
     },
+
     {
         path: '/auth/login',
         name: 'login',

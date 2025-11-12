@@ -18,6 +18,11 @@ import router from './router';
 import { setGlobalToast } from '@/utils/showNotification.utils';
 import { useToast } from 'primevue/usetoast';
 
+// UI kit CSS
+import '@qubit/prosync/style.css';
+
+import { VueComponentLibrary } from '@qubit/prosync';
+
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -56,6 +61,7 @@ app.component('Toast', Toast);
 app.use(ConfirmationService);
 app.use(HighchartsVue);
 app.use(pinia);
+app.use(VueComponentLibrary);
 app.mixin({
     mounted() {
         if (this.$root === this) {
