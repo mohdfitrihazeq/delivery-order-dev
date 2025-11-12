@@ -107,8 +107,12 @@ export default defineComponent({
         };
 
         const removeCard = (card: PurchaseOrderCard) => {
-            if (selectedCard.value?.id === card.id) selectedCard.value = null;
-            filtered;
+            if (selectedCard.value?.id === card.id) {
+                selectedCard.value = null;
+                // Restore full cards list
+                filteredCards.value = [...allCards.value];
+                searchTerm.value = '';
+            }
         };
 
         const isSelected = (card: PurchaseOrderCard) => selectedCard.value?.id === card.id;
