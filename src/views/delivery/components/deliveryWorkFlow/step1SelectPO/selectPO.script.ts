@@ -72,9 +72,9 @@ export default defineComponent({
             if (!fullPO) return;
 
             emit('update', {
-                purchaseOrderId: fullPO.id,
-                DocNo: fullPO.poNumber,
-                PurchaseOrderItems: fullPO.items
+                id: fullPO.id,
+                poNumber: fullPO.poNumber,
+                items: fullPO.items
             });
 
             emit('next-step');
