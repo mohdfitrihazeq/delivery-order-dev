@@ -51,7 +51,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             };
 
             const response = await purchaseService.getPurchaseOrders(params);
-
             purchaseOrders.value = response.data.map(
                 (output: any): PurchaseOrder => ({
                     id: output.Id,
@@ -62,19 +61,18 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                     totalAmount: output.TotalAmount,
                     status: output.Status,
                     createdAt: output.CreatedAt,
-                    items: (output.PurchaseOrderItems || []).map((item: any) => ({
+                    items: (output.PurchaseOrderItems || output.purchaseorderitems || []).map((item: any) => ({
                         code: item.ItemCode || '',
                         description: item.Description || '',
-                        uom: item.Unit || '',
-                        qty: Number(item.Quantity),
-                        price: item.UnitPrice || 0,
+                        uom: item.Uom || item.Unit || '',
+                        qty: Number(item.Quantity) || 0,
+                        price: item.Price || item.UnitPrice || 0,
                         amount: item.Amount || 0,
                         deliveryDate: item.DeliveryDate || null,
                         note: item.Notes || ''
                     }))
                 })
             );
-
             if (response.pagination) {
                 pagination.total = response.pagination.total;
                 pagination.totalPages = response.pagination.totalPages;

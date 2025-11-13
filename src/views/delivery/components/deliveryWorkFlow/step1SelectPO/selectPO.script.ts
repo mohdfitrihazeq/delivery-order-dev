@@ -32,7 +32,6 @@ export default defineComponent({
 
         // computed wrapper for reactive pagination
         const pagination = computed(() => purchaseStore.pagination);
-        console.log('Pagination in SelectPO:', pagination.value);
 
         // Fetch POs on mount
         const fetchPage = async () => {
