@@ -65,7 +65,17 @@ export default defineComponent({
         // ---------------------------
         // 2. COMPUTED
         // ---------------------------
-        const deliveredItems = computed(() => selectPO.value?.PurchaseOrderItems ?? []);
+
+        // for ReusableTable
+        const deliveredItems = computed(() =>
+            (selectPO.value?.items ?? []).map((item) => ({
+                ItemCode: item.code,
+                Name: item.description || item.code,
+                Price: item.price,
+                Quantity: item.qty,
+                SoDocNo: selectPO.value?.poNumber
+            }))
+        );
         const hasDeliveredItems = computed(() => deliveredItems.value.length > 0);
 
         const formatDate = (dateStr?: string) => {
@@ -132,7 +142,17 @@ export default defineComponent({
             () => props.deliveryData,
             (newData) => {
                 deliveryInfo.value = newData.deliveryInfo ?? null;
-                selectPO.value = newData.selectPO ?? null;
+                if (newData.selectPO) {
+                    selectPO.value = {
+                        id: newData.selectPO.id ?? newData.selectPO.purchaseOrderId,
+                        poNumber: newData.selectPO.poNumber ?? newData.selectPO.DocNo,
+                        items: newData.selectPO.items ?? newData.selectPO.PurchaseOrderItems ?? []
+                    };
+                    console.log('selectPO.value', selectPO.value);
+                } else {
+                    selectPO.value = null;
+                }
+
                 verifyItem.value = newData.verifyItem ?? [];
             },
             { immediate: true, deep: true }

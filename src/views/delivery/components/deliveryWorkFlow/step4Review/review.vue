@@ -40,7 +40,7 @@
                         <div class="grid gap-2 text-sm">
                             <div class="flex justify-between">
                                 <span class="font-medium">PO Number:</span>
-                                <span>{{ selectPO?.DocNo }}</span>
+                                <span>{{ selectPO?.DocNo || selectPO?.poNumber || '-' }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="font-medium">Total Items:</span>
