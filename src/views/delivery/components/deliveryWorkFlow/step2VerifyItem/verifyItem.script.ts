@@ -58,7 +58,6 @@ export default defineComponent({
                     poNumber.value = null;
                     return;
                 }
-
                 itemList.value = newPo.items.map((i: PurchaseOrderItem) => ({
                     id: i.id,
                     purchaseOrderId: newPo.id,
@@ -72,7 +71,6 @@ export default defineComponent({
                     delivered: 0,
                     total: Number(i.qty) || 0
                 }));
-
                 poNumber.value = newPo.poNumber ?? newPo.DocNo ?? null;
             },
             { immediate: true }

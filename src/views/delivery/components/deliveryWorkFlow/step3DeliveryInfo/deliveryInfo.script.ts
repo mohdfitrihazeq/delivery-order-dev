@@ -113,8 +113,6 @@ export default defineComponent({
                 attachments: files.value.map((f) => f.raw)
             };
 
-            console.log(' Emitting data:', dataToEmit);
-
             emit('update', dataToEmit);
 
             toast.add({

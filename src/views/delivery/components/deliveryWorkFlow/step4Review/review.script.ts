@@ -96,10 +96,9 @@ export default defineComponent({
                 });
                 return;
             }
-
             const payload = {
-                PurchaseOrderId: selectPO.value?.purchaseOrderId,
-                DocNo: selectPO.value?.DocNo,
+                PurchaseOrderId: selectPO.value?.id,
+                DocNo: selectPO.value?.poNumber,
                 Date: deliveryInfo.value?.Date,
                 PlateNo: deliveryInfo.value?.PlateNo,
                 Remarks: deliveryInfo.value?.Remarks,
@@ -148,7 +147,6 @@ export default defineComponent({
                         poNumber: newData.selectPO.poNumber ?? newData.selectPO.DocNo,
                         items: newData.selectPO.items ?? newData.selectPO.PurchaseOrderItems ?? []
                     };
-                    console.log('selectPO.value', selectPO.value);
                 } else {
                     selectPO.value = null;
                 }

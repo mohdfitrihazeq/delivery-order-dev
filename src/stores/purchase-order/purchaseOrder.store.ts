@@ -54,6 +54,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             purchaseOrders.value = response.data.map(
                 (output: any): PurchaseOrder => ({
                     id: output.Id,
+                    projectId: output.ProjectId,
                     poNumber: output.DocNo,
                     supplierName: output.SupplierName,
                     createdBy: output.CreatedBy,
@@ -62,6 +63,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                     status: output.Status,
                     createdAt: output.CreatedAt,
                     items: (output.PurchaseOrderItems || output.purchaseorderitems || []).map((item: any) => ({
+                        id: item.Id,
                         code: item.ItemCode || '',
                         description: item.Description || '',
                         uom: item.Uom || item.Unit || '',
