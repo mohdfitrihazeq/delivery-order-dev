@@ -23,7 +23,17 @@
                         <Motion :key="activeTab" :initial="{ opacity: 0, x: 30 }" :animate="{ opacity: 1, x: 0 }" :exit="{ opacity: 0, x: -30 }" :transition="{ duration: 0.8 }">
                             <!-- Pending -->
                             <template v-if="activeTab === '0'">
-                                <ReusableTable :value="pendingList" :loading="isLoading" emptyTitle="No Pending Purchase Orders Found" :columns="pendingListColumn" :filters="filters" :onSearch="onSearchWrapper">
+                                <ReusableTable
+                                    :value="pendingList"
+                                    :loading="isLoading"
+                                    :columns="pendingListColumn"
+                                    :filters="filters"
+                                    :onSearch="onSearchWrapper"
+                                    emptyTitle="No Pending Purchase Orders Found"
+                                    :pagination="pagination"
+                                    :onPageChange="handlePageChange"
+                                    :onPageSizeChange="handlePageSizeChange"
+                                >
                                     <template #no="{ data }">{{ data.no }}</template>
                                     <template #totalAmount="{ data }"> ${{ data.totalAmount }} </template>
                                     <template #status="{ data }">

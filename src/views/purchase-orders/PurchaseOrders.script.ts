@@ -27,12 +27,14 @@ export default defineComponent({
         const isLoading = ref(true);
         const store = usePurchaseOrderStore();
 
+        // Lists from DB
         const pendingList = ref([]);
         const partiallyList = ref([]);
         const completedList = ref([]);
 
         const poSummaryData = ref<CardItem[]>([]);
 
+        // Search
         const filters = ref({
             global: { value: null as string | null, matchMode: 'contains' }
         });
@@ -43,11 +45,49 @@ export default defineComponent({
             filters.value.global.value = value;
         };
 
+        /** -------------------------
+         *  PAGINATION SUPPORT
+         * ------------------------*/
+        const pagination = ref({
+            page: 1,
+            pageSize: 10,
+            total: 0,
+            totalPages: 0
+        });
+
+        const startingIndex = computed(() => {
+            return (pagination.value.page - 1) * pagination.value.pageSize;
+        });
+
+        const pendingListWithNo = computed(() =>
+            pendingList.value.map((item, i) => ({
+                ...item,
+                no: startingIndex.value + i + 1
+            }))
+        );
+
+        const partiallyListWithNo = computed(() =>
+            partiallyList.value.map((item, i) => ({
+                ...item,
+                no: startingIndex.value + i + 1
+            }))
+        );
+
+        const completedListWithNo = computed(() =>
+            completedList.value.map((item, i) => ({
+                ...item,
+                no: startingIndex.value + i + 1
+            }))
+        );
+
+        /** -------------------------
+         *  LOAD DATA + PATCH STATUS
+         * ------------------------*/
         const loadData = async () => {
             isLoading.value = true;
             try {
                 await store.fetchPurchaseOrders();
-                // Assign a temporary status since DB has no status
+
                 const purchaseOrdersWithStatus = store.purchaseOrders.map((po) => ({
                     ...po,
                     poNumber: po.poNumber,
@@ -59,6 +99,9 @@ export default defineComponent({
                 pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending');
                 partiallyList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'partially delivered');
                 completedList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'completed');
+
+                pagination.value.total = pendingList.value.length;
+                pagination.value.totalPages = Math.ceil(pendingList.value.length / pagination.value.pageSize);
 
                 poSummaryData.value = [
                     {
@@ -97,16 +140,32 @@ export default defineComponent({
             }
         };
 
-        const pendingListWithNo = computed(() => pendingList.value.map((item, i) => ({ ...item, no: i + 1 })));
-        const partiallyListWithNo = computed(() => partiallyList.value.map((item, i) => ({ ...item, no: i + 1 })));
-        const completedListWithNo = computed(() => completedList.value.map((item, i) => ({ ...item, no: i + 1 })));
+        /** -------------------------
+         *  PAGINATION HANDLERS
+         * ------------------------*/
+        function handlePageChange(page: number) {
+            pagination.value.page = page;
+        }
 
+        function handlePageSizeChange(pageSize: number) {
+            pagination.value.pageSize = pageSize;
+            pagination.value.page = 1;
+        }
+
+        /** -------------------------
+         *  COLUMNS
+         * ------------------------*/
         const pendingListColumn: TableColumn[] = [
             { field: 'no', header: '#', sortable: false, bodySlot: 'no' },
             { field: 'poNumber', header: 'PO Number', sortable: true },
             { field: 'supplier', header: 'Supplier', sortable: false },
             { field: 'poDate', header: 'Date', sortable: true },
-            { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+            {
+                field: 'totalAmount',
+                header: 'Total Amount',
+                sortable: true,
+                bodySlot: 'totalAmount'
+            },
             { field: 'status', header: 'Status', sortable: false, bodySlot: 'status' },
             { field: 'action', header: 'Action', bodySlot: 'action', sortable: false }
         ];
@@ -125,10 +184,18 @@ export default defineComponent({
             { field: 'poNumber', header: 'PO Number', sortable: true },
             { field: 'poDate', header: 'Date', sortable: true },
             { field: 'receivedBy', header: 'Received By', sortable: true },
-            { field: 'discrepancyType', header: 'Discrepancy Type', sortable: true, bodySlot: 'discrepancyType' },
+            {
+                field: 'discrepancyType',
+                header: 'Discrepancy Type',
+                sortable: true,
+                bodySlot: 'discrepancyType'
+            },
             { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' }
         ];
 
+        /** -------------------------
+         *  TABS
+         * ------------------------*/
         const tabItems = [
             { value: '0', label: 'Pending' },
             { value: '1', label: 'Partial Delivery', badge: partiallyList.value.length },
@@ -137,13 +204,14 @@ export default defineComponent({
 
         const activeTab = ref('0');
 
+        /** -------------------------
+         *  ACTIONS
+         * ------------------------*/
         const viewPO = (po: any) => {
             router.push({
                 name: 'ViewDetailsPO',
                 params: { poNumber: po.poNumber },
-                query: {
-                    id: po.id
-                }
+                query: { id: po.id }
             });
         };
 
@@ -159,6 +227,7 @@ export default defineComponent({
             poSummaryData,
             filters,
             search,
+            pagination,
             onSearchWrapper: handleSearch,
             pendingListColumn,
             partiallyListColumn,
@@ -166,7 +235,9 @@ export default defineComponent({
             activeTab,
             tabItems,
             viewPO,
-            loadData
+            loadData,
+            handlePageChange,
+            handlePageSizeChange
         };
     }
 });
