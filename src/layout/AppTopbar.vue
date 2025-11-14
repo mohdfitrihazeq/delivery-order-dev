@@ -166,9 +166,9 @@ onMounted(() => {
                         </Button>
                     </div>
 
-                    <!-- Mobile: show avatar only -->
+                    <!-- Mobile: show 3-dots button -->
                     <div class="flex lg:hidden items-center relative">
-                        <Button ref="mobileProfileButtonRef" icon="pi pi-user-circle" class="p-button-text p-button-plain p-button-lg text-gray-700 dark:text-gray-200 hover:text-blue-500" @click="toggleProfileMenu" />
+                        <Button ref="mobileProfileButtonRef" icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-lg text-gray-700 dark:text-gray-200 hover:text-blue-500" @click="toggleProfileMenu" />
                     </div>
 
                     <!-- Shared dropdown menu -->
