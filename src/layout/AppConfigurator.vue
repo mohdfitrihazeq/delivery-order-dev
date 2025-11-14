@@ -11,7 +11,7 @@ const { layoutConfig, isDarkTheme } = useLayout();
 const presets = {
     Aura,
     Lara,
-    Nora
+    Nora,
 };
 const preset = ref(layoutConfig.preset);
 const presetOptions = ref(Object.keys(presets));
