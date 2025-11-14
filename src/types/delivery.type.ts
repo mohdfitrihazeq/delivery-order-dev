@@ -87,3 +87,17 @@ export interface DeliveryFlow {
     selectPO: Step1SelectPO;
     verifyItem: Step2VerifyItem[];
 }
+
+export interface FormValues {
+    driverPlate: string;
+    deliveryDate: Date | null;
+    remarks?: string;
+}
+
+export interface UploadFile {
+    name: string;
+    size: number;
+    type?: string;
+    raw: File;
+    preview?: string;
+}

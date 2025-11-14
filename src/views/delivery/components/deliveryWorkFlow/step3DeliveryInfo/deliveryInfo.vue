@@ -45,16 +45,21 @@
                             </label>
                         </div>
                         <FileUpload name="attachments" url="#" :multiple="true" :maxFileSize="10_000_000" accept="image/*" @select="onSelectedFiles">
-                            <template #content="{ files, removeFileCallback }">
-                                <div v-if="files.length > 0" class="flex flex-wrap gap-4 pt-4">
-                                    <div v-for="(file, index) of files" :key="file.name + file.size" class="p-4 border flex flex-col items-center gap-2">
+                            <template #content="{ removeFileCallback }">
+                                <div v-if="deliveryAttachments.length > 0" class="flex flex-wrap gap-4 pt-4">
+                                    <div v-for="(file, index) of deliveryAttachments" :key="file.name + file.size" class="p-4 border flex flex-col items-center gap-2">
+                                        <img v-if="file.preview" :src="file.preview" class="w-32 h-32 object-cover rounded border" />
+
                                         <span class="font-semibold text-ellipsis max-w-60">{{ file.name }}</span>
                                         <div>{{ formatSize(file.size) }}</div>
+
                                         <Badge value="Pending" severity="warn" />
+
                                         <Button icon="pi pi-times" @click="onRemoveFile(file, removeFileCallback, index)" variant="outlined" rounded severity="danger" />
                                     </div>
                                 </div>
                             </template>
+
                             <template #empty>
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color" />
@@ -62,7 +67,42 @@
                                 </div>
                             </template>
                         </FileUpload>
+
                         <ProgressBar :value="totalSizePercent" :showValue="false" class="w-full h-1 mt-2" />
+                    </div>
+
+                    <!-- Delivery Evidence Photos -->
+                    <div class="grid grid-cols-1 gap-4 p-3 mt-4">
+                        <div>
+                            <label class="font-semibold text-gray-800 flex items-center">
+                                <i class="pi pi-image mr-2"></i>
+                                Delivery Evidence Photos (optional)
+                            </label>
+                        </div>
+
+                        <FileUpload name="deliveryEvidence" url="#" :multiple="true" :maxFileSize="10_000_000" accept="image/*" @select="onSelectedEvidenceFiles">
+                            <template #content="{ removeFileCallback }">
+                                <div v-if="evidenceFiles.length > 0" class="flex flex-wrap gap-4 pt-4">
+                                    <div v-for="(file, index) of evidenceFiles" :key="file.name + file.size" class="p-4 border flex flex-col items-center gap-2">
+                                        <img v-if="file.preview" :src="file.preview" class="w-32 h-32 object-cover rounded border" />
+
+                                        <span class="font-semibold text-ellipsis max-w-60">{{ file.name }}</span>
+                                        <div>{{ formatSize(file.size) }}</div>
+
+                                        <Badge value="Pending" severity="warn" />
+
+                                        <Button icon="pi pi-times" @click="onRemoveEvidenceFile(file, removeFileCallback, index)" variant="outlined" rounded severity="danger" />
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #empty>
+                                <div class="flex flex-col items-center justify-center">
+                                    <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color" />
+                                    <p class="mt-4 mb-0">Drag and drop photos here</p>
+                                </div>
+                            </template>
+                        </FileUpload>
                     </div>
 
                     <div class="flex justify-end mt-4">

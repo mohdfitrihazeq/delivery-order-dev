@@ -53,29 +53,25 @@ export default defineComponent({
         watch(
             () => props.selectedPo,
             (newPo) => {
-                console.log('check the po', newPo);
-                if (!newPo || !newPo.PurchaseOrderItems) {
+                if (!newPo || !newPo.items) {
                     itemList.value = [];
                     poNumber.value = null;
                     return;
                 }
-
-                itemList.value =
-                    newPo.PurchaseOrderItems?.map((i: PurchaseOrderItem) => ({
-                        id: i.Id,
-                        purchaseOrderId: i.PurchaseOrderId,
-                        requestOrderId: i.RequestOrderItemId,
-                        name: i.Name,
-                        order: i.ItemCode,
-                        status: 'Pending',
-                        location: '',
-                        category: '',
-                        type: '',
-                        delivered: 0,
-                        total: Number(i.Quantity) || 0
-                    })) ?? [];
-
-                poNumber.value = newPo.DocNo;
+                itemList.value = newPo.items.map((i: PurchaseOrderItem) => ({
+                    id: i.id,
+                    purchaseOrderId: newPo.id,
+                    requestOrderId: i.requestOrderId ?? null,
+                    name: i.description || i.code || 'Unnamed Item',
+                    order: i.code || '',
+                    status: 'Pending',
+                    location: '',
+                    category: '',
+                    type: '',
+                    delivered: 0,
+                    total: Number(i.qty) || 0
+                }));
+                poNumber.value = newPo.poNumber ?? newPo.DocNo ?? null;
             },
             { immediate: true }
         );

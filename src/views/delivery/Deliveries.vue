@@ -10,16 +10,50 @@
 
             <BaseTab v-model="activeTab" :tabs="tabItems">
                 <template #default="{ activeTab }">
+                    <!-- Pending Deliveries -->
                     <template v-if="activeTab === '0'">
-                        <ReusableTable :value="deliveryStore.incompletedList" emptyTitle="Pending Delivery List" :columns="deliveryListColumn" :onSearch="handleSearch" :onActionClick="handleAction" :loading="deliveryStore.loading">
+                        <ReusableTable
+                            :value="filteredDeliveries"
+                            :columns="deliveryListColumn"
+                            :loading="deliveryStore.loading"
+                            :pagination="deliveryStore.pagination"
+                            :onPageChange="handlePageChange"
+                            :onPageSizeChange="handlePageSizeChange"
+                            :onFilterChange="handleFilterChange"
+                            :onActionClick="handleAction"
+                            emptyTitle="No pending deliveries found"
+                        >
+                            <!-- Numbering -->
+                            <template #rowIndex="{ data }">
+                                {{ data.rowIndex }}
+                            </template>
+
+                            <!-- Status -->
                             <template #status="{ data }">
                                 <Tag :value="data.Status" severity="warn" />
                             </template>
                         </ReusableTable>
                     </template>
 
+                    <!-- Completed Deliveries -->
                     <template v-else>
-                        <ReusableTable :value="deliveryStore.completedList" emptyTitle="Completed Delivery List" :columns="deliveryListColumn" :onSearch="handleSearch" :onActionClick="handleAction" :loading="deliveryStore.loading">
+                        <ReusableTable
+                            :value="filteredDeliveries"
+                            :columns="deliveryListColumn"
+                            :loading="deliveryStore.loading"
+                            :pagination="deliveryStore.pagination"
+                            :onPageChange="handlePageChange"
+                            :onPageSizeChange="handlePageSizeChange"
+                            :onFilterChange="handleFilterChange"
+                            :onActionClick="handleAction"
+                            emptyTitle="No completed deliveries found"
+                        >
+                            <!-- Numbering -->
+                            <template #rowIndex="{ data }">
+                                {{ data.rowIndex }}
+                            </template>
+
+                            <!-- Status -->
                             <template #status="{ data }">
                                 <Tag :value="data.Status" severity="success" />
                             </template>
