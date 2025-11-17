@@ -8,7 +8,7 @@
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h1 class="text-2xl font-bold">New Budget Change Request</h1>
-                    <p class="text-gray-500">Project: MKT</p>
+                    <p class="text-gray-500">Project: {{ projectName }}</p>
                 </div>
                 <div class="flex gap-2">
                     <Button label="Cancel" @click="goBack" outlined />
@@ -21,9 +21,10 @@
                 <h2 class="text-lg font-semibold mb-4">Header Information</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">Serial No</label>
-                        <InputText v-model="roNumber" type="text" class="w-full" disabled />
+                        <label class="block text-sm text-gray-600 mb-1">RO Number</label>
+                        <InputText v-model="roNumber" type="text" class="w-full" :placeholder="roNumber ? roNumber : 'Enter RO No'" />
                     </div>
+
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">Date Requested</label>
                         <InputText v-model="requestDate" type="text" class="w-full" disabled />
@@ -37,9 +38,13 @@
                         <InputText v-model="department" type="text" class="w-full" disabled />
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">Reason of Request</label>
-                        <Select v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" />
+                        <label class="block text-sm font-medium mb-1"> Reason for Request <span class="text-red-600 font-bold">*</span> </label>
+
+                        <Dropdown v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" :invalid="showValidation && !selectedReason" />
+
+                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-1"> Reason for request is required </Message>
                     </div>
+
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">Remarks</label>
                         <InputText v-model="remarks" type="text" class="w-full" />
@@ -57,6 +62,7 @@
                 <div v-if="items.length === 0" class="flex justify-center items-center py-10 text-gray-500">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
                         <ResultNotFound />
+                        <Message v-if="showValidation && items.length === 0" severity="error" icon="pi pi-times-circle" class="mt-2"> Please add at least one item. </Message>
                     </Motion>
                 </div>
 
@@ -175,6 +181,7 @@
                                 <Button type="button" icon="pi pi-download" text @click="handleExport" />
                             </template>
                         </DataTable>
+
                         <div class="pt-3 mt-2 text-small font-semibold flex justify-between items-center">
                             <span>{{ items.length }} {{ items.length > 1 ? 'items' : 'item' }}</span>
                             <span class="font-semibold"> Total Variance Amount: ${{ totalVarianceAmount.toFixed(2) }} </span>
@@ -182,7 +189,12 @@
                     </Motion>
                 </div>
             </div>
-
+            <div class="flex justify-end mb-6">
+                <div class="flex gap-2">
+                    <Button label="Cancel" @click="goBack" outlined />
+                    <Button label="Submit Request" @click="submitRequest" />
+                </div>
+            </div>
             <MeterialModal v-model:visible="showBulkItemModal" @material-selected="handleBulkItems" />
         </div>
     </Motion>

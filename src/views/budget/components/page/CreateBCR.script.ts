@@ -1,6 +1,7 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { BudgetChangeItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { computed, defineComponent, ref } from 'vue';
@@ -33,6 +34,8 @@ export default defineComponent({
         const requestDate = ref(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
         const selectedReason = ref<string | null>(null);
         const remarks = ref('');
+        const projectName = getCurrentProjectName();
+        const showValidation = ref(false);
 
         // --- Reason Options ---
         const reasonOptions = ref([
@@ -112,11 +115,19 @@ export default defineComponent({
             URL.revokeObjectURL(url);
         };
 
-        // --- Submit Request ---
         const submitRequest = async () => {
-            if (items.value.length === 0) return;
+            showValidation.value = true;
+
+            // validation
+            const reasonValid = !!selectedReason.value;
+            const itemsValid = items.value.length > 0;
+
+            if (!reasonValid || !itemsValid) {
+                return;
+            }
 
             const payload: BudgetChangeRequestPayload = {
+                ProjectId: getCurrentProjectId(),
                 DocNo: roNumber.value,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
@@ -138,7 +149,6 @@ export default defineComponent({
                     element: ''
                 }))
             };
-
             const result = await budgetStore.createBudgetChangeRequest(payload as any);
             if (result) router.push({ name: 'budgetChangeRequest' });
         };
@@ -167,7 +177,9 @@ export default defineComponent({
             isAttachmentValid,
             handleExport,
             submitRequest,
-            goBack
+            goBack,
+            projectName,
+            showValidation
         };
     }
 });
