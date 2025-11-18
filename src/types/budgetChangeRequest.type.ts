@@ -96,3 +96,14 @@ export interface BudgetChangeRequestPayload {
     Type: 'BudgetChangeRequest';
     Items: BudgetChangeItemPayload[];
 }
+
+export interface TableItem {
+    itemCode: string;
+    description: string;
+    uom: string;
+    unitPrice: number;
+    budgetQty: number;
+    orderedQty: number;
+    newOrder: number;
+    remark: string;
+}

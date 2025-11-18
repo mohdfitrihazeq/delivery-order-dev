@@ -1,23 +1,12 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import type { BudgetChangeRequestPayload, TableItem } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
 import { useToast } from 'primevue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-interface TableItem {
-    itemCode: string;
-    description: string;
-    uom: string;
-    unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    remark: string;
-}
 
 export default defineComponent({
     name: 'CreateBCR',
