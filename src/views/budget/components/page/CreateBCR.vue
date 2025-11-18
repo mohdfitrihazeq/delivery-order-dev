@@ -112,18 +112,16 @@
                                     <InputText type="number" v-model.number="slotProps.data.unitPrice" class="w-full" />
                                 </template>
                             </Column>
-
-                            <!-- Budgeted Quantity -->
-                            <Column field="budgetQty" header="Budgeted Quantity">
-                                <template #body="slotProps">
-                                    <InputText type="number" v-model.number="slotProps.data.budgetQty" class="w-full" />
-                                </template>
-                            </Column>
-
                             <!-- Ordered Quantity -->
                             <Column field="orderedQty" header="Ordered Quantity">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.orderedQty" class="w-full" />
+                                </template>
+                            </Column>
+                            <!-- Budgeted Quantity -->
+                            <Column field="budgetQty" header="Budgeted Quantity">
+                                <template #body="slotProps">
+                                    <InputText type="number" v-model.number="slotProps.data.budgetQty" class="w-full" />
                                 </template>
                             </Column>
 

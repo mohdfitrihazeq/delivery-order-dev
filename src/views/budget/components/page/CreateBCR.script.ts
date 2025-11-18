@@ -79,7 +79,7 @@ export default defineComponent({
                         uom: mat.uom || mat.Uom || '',
                         unitPrice: Number(mat.price || mat.UnitPrice || 0),
                         budgetQty: 0,
-                        orderedQty: Number(mat.orderedQty || mat.OrderedQty || 0),
+                        orderedQty: Number(mat.Quantity || mat.quantity || 0),
                         newOrder: Number(mat.newOrder || mat.NewOrder || 0),
                         remark: mat.remark || mat.Remark || ''
                     });
