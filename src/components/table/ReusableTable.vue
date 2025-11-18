@@ -231,14 +231,26 @@ const displayEnd = computed(() => {
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
             <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+                <!-- 1. Slot-based body (status, TotalAmount, etc.) -->
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />
                 </template>
 
-                <template v-if="col.action" #body="slotProps">
+                <!-- 2. NEW: Custom formatter -->
+                <template v-else-if="col.body" #body="slotProps">
+                    {{ col.body?.(slotProps.data) }}
+                </template>
+
+                <!-- 3. Actions column -->
+                <template v-else-if="col.action" #body="slotProps">
                     <div class="flex gap-2">
                         <Button icon="pi pi-ellipsis-v" text @click="openMenu($event, slotProps.data, col.actions)" />
                     </div>
+                </template>
+
+                <!-- 4. Default fallback (raw value) -->
+                <template v-else #body="slotProps">
+                    {{ col.field ? slotProps.data[col.field] : '' }}
                 </template>
             </Column>
         </DataTable>

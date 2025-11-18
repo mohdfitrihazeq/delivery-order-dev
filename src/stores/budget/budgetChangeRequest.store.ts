@@ -23,7 +23,6 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
 
             try {
                 const response = await budgetService.getBudgetChangeRequests();
-
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget change requests.');
                     return [];

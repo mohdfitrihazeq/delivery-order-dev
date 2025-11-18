@@ -29,6 +29,7 @@ declare module 'vue' {
     Dropdown: typeof import('primevue/dropdown')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
+    InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Message: typeof import('primevue/message')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
@@ -40,7 +41,11 @@ declare module 'vue' {
     Select: typeof import('primevue/select')['default']
     SeparatorLine: typeof import('./src/components/SeparatorLine.vue')['default']
     SummaryCard: typeof import('./src/components/summaryCard/SummaryCard.vue')['default']
+    Tag: typeof import('primevue/tag')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']
+  }
+  export interface ComponentCustomProperties {
+    Tooltip: typeof import('primevue/tooltip')['default']
   }
 }

@@ -3,6 +3,7 @@ import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest
 import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
+import { formatDate } from '@/utils/dateHelper';
 import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref } from 'vue';
@@ -76,12 +77,17 @@ export default defineComponent({
             { field: 'DocNo', header: 'Request No' },
             { field: 'ProjectId', header: 'Project Code' },
             { field: 'RequestedBy', header: 'Requested By' },
-            { field: 'RequestDate', header: 'Date Requested' },
+            {
+                field: 'RequestDate',
+                header: 'Date Requested',
+                body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
+            },
             { field: 'Status', header: 'Status', bodySlot: 'status' },
             { field: 'BudgetChangeItem', header: '# Materials', bodySlot: 'materials' },
             { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
             { field: 'actions', header: 'Actions', action: true }
         ]);
+
         function getStatusSeverity(Status: string) {
             switch (Status) {
                 case 'Approved':

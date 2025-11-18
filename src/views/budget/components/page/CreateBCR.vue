@@ -10,10 +10,6 @@
                     <h1 class="text-2xl font-bold">New Budget Change Request</h1>
                     <p class="text-gray-500">Project: {{ projectName }}</p>
                 </div>
-                <div class="flex gap-2">
-                    <Button label="Cancel" @click="goBack" outlined />
-                    <Button label="Submit Request" :disabled="items.length === 0" @click="submitRequest" />
-                </div>
             </div>
 
             <!-- Header Information -->
@@ -195,7 +191,7 @@
                     <Button label="Submit Request" @click="submitRequest" />
                 </div>
             </div>
-            <MeterialModal v-model:visible="showBulkItemModal" @material-selected="handleBulkItems" />
+            <MeterialModal v-model:visible="showBulkItemModal" @items-selected="handleBulkItems" />
         </div>
     </Motion>
 </template>
