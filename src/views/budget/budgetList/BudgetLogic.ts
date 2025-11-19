@@ -16,6 +16,7 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
+import { useToast } from 'primevue/usetoast';
 
 interface PaginationConfig {
     page: number;
@@ -41,7 +42,7 @@ export default defineComponent({
     },
     setup() {
         const budgetStore = useBudgetStore();
-
+        const toast = useToast();
         // ---------------------------
         // 1. Static
         // ---------------------------
@@ -124,7 +125,15 @@ export default defineComponent({
 
         watch(selectedVersion, async (newVersion) => {
             const selected = versions.value.find((v) => v.value === newVersion);
+
             if (selected) {
+                toast.add({
+                    severity: 'info',
+                    summary: 'Version Changed',
+                    detail: `Switched to version: ${selected.label}`,
+                    life: 2000
+                });
+
                 latestBudgetId.value = selected.id!;
                 await fetchBudgetList();
             }
