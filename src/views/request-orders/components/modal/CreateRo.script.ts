@@ -1,12 +1,12 @@
-import { computed, defineComponent, ref, watch, onMounted } from 'vue';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
-import { useBudgetStore } from '@/stores/budget/newBudget.store';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { useBudgetStore } from '@/stores/budget/newBudget.store';
 import type { TableColumn } from '@/types/table.type';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 
@@ -57,13 +57,21 @@ export default defineComponent({
 
         onMounted(() => {
             budgetStore.fetchBudgets();
-            budgetStore.fetchBudgetItems();
+            budgetStore.fetchBudgetItems(currentVersion.value ?? 0, pagination.value.page, pagination.value.pageSize);
         });
 
+        const loadLatestBudgetVersion = (): number | null => {
+            const v = localStorage.getItem('latestBudgetVersion');
+            return v ? Number(v) : null;
+        };
+
+        const currentVersion = ref<number | null>(props.version || loadLatestBudgetVersion());
+
         const fetchBudgetItems = async () => {
+            if (!currentVersion.value) return;
             loading.value = true;
             try {
-                await budgetStore.fetchBudgetItems(pagination.value.page, pagination.value.pageSize);
+                await budgetStore.fetchBudgetItems(currentVersion.value, pagination.value.page, pagination.value.pageSize);
                 pagination.value.total = budgetStore.pagination.total;
                 pagination.value.totalPages = budgetStore.pagination.totalPages;
             } catch (error) {
@@ -170,9 +178,15 @@ export default defineComponent({
             return severityMap[itemType] || 'info';
         };
 
-        watch(localVisible, (visible) => {
+        watch(localVisible, async (visible) => {
             if (visible) {
-                fetchBudgetItems();
+                if (!currentVersion.value) {
+                    // fallback in case version not set
+                    currentVersion.value = loadLatestBudgetVersion();
+                }
+                if (currentVersion.value) {
+                    await fetchBudgetItems();
+                }
             }
         });
 

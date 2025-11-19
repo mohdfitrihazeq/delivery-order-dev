@@ -102,18 +102,25 @@ export const useBudgetStore = defineStore('budget', () => {
                 itemType: item.ItemType,
                 description: item.Description,
                 description2: item.Description2,
+
                 location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
-                element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
                 location1: item.Location1,
                 location2: item.Location2,
+
                 category: item.Category,
+                element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
                 elementCode: item.Element,
                 subElement: item.SubElement,
                 subSubElement: item.SubSubElement,
+
+                uom: item.Unit,
+                quantity: Number(item.Quantity),
+                price: Number(item.Rate),
+                total: Number(item.Quantity) * Number(item.Rate),
                 unit: item.Unit,
-                quantity: Number(item.Quantity) || 0,
                 rate: Number(item.Rate) || 0,
                 amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
+
                 status: item.Status,
                 createdAt: formatDate(item.CreatedAt),
                 updatedAt: formatDate(item.UpdatedAt)

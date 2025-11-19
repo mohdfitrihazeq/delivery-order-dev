@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth/auth.store';
+import { useBudgetStore } from '@/stores/budget/newBudget.store';
 import { Motion } from '@motionone/vue';
+import Badge from 'primevue/badge';
 import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
 import type { MenuItemCommandEvent } from 'primevue/menuitem';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import Dialog from 'primevue/dialog';
-import Badge from 'primevue/badge';
 
 const toast = useToast();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
@@ -115,6 +116,14 @@ const selectProject = (company: string, project: Project) => {
     showProjectDialog.value = false;
 };
 
+const saveLatestBudgetVersion = (version: number) => {
+    try {
+        localStorage.setItem('latestBudgetVersion', version.toString());
+    } catch (err) {
+        console.error('Error saving latest budget version to localStorage', err);
+    }
+};
+
 watch(selectedProject, (newProject) => saveProjectToStorage(newProject), { deep: true });
 
 onMounted(() => {
@@ -133,6 +142,15 @@ onMounted(() => {
         selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
     } else {
         selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
+    }
+});
+
+onMounted(async () => {
+    const budgetStore = useBudgetStore();
+    const versions = await budgetStore.fetchBudgetVersion();
+    if (versions && versions.length > 0) {
+        const latest = versions.reduce((prev, curr) => (Number(curr.id) > Number(prev.id) ? curr : prev));
+        saveLatestBudgetVersion(Number(latest.id));
     }
 });
 </script>

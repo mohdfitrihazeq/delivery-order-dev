@@ -45,14 +45,20 @@ export default defineComponent({
             totalPages: 0
         });
 
-        // Budget store
         const budgetStore = useBudgetStore();
 
-        // Fetch data
+        const loadLatestBudgetVersion = (): number | null => {
+            const v = localStorage.getItem('latestBudgetVersion');
+            return v ? Number(v) : null;
+        };
+
+        const currentVersion = ref<number | null>(props.version || loadLatestBudgetVersion());
+
         const fetchBudgetItems = async () => {
+            if (!currentVersion.value) return;
             loading.value = true;
             try {
-                await budgetStore.fetchBudgetItems(pagination.value.page, pagination.value.pageSize);
+                await budgetStore.fetchBudgetItems(currentVersion.value, pagination.value.page, pagination.value.pageSize);
                 pagination.value.total = budgetStore.pagination.total;
                 pagination.value.totalPages = budgetStore.pagination.totalPages;
             } catch (error) {
@@ -138,8 +144,16 @@ export default defineComponent({
             return map[itemType] || 'info';
         };
 
-        watch(localVisible, (visible) => {
-            if (visible) fetchBudgetItems();
+        watch(localVisible, async (visible) => {
+            if (visible) {
+                if (!currentVersion.value) {
+                    // fallback in case version not set
+                    currentVersion.value = loadLatestBudgetVersion();
+                }
+                if (currentVersion.value) {
+                    await fetchBudgetItems();
+                }
+            }
         });
 
         // Table columns
