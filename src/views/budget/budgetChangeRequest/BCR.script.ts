@@ -63,17 +63,25 @@ export default defineComponent({
         const showCommentModal = ref(false);
         const selectedRequestNo = ref<string | null>(null);
 
-        const filteredRequests = computed(() =>
-            budgetChangeRequestData.value.filter((r) => {
-                const matchSearch = !searchTerm.value || r.DocNo.toLowerCase().includes(searchTerm.value.toLowerCase());
-                const statusFilter = activeFilters.value?.status;
+        const filteredRequests = computed(() => {
+            return budgetChangeRequestData.value.filter((r) => {
+                const matchSearch = !budgetStore.filters.search || r.DocNo.toLowerCase().includes(budgetStore.filters.search.toLowerCase());
+
+                const statusFilter = budgetStore.filters.status;
                 const matchStatus = !statusFilter ? true : r.Status === statusFilter;
 
                 return matchSearch && matchStatus;
-            })
-        );
+            });
+        });
+
+        const paginatedRequests = computed(() => {
+            const start = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
+            const end = start + budgetStore.pagination.pageSize;
+            return filteredRequests.value.slice(start, end);
+        });
 
         const tableColumns = computed<TableColumn[]>(() => [
+            { field: 'rowIndex', header: '#' },
             { field: 'DocNo', header: 'Request No' },
             { field: 'ProjectId', header: 'Project Code' },
             { field: 'RequestedBy', header: 'Requested By' },
@@ -101,12 +109,20 @@ export default defineComponent({
             }
         }
 
-        function handleSearch(val: string) {
-            searchTerm.value = val;
+        function handlePageChange(page: number) {
+            budgetStore.setPage(page);
         }
 
-        function handleFilterChange(filters: Record<string, string | number | boolean>) {
-            activeFilters.value = filters;
+        function handlePageSizeChange(size: number) {
+            budgetStore.setPageSize(size);
+        }
+
+        function handleSearch(value: string) {
+            budgetStore.handleSearch(value);
+        }
+
+        function handleFilterChange(filters: Record<string, any>) {
+            budgetStore.handleFilterChange(filters);
         }
 
         const router = useRouter();
@@ -118,6 +134,17 @@ export default defineComponent({
                 router.push(`/bcr/view/${rowData.Id}`);
             }
         }
+
+        const startingIndex = computed(() => {
+            return (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
+        });
+
+        const numberedRequests = computed(() => {
+            return paginatedRequests.value.map((item, index) => ({
+                ...item,
+                rowIndex: startingIndex.value + index + 1
+            }));
+        });
 
         return {
             budgetChangeRequestData,
@@ -132,7 +159,13 @@ export default defineComponent({
             handleActionClick,
             showCommentModal,
             selectedRequestNo,
-            BudgetChangeRequestSummaryData
+            BudgetChangeRequestSummaryData,
+            paginatedRequests,
+            handlePageChange,
+            handlePageSizeChange,
+            pagination: budgetStore.pagination,
+            budgetStore,
+            numberedRequests
         };
     }
 });

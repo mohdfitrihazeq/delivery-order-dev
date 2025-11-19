@@ -7,13 +7,37 @@ interface State {
     loading: boolean;
     budgetChangeRequestList: BudgetChangeRequest[];
     singleBudgetChangeRequest: BudgetChangeRequest | null;
+
+    pagination: {
+        page: number;
+        pageSize: number;
+        total: number;
+        totalPages: number;
+    };
+
+    filters: {
+        search: string;
+        status: string;
+    };
 }
 
 export const useBudgetChangeRequestStore = defineStore('budgetStore', {
     state: (): State => ({
         loading: false,
         budgetChangeRequestList: [],
-        singleBudgetChangeRequest: null
+        singleBudgetChangeRequest: null,
+
+        pagination: {
+            page: 1,
+            pageSize: 10,
+            total: 0,
+            totalPages: 0
+        },
+
+        filters: {
+            search: '',
+            status: ''
+        }
     }),
 
     actions: {
@@ -29,6 +53,11 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
                 }
 
                 this.budgetChangeRequestList = response.data || [];
+
+                // FE pagination (simulate total count)
+                this.pagination.total = this.budgetChangeRequestList.length;
+                this.pagination.totalPages = Math.ceil(this.pagination.total / this.pagination.pageSize);
+
                 return this.budgetChangeRequestList;
             } catch (error: any) {
                 showError(error?.message || 'Failed to fetch budget change requests.');
@@ -49,7 +78,6 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
                 }
 
                 showSuccess(response.message || 'Budget Change Request created successfully.');
-
                 await this.fetchBudgetChangesRequestList();
 
                 return response.data;
@@ -103,6 +131,25 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        setPage(page: number) {
+            this.pagination.page = page;
+        },
+
+        setPageSize(size: number) {
+            this.pagination.pageSize = size;
+            this.pagination.page = 1;
+        },
+
+        handleSearch(value: string) {
+            this.filters.search = value;
+            this.pagination.page = 1;
+        },
+
+        handleFilterChange(value: Record<string, any>) {
+            this.filters.status = value.status ?? '';
+            this.pagination.page = 1;
         }
     }
 });
