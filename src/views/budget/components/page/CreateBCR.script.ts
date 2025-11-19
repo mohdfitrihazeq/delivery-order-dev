@@ -1,21 +1,12 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeItem, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import type { BudgetChangeRequestPayload, TableItem } from '@/types/budgetChangeRequest.type';
+import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
+import { useToast } from 'primevue';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-interface TableItem {
-    itemCode: string;
-    description: string;
-    uom: string;
-    unitPrice: number;
-    budgetQty: number;
-    orderedQty: number;
-    newOrder: number;
-    remark: string;
-}
 
 export default defineComponent({
     name: 'CreateBCR',
@@ -33,7 +24,9 @@ export default defineComponent({
         const requestDate = ref(`${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
         const selectedReason = ref<string | null>(null);
         const remarks = ref('');
-
+        const projectName = getCurrentProjectName();
+        const showValidation = ref(false);
+        const toast = useToast();
         // --- Reason Options ---
         const reasonOptions = ref([
             { label: 'Exceed Budget', value: 'Exceed Budget' },
@@ -66,18 +59,18 @@ export default defineComponent({
         // --- Modal ---
         const showBulkItemModal = ref(false);
         const openMeterial = () => (showBulkItemModal.value = true);
-        const handleBulkItems = (selectedMaterials: BudgetChangeItem[]) => {
+        const handleBulkItems = (selectedMaterials: any[]) => {
             selectedMaterials.forEach((mat) => {
-                if (!items.value.some((i) => i.itemCode === mat.ItemCode)) {
+                if (!items.value.some((i) => i.itemCode === mat.itemCode)) {
                     items.value.push({
-                        itemCode: mat.ItemCode,
-                        description: mat.Name?.trim() || mat.Description || '',
-                        uom: mat.Uom || '',
-                        unitPrice: Number(mat.UnitPrice) || 0,
+                        itemCode: mat.itemCode || mat.ItemCode,
+                        description: mat.description || mat.Name || '',
+                        uom: mat.uom || mat.Uom || '',
+                        unitPrice: Number(mat.price || mat.UnitPrice || 0),
                         budgetQty: 0,
-                        orderedQty: Number(mat.OrderedQty) || 0,
-                        newOrder: Number(mat.NewOrder) || 0,
-                        remark: mat.Remark || ''
+                        orderedQty: Number(mat.Quantity || mat.quantity || 0),
+                        newOrder: Number(mat.newOrder || mat.NewOrder || 0),
+                        remark: mat.remark || mat.Remark || ''
                     });
                 }
             });
@@ -112,11 +105,35 @@ export default defineComponent({
             URL.revokeObjectURL(url);
         };
 
-        // --- Submit Request ---
         const submitRequest = async () => {
-            if (items.value.length === 0) return;
+            showValidation.value = true;
+
+            // validation
+            const reasonValid = !!selectedReason.value;
+            const itemsValid = items.value.length > 0;
+
+            if (!reasonValid || !itemsValid) {
+                if (!reasonValid) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation',
+                        detail: 'Please select a reason for the request',
+                        life: 3000
+                    });
+                }
+                if (!itemsValid) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation',
+                        detail: 'Please add at least one item',
+                        life: 3000
+                    });
+                }
+                return;
+            }
 
             const payload: BudgetChangeRequestPayload = {
+                ProjectId: getCurrentProjectId(),
                 DocNo: roNumber.value,
                 RequestDate: requestDate.value,
                 RequestedBy: requestBy.value,
@@ -140,7 +157,15 @@ export default defineComponent({
             };
 
             const result = await budgetStore.createBudgetChangeRequest(payload as any);
-            if (result) router.push({ name: 'budgetChangeRequest' });
+            if (result) {
+                toast.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: 'Budget Change Request submitted successfully',
+                    life: 3000
+                });
+                router.push({ name: 'budgetChangeRequest' });
+            }
         };
 
         const goBack = () => router.push({ name: 'budgetChangeRequest' });
@@ -167,7 +192,9 @@ export default defineComponent({
             isAttachmentValid,
             handleExport,
             submitRequest,
-            goBack
+            goBack,
+            projectName,
+            showValidation
         };
     }
 });

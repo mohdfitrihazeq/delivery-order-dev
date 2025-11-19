@@ -3,6 +3,7 @@ import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest
 import type { BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
 import type { CardItem } from '@/types/card.type';
 import type { TableColumn } from '@/types/table.type';
+import { formatDate } from '@/utils/dateHelper';
 import CommentBCR from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import Badge from 'primevue/badge';
 import { computed, defineComponent, onMounted, ref } from 'vue';
@@ -62,26 +63,39 @@ export default defineComponent({
         const showCommentModal = ref(false);
         const selectedRequestNo = ref<string | null>(null);
 
-        const filteredRequests = computed(() =>
-            budgetChangeRequestData.value.filter((r) => {
-                const matchSearch = !searchTerm.value || r.DocNo.toLowerCase().includes(searchTerm.value.toLowerCase());
-                const statusFilter = activeFilters.value?.status;
+        const filteredRequests = computed(() => {
+            return budgetChangeRequestData.value.filter((r) => {
+                const matchSearch = !budgetStore.filters.search || r.DocNo.toLowerCase().includes(budgetStore.filters.search.toLowerCase());
+
+                const statusFilter = budgetStore.filters.status;
                 const matchStatus = !statusFilter ? true : r.Status === statusFilter;
 
                 return matchSearch && matchStatus;
-            })
-        );
+            });
+        });
+
+        const paginatedRequests = computed(() => {
+            const start = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
+            const end = start + budgetStore.pagination.pageSize;
+            return filteredRequests.value.slice(start, end);
+        });
 
         const tableColumns = computed<TableColumn[]>(() => [
+            { field: 'rowIndex', header: '#' },
             { field: 'DocNo', header: 'Request No' },
             { field: 'ProjectId', header: 'Project Code' },
             { field: 'RequestedBy', header: 'Requested By' },
-            { field: 'RequestDate', header: 'Date Requested' },
+            {
+                field: 'RequestDate',
+                header: 'Date Requested',
+                body: (rowData: BudgetChangeRequest) => formatDate(rowData.RequestDate)
+            },
             { field: 'Status', header: 'Status', bodySlot: 'status' },
             { field: 'BudgetChangeItem', header: '# Materials', bodySlot: 'materials' },
             { field: 'TotalAmount', header: 'Variance Amount', bodySlot: 'TotalAmount' },
             { field: 'actions', header: 'Actions', action: true }
         ]);
+
         function getStatusSeverity(Status: string) {
             switch (Status) {
                 case 'Approved':
@@ -95,12 +109,20 @@ export default defineComponent({
             }
         }
 
-        function handleSearch(val: string) {
-            searchTerm.value = val;
+        function handlePageChange(page: number) {
+            budgetStore.setPage(page);
         }
 
-        function handleFilterChange(filters: Record<string, string | number | boolean>) {
-            activeFilters.value = filters;
+        function handlePageSizeChange(size: number) {
+            budgetStore.setPageSize(size);
+        }
+
+        function handleSearch(value: string) {
+            budgetStore.handleSearch(value);
+        }
+
+        function handleFilterChange(filters: Record<string, any>) {
+            budgetStore.handleFilterChange(filters);
         }
 
         const router = useRouter();
@@ -112,6 +134,17 @@ export default defineComponent({
                 router.push(`/bcr/view/${rowData.Id}`);
             }
         }
+
+        const startingIndex = computed(() => {
+            return (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
+        });
+
+        const numberedRequests = computed(() => {
+            return paginatedRequests.value.map((item, index) => ({
+                ...item,
+                rowIndex: startingIndex.value + index + 1
+            }));
+        });
 
         return {
             budgetChangeRequestData,
@@ -126,7 +159,13 @@ export default defineComponent({
             handleActionClick,
             showCommentModal,
             selectedRequestNo,
-            BudgetChangeRequestSummaryData
+            BudgetChangeRequestSummaryData,
+            paginatedRequests,
+            handlePageChange,
+            handlePageSizeChange,
+            pagination: budgetStore.pagination,
+            budgetStore,
+            numberedRequests
         };
     }
 });

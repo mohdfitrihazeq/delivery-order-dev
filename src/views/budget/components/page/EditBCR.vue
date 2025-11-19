@@ -6,10 +6,6 @@
 
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold">Edit Budget Change Request</h1>
-            <div class="flex gap-2">
-                <Button label="Cancel" @click="goBack" outlined />
-                <Button label="Submit Request" @click="submitRequest" />
-            </div>
         </div>
 
         <!-- Header -->
@@ -117,5 +113,11 @@
             </DataTable>
         </div>
         <div class="text-right font-semibold mt-4">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+        <div class="flex justify-end mb-6 mt-6">
+            <div class="flex gap-2">
+                <Button label="Cancel" @click="goBack" outlined />
+                <Button label="Submit Request" @click="submitRequest" />
+            </div>
+        </div>
     </div>
 </template>

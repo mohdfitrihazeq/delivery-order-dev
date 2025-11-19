@@ -49,8 +49,8 @@
                     :showImportFile="true"
                     :onImportFile="handleImportClick"
                 >
-                    <template #rate="{ data }"> ${{ data.Rate }} </template>
-                    <template #amount="{ data }"> ${{ data.Amount }} </template>
+                    <template #rate="{ data }"> RM {{ data.rate }} </template>
+                    <template #amount="{ data }"> RM {{ data.amount }} </template>
                 </ReusableTable>
 
                 <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />

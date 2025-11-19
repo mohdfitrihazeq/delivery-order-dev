@@ -17,10 +17,22 @@
                 <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="4" />
             </div>
 
-            <ReusableTable :value="filteredRequests" :columns="tableColumns" :onSearch="handleSearch" :extraFilters="extraFilters" :onFilterChange="handleFilterChange" :onActionClick="handleActionClick">
+            <ReusableTable
+                :value="numberedRequests"
+                :columns="tableColumns"
+                :loading="budgetStore.loading"
+                :pagination="budgetStore.pagination"
+                :onPageChange="handlePageChange"
+                :onPageSizeChange="handlePageSizeChange"
+                :onSearch="handleSearch"
+                :extraFilters="extraFilters"
+                :onFilterChange="handleFilterChange"
+                :onActionClick="handleActionClick"
+            >
                 <template #status="{ data }">
                     <Badge :value="data.Status" :severity="getStatusSeverity(data.Status)" />
                 </template>
+
                 <template #TotalAmount="{ data }">
                     <span class="font-semibold">{{ data.TotalAmount }}</span>
                 </template>

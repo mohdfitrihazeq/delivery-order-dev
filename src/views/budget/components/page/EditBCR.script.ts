@@ -1,5 +1,6 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
+import type { BudgetChangeItem, BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import { formatDateToAPI } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -131,28 +132,35 @@ export default defineComponent({
             return (Math.max(0, newOrder - ordered) * unit).toFixed(2);
         };
 
-        const totalVarianceAmount = computed(() => items.value.reduce((sum, it) => sum + (Number(it.UnitPrice) || 0) * (Number(it.NewOrder) || 0), 0));
+        const totalVarianceAmount = computed(() => items.value.reduce((acc, it) => acc + calcEstimatedExceed(it), 0));
 
         const submitRequest = async () => {
-            const payload: BudgetChangeRequest = {
-                Id: singleBudgetChangeRequest.value?.Id ?? 0,
+            const payload: BudgetChangeRequestPayload = {
                 ProjectId: singleBudgetChangeRequest.value?.ProjectId ?? 0,
                 DocNo: roNumber.value,
-                RequestDate: requestDate.value,
+                RequestDate: requestDate.value ? formatDateToAPI(requestDate.value) : '',
                 RequestedBy: requestBy.value,
                 Reason: reason.value,
                 Department: singleBudgetChangeRequest.value?.Department ?? '',
                 Remark: singleBudgetChangeRequest.value?.Remark ?? '',
                 TotalAmount: totalVarianceAmount.value,
-                Attachment: singleBudgetChangeRequest.value?.Attachment ?? '',
-                Status: singleBudgetChangeRequest.value?.Status ?? '',
-                CreatedBy: singleBudgetChangeRequest.value?.CreatedBy ?? null,
-                CreatedAt: singleBudgetChangeRequest.value?.CreatedAt ?? '',
-                UpdatedAt: singleBudgetChangeRequest.value?.UpdatedAt ?? '',
-                UpdatedBy: singleBudgetChangeRequest.value?.UpdatedBy ?? null,
-                budgetchangeitem: items.value
+                Type: 'BudgetChangeRequest',
+
+                Items: items.value.map((i) => ({
+                    ItemCode: i.ItemCode,
+                    Name: i.Description,
+                    Uom: i.Uom,
+                    UnitPrice: Number(i.UnitPrice),
+                    OrderedQty: Number(i.OrderedQty),
+                    NewOrder: Number(i.NewOrder),
+                    Description: i.Description,
+                    Remark: i.Remark,
+                    location: '',
+                    element: ''
+                }))
             };
-            const isSuccess = await store.editBudgetChangeRequest(payload as any, payload.Id);
+
+            const isSuccess = await store.editBudgetChangeRequest(payload, singleBudgetChangeRequest.value?.Id ?? 0);
 
             if (isSuccess) router.push('/bcr');
         };

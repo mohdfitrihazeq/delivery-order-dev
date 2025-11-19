@@ -1,7 +1,7 @@
 <script lang="ts" src="./CreateBCRModal.script.ts"></script>
 
 <template>
-    <Dialog v-model:visible="localVisible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal" class="create-ro-modal">
+    <Dialog v-model:visible="localVisible" modal :header="modalTitle" :style="{ width: '90vw', maxWidth: '1200px' }" :closable="true" @hide="closeModal">
         <template #header>
             <div class="flex items-center gap-3">
                 <i class="pi pi-box text-xl"></i>
@@ -12,75 +12,69 @@
             </div>
         </template>
 
-        <!-- Search and Filters -->
-        <div class="mb-3">
-            <div class="flex gap-4 mb-3">
-                <!-- Search -->
+        <!-- Search & Filters -->
+        <div class="mb-4">
+            <div class="flex gap-4 mb-4">
                 <div class="flex-1">
                     <div class="p-input-icon-left w-full">
-                        <InputText v-model="searchTerm" placeholder="Search by Item Code / Name" class="w-full" :show-clear="true" />
+                        <InputText v-model="searchTerm" placeholder="Search by item code or description..." class="w-full" />
                     </div>
                 </div>
-                <!-- Clear Filters Button -->
                 <Button label="Clear Filters" icon="pi pi-times" outlined @click="clearFilters" :disabled="!hasActiveFilters" />
             </div>
 
-            <!-- Filter Dropdowns -->
-            <div class="grid grid-cols-2 gap-2">
-                <!-- Location Filter -->
+            <div class="grid grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">Location</label>
-                    <Dropdown v-model="selectedLocation" :options="locationOptions" optionLabel="label" optionValue="value" placeholder="Location" class="w-full" :show-clear="true" />
+                    <Dropdown v-model="selectedLocation" :options="locationOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
 
-                <!-- Element Filter -->
                 <div>
                     <label class="block text-sm font-medium mb-2">Element</label>
-                    <Dropdown v-model="selectedElement" :options="elementOptions" optionLabel="label" optionValue="value" placeholder="Element" class="w-full" :show-clear="true" />
+                    <Dropdown v-model="selectedElement" :options="elementOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Item Type</label>
+                    <Dropdown v-model="selectedItemType" :options="itemTypeOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
             </div>
         </div>
 
         <!-- Results Summary -->
-        <div class="mb-3 text-sm text-gray-600">Showing {{ filteredItems.length }} of {{ budgetItems.length }} items</div>
+        <div class="mb-4 text-sm text-gray-600">Showing {{ filteredItems?.length || 0 }} of {{ allBudgetItems?.length || 0 }} items</div>
 
         <!-- Items Table -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden mb-3">
-            <DataTable v-model:selection="selectedItems" :value="filteredItems" dataKey="ItemCode" :loading="loading" scrollable scrollHeight="280px" class="w-full">
-                <Column selectionMode="multiple" headerStyle="width:3rem" />
+        <ReusableTable
+            :value="paginatedItems"
+            :columns="columns"
+            :loading="loading"
+            :pagination="pagination"
+            :onPageChange="handlePageChange"
+            :onPageSizeChange="handlePageSizeChange"
+            :selection-mode="'checkbox'"
+            v-model:selection="selectedItems"
+            emptyTitle="No budget items found"
+        >
+            <template #itemTypeSlot="{ data }">
+                <Tag :value="data.itemType" :severity="getItemTypeSeverity(data.itemType)" />
+            </template>
 
-                <Column field="ItemCode" header="Item Code" style="min-width: 150px" />
-                <Column field="Name" header="Item Name" style="min-width: 220px" />
+            <template #priceSlot="{ data }">
+                {{ data.price.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
 
-                <Column field="location" header="Location" style="min-width: 200px" />
-                <Column field="element" header="Element" style="min-width: 200px" />
+            <template #totalSlot="{ data }">
+                {{ (data.price * data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+            </template>
+        </ReusableTable>
 
-                <Column field="Uom" header="UoM" style="min-width: 100px" />
-                <Column field="OrderedQty" header="Qty" style="min-width: 100px">
-                    <template #body="slotProps">
-                        {{ Number(slotProps.data.OrderedQty) || 0 }}
-                    </template>
-                </Column>
-
-                <Column field="UnitPrice" header="Unit Price" style="min-width: 120px">
-                    <template #body="slotProps">
-                        {{ Number(slotProps.data.UnitPrice).toFixed(2) }}
-                    </template>
-                </Column>
-
-                <Column header="Total" style="min-width: 150px">
-                    <template #body="slotProps">
-                        {{ (Number(slotProps.data.UnitPrice) * Number(slotProps.data.OrderedQty) || 0).toFixed(2) }}
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
-        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toFixed(2) }}</div>
+        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
 
         <!-- Footer -->
         <template #footer>
             <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-600 mr-3">{{ selectedItems.length }} items selected</div>
+                <div class="text-sm text-gray-600">{{ selectedItems.length }} items selected</div>
                 <div class="flex gap-3">
                     <Button label="Cancel" icon="pi pi-times" outlined @click="closeModal" />
                     <Button :label="`Add Selected Items (${selectedItems.length})`" icon="pi pi-check" @click="addSelectedItems" :disabled="selectedItems.length === 0" />
@@ -89,30 +83,3 @@
         </template>
     </Dialog>
 </template>
-
-<style scoped>
-.create-ro-modal :deep(.p-dialog-header) {
-    padding: 1.5rem;
-}
-
-.create-ro-modal :deep(.p-dialog-content) {
-    padding: 1.5rem;
-}
-
-.create-ro-modal :deep(.p-dialog-footer) {
-    padding: 1rem 1.5rem;
-}
-
-.create-ro-modal :deep(.p-datatable-header) {
-    padding: 0;
-}
-
-.create-ro-modal :deep(.p-datatable .p-datatable-thead > tr > th) {
-    padding: 0.75rem;
-    font-weight: 600;
-}
-
-.create-ro-modal :deep(.p-datatable .p-datatable-tbody > tr > td) {
-    padding: 0.75rem;
-}
-</style>

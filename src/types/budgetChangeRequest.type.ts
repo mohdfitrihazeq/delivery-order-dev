@@ -85,6 +85,7 @@ export interface BudgetChangeItemPayload {
 }
 
 export interface BudgetChangeRequestPayload {
+    ProjectId: number;
     DocNo: string;
     RequestDate: string;
     RequestedBy: string;
@@ -94,4 +95,15 @@ export interface BudgetChangeRequestPayload {
     Reason: string;
     Type: 'BudgetChangeRequest';
     Items: BudgetChangeItemPayload[];
+}
+
+export interface TableItem {
+    itemCode: string;
+    description: string;
+    uom: string;
+    unitPrice: number;
+    budgetQty: number;
+    orderedQty: number;
+    newOrder: number;
+    remark: string;
 }

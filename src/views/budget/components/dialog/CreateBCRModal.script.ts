@@ -1,33 +1,24 @@
-import type { BudgetChangeItem } from '@/types/budgetChangeRequest.type';
 import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import { computed, defineComponent, ref, watch } from 'vue';
 
-type FilterOption = { label: string; value: string | null };
+import ReusableTable from '@/components/table/ReusableTable.vue';
+import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import type { BudgetItem, FilterOption } from '@/types/request-order.type';
+import type { TableColumn } from '@/types/table.type';
 
 export default defineComponent({
-    name: 'BudgetItemModal',
-    components: {
-        Dialog,
-        DataTable,
-        Column,
-        Button,
-        InputText,
-        Dropdown,
-        Tag
-    },
+    name: 'CreateBCRModal',
+    components: { Dialog, Button, InputText, Dropdown, Tag, ReusableTable },
     props: {
-        visible: {
-            type: Boolean,
-            required: true
-        }
+        visible: { type: Boolean, required: true },
+        projectId: { type: Number, required: true },
+        version: { type: Number, required: true }
     },
-    emits: ['update:visible', 'material-selected'],
+    emits: ['update:visible', 'items-selected'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
         watch(
@@ -39,207 +30,84 @@ export default defineComponent({
         const modalTitle = ref('Add Items from Budget');
         const loading = ref(false);
 
+        // Selection & Filters
+        const selectedItems = ref<BudgetItem[]>([]);
         const searchTerm = ref('');
         const selectedLocation = ref<string | null>(null);
         const selectedElement = ref<string | null>(null);
+        const selectedItemType = ref<string | null>(null);
 
-        const selectedItems = ref<BudgetChangeItem[]>([]);
+        // Pagination
+        const pagination = ref({
+            page: 1,
+            pageSize: 10,
+            total: 0,
+            totalPages: 0
+        });
 
-        const budgetItems = ref<BudgetChangeItem[]>([
-            {
-                Id: 1,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'STL-001',
-                Name: 'Steel reinforcement bars Grade 60',
-                Description: '',
-                Uom: 'kg',
-                UnitPrice: '5.50',
-                OrderedQty: '2500',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 2,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'CON-002',
-                Name: 'Ready mix concrete C25/30',
-                Description: '',
-                Uom: 'm³',
-                UnitPrice: '250',
-                OrderedQty: '180',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 3,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'BRK-003',
-                Name: 'Clay bricks standard size',
-                Description: '',
-                Uom: 'pcs',
-                UnitPrice: '0.45',
-                OrderedQty: '10000',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 4,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'PLS-004',
-                Name: 'PVC water pipes Ø50mm',
-                Description: '',
-                Uom: 'm',
-                UnitPrice: '1.80',
-                OrderedQty: '500',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 5,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'ELC-005',
-                Name: 'Electrical copper cables 4mm²',
-                Description: '',
-                Uom: 'm',
-                UnitPrice: '2.20',
-                OrderedQty: '300',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 6,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'WOD-006',
-                Name: 'Plywood sheets 18mm',
-                Description: '',
-                Uom: 'sheet',
-                UnitPrice: '22',
-                OrderedQty: '150',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 7,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'GLS-007',
-                Name: 'Tempered glass panels 10mm',
-                Description: '',
-                Uom: 'm²',
-                UnitPrice: '45',
-                OrderedQty: '80',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
-            },
-            {
-                Id: 8,
-                BudgetChangeId: 1,
-                BudgetItemId: 2,
-                ItemCode: 'PNT-008',
-                Name: 'Exterior wall paint',
-                Description: '',
-                Uom: 'litre',
-                UnitPrice: '12',
-                OrderedQty: '200',
-                NewOrder: '',
-                ExceededQty: '',
-                Remark: '',
-                CreatedAt: '',
-                CreatedBy: null,
-                UpdatedAt: '',
-                UpdatedBy: null,
-                location: '',
-                element: ''
+        const budgetStore = useBudgetStore();
+
+        const loadLatestBudgetVersion = (): number | null => {
+            const v = localStorage.getItem('latestBudgetVersion');
+            return v ? Number(v) : null;
+        };
+
+        const currentVersion = ref<number | null>(props.version || loadLatestBudgetVersion());
+
+        const fetchBudgetItems = async () => {
+            if (!currentVersion.value) return;
+            loading.value = true;
+            try {
+                await budgetStore.fetchBudgetItems(currentVersion.value, pagination.value.page, pagination.value.pageSize);
+                pagination.value.total = budgetStore.pagination.total;
+                pagination.value.totalPages = budgetStore.pagination.totalPages;
+            } catch (error) {
+                console.error('Error fetching budget items:', error);
+            } finally {
+                loading.value = false;
             }
-        ]);
+        };
 
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (parseFloat(item.UnitPrice) || 0) * (parseFloat(item.OrderedQty) || 0), 0));
-
-        const locationOptions = computed<FilterOption[]>(() =>
-            [...new Set(budgetItems.value.map((i) => i.location))].map((l) => ({
-                label: l || 'N/A',
-                value: l
-            }))
-        );
-        const elementOptions = computed<FilterOption[]>(() =>
-            [...new Set(budgetItems.value.map((i) => i.element))].map((l) => ({
-                label: l || 'N/A',
-                value: l
-            }))
-        );
+        // Computed items & filters
+        const allBudgetItems = computed(() => budgetStore.budgetItems);
 
         const filteredItems = computed(() => {
-            let items = [...budgetItems.value];
+            let items = [...allBudgetItems.value];
+
             if (searchTerm.value) {
                 const s = searchTerm.value.toLowerCase();
-                items = items.filter((item) => item.ItemCode.toLowerCase().includes(s) || item.Name.toLowerCase().includes(s));
+                items = items.filter((i) => i.itemCode.toLowerCase().includes(s) || i.description.toLowerCase().includes(s));
             }
             if (selectedLocation.value) items = items.filter((i) => i.location === selectedLocation.value);
             if (selectedElement.value) items = items.filter((i) => i.element === selectedElement.value);
+            if (selectedItemType.value) items = items.filter((i) => i.itemType === selectedItemType.value);
+
             return items;
         });
 
-        const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value));
+        const paginatedItems = computed(() => {
+            return filteredItems.value.map((item, index) => ({
+                ...item,
+                rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
+            }));
+        });
+
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
+
+        const locationOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.location))].map((l) => ({ label: l || 'N/A', value: l })));
+
+        const elementOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.element))].map((e) => ({ label: e || 'N/A', value: e })));
+
+        const itemTypeOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.itemType))].map((t) => ({ label: t, value: t })));
+
+        const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value));
 
         const clearFilters = () => {
             searchTerm.value = '';
             selectedLocation.value = null;
             selectedElement.value = null;
+            selectedItemType.value = null;
+            pagination.value.page = 1;
         };
 
         const closeModal = () => {
@@ -250,29 +118,83 @@ export default defineComponent({
 
         const addSelectedItems = () => {
             if (selectedItems.value.length > 0) {
-                console.log('✅ Selected Items:', selectedItems.value);
-                emit('material-selected', [...selectedItems.value]);
+                emit('items-selected', [...selectedItems.value]);
                 closeModal();
             }
         };
+
+        const handlePageChange = async (page: number) => {
+            pagination.value.page = page;
+            await fetchBudgetItems();
+        };
+
+        const handlePageSizeChange = async (pageSize: number) => {
+            pagination.value.pageSize = pageSize;
+            pagination.value.page = 1;
+            await fetchBudgetItems();
+        };
+
+        const getItemTypeSeverity = (itemType: string) => {
+            const map: Record<string, string> = {
+                Materials: 'info',
+                Labour: 'warning',
+                Equipment: 'success',
+                Installation: 'secondary'
+            };
+            return map[itemType] || 'info';
+        };
+
+        watch(localVisible, async (visible) => {
+            if (visible) {
+                if (!currentVersion.value) {
+                    // fallback in case version not set
+                    currentVersion.value = loadLatestBudgetVersion();
+                }
+                if (currentVersion.value) {
+                    await fetchBudgetItems();
+                }
+            }
+        });
+
+        // Table columns
+        const columns: TableColumn[] = [
+            { field: 'rowIndex', header: '#' },
+            { field: 'itemCode', header: 'Item Code', sortable: true },
+            { field: 'description', header: 'Description', sortable: true },
+            { field: 'location', header: 'Location' },
+            { field: 'element', header: 'Element' },
+            { field: 'itemType', header: 'Item Type', bodySlot: 'itemTypeSlot' },
+            { field: 'uom', header: 'UoM' },
+            { field: 'quantity', header: 'Qty' },
+            { field: 'price', header: 'Unit Price', bodySlot: 'priceSlot' },
+            { field: 'total', header: 'Total', bodySlot: 'totalSlot' }
+        ];
 
         return {
             localVisible,
             modalTitle,
             loading,
+            selectedItems,
             searchTerm,
             selectedLocation,
             selectedElement,
-            selectedItems,
-            budgetItems,
+            selectedItemType,
+            pagination,
+            filteredItems,
+            paginatedItems,
+            allBudgetItems,
             grandTotal,
             locationOptions,
             elementOptions,
-            filteredItems,
+            itemTypeOptions,
             hasActiveFilters,
+            columns,
             clearFilters,
             closeModal,
-            addSelectedItems
+            addSelectedItems,
+            handlePageChange,
+            handlePageSizeChange,
+            getItemTypeSeverity
         };
     }
 });
