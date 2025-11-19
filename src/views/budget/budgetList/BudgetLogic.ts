@@ -112,7 +112,7 @@ export default defineComponent({
 
         const fetchBudgetList = async () => {
             if (!latestBudgetId.value) return;
-            await budgetStore.fetchBudgetItems(pagination.value.page, pagination.value.pageSize);
+            await budgetStore.fetchBudgetItems(latestBudgetId.value, pagination.value.page, pagination.value.pageSize);
             // Add rowIndex based on pagination
             budgetItems.value = budgetStore.budgetItems.map((item, index) => ({
                 ...item,

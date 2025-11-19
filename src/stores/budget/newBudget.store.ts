@@ -84,11 +84,12 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    async function fetchBudgetItems(page: number = pagination.value.page, pageSize: number = pagination.value.pageSize) {
+    async function fetchBudgetItems(budgetId: number, page: number = pagination.value.page, pageSize: number = pagination.value.pageSize) {
         loading.value = true;
         try {
             const params = {
                 projectId: getCurrentProjectId(),
+                budgetId,
                 page,
                 pageSize
             };
