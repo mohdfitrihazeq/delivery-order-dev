@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { formatDate } from '@/utils/dateHelper';
 import { budgetService } from '@/services/newBudget.service';
 import { getCurrentProjectId } from '@/utils/contextHelper';
+import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useBudgetStore = defineStore('budget', () => {
     const budgets = ref<any[]>([]);
@@ -15,6 +15,35 @@ export const useBudgetStore = defineStore('budget', () => {
         pageSize: 10
     });
     const loading = ref(false);
+
+    async function fetchBudgetVersion() {
+        loading.value = true;
+        try {
+            const params = {
+                projectId: getCurrentProjectId()
+            };
+
+            const response = await budgetService.getBudgetVersion(params);
+            if (!response.success) {
+                showError(response.message || 'Failed to fetch budget versions.');
+                return [];
+            }
+
+            const versions = response.data.map((v: any) => ({
+                id: v.Id,
+                versionCode: v.VersionCode,
+                name: v.BudgetName,
+                createdAt: formatDate(v.CreatedAt)
+            }));
+
+            return versions;
+        } catch (error) {
+            showError(error, 'Failed to fetch budget versions.');
+            return [];
+        } finally {
+            loading.value = false;
+        }
+    }
 
     async function fetchBudgets(version = 1, page = pagination.value.page, pageSize = pagination.value.pageSize) {
         loading.value = true;
@@ -74,16 +103,23 @@ export const useBudgetStore = defineStore('budget', () => {
                 description2: item.Description2,
                 location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
                 element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
-                uom: item.Unit,
+                location1: item.Location1,
+                location2: item.Location2,
+                category: item.Category,
+                elementCode: item.Element,
+                subElement: item.SubElement,
+                subSubElement: item.SubSubElement,
+                unit: item.Unit,
                 quantity: Number(item.Quantity) || 0,
-                price: Number(item.Rate) || 0,
+                rate: Number(item.Rate) || 0,
+                amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
                 status: item.Status,
                 createdAt: formatDate(item.CreatedAt),
                 updatedAt: formatDate(item.UpdatedAt)
             }));
 
             if (response.pagination) {
-                pagination.value.total = response.pagination.totalBudgetItems;
+                pagination.value.total = response.pagination.total;
                 pagination.value.totalPages = response.pagination.totalPages;
                 pagination.value.page = response.pagination.page;
                 pagination.value.pageSize = response.pagination.pageSize;
@@ -101,6 +137,7 @@ export const useBudgetStore = defineStore('budget', () => {
         pagination,
         loading,
         fetchBudgets,
-        fetchBudgetItems
+        fetchBudgetItems,
+        fetchBudgetVersion
     };
 });

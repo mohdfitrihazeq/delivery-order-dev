@@ -1,4 +1,4 @@
-import { useBudgetStore } from '@/stores/budget/budget.store';
+import { useBudgetStore } from '@/stores/budget/newBudget.store';
 import type { FilterVersion } from '@/types/budget.type';
 import type { TableColumn } from '@/types/table.type';
 import { defineComponent, onMounted, ref, watch } from 'vue';
@@ -41,6 +41,7 @@ export default defineComponent({
     },
     setup() {
         const budgetStore = useBudgetStore();
+
         // ---------------------------
         // 1. Static
         // ---------------------------
@@ -50,16 +51,17 @@ export default defineComponent({
         ];
 
         const columns: TableColumn[] = [
-            { field: 'ItemCode', header: 'Item Code', sortable: true },
-            { field: 'Description', header: 'Description', sortable: true },
-            { field: 'Location1', header: 'Location', sortable: true },
-            { field: 'Element', header: 'Element', sortable: true },
-            { field: 'SubElement', header: '1st Sub Element', sortable: true },
-            { field: 'SubSubElement', header: '2nd Sub Element', sortable: true },
-            { field: 'Unit', header: 'UOM', sortable: true },
-            { field: 'Quantity', header: 'Qty', sortable: true },
-            { field: 'Rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
-            { field: 'Amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
+            { field: 'rowIndex', header: '#' },
+            { field: 'itemCode', header: 'Item Code', sortable: true },
+            { field: 'description', header: 'Description', sortable: true },
+            { field: 'location1', header: 'Location', sortable: true },
+            { field: 'elementCode', header: 'Element', sortable: true },
+            { field: 'subElement', header: '1st Sub Element', sortable: true },
+            { field: 'subSubElement', header: '2nd Sub Element', sortable: true },
+            { field: 'unit', header: 'UOM', sortable: true },
+            { field: 'quantity', header: 'Qty', sortable: true },
+            { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
+            { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
 
         // ---------------------------
@@ -87,46 +89,44 @@ export default defineComponent({
         // ---------------------------
 
         const fetchBudgetVersionList = async () => {
-            const projectId = JSON.parse(localStorage.getItem('selectedProject') || '{}')?.ProjectId;
-            if (!projectId) return;
+            const versionsData = await budgetStore.fetchBudgetVersion();
+            if (!versionsData || versionsData.length === 0) return;
 
-            const response = await budgetStore.fetchBudgetVersionList(projectId);
-            if (!response) return;
-
-            const sorted = [...response].sort((a, b) => Number(a.VersionCode) - Number(b.VersionCode));
-            const latestVersionCode = Math.max(...sorted.map((v) => Number(v.VersionCode)));
+            const sorted = [...versionsData].sort((a, b) => Number(a.versionCode) - Number(b.versionCode));
+            const latestVersionCode = Math.max(...sorted.map((v) => Number(v.versionCode)));
 
             versions.value = sorted.map((item) => ({
-                label: `Version ${item.VersionCode}`,
-                value: String(item.VersionCode),
-                latest: Number(item.VersionCode) === latestVersionCode,
-                id: item.Id
+                label: `Version ${item.versionCode}`,
+                value: String(item.versionCode),
+                latest: Number(item.versionCode) === latestVersionCode,
+                id: item.id
             }));
 
             const latest = versions.value.find((v) => v.latest);
             if (latest) {
                 selectedVersion.value = latest.value;
                 latestBudgetId.value = latest.id!;
-                await fetchBudgetList(latest.id!);
+                await fetchBudgetList();
             }
         };
 
-        const fetchBudgetList = async (budgetId: number) => {
-            const { page, pageSize } = pagination.value;
-            const response = await budgetStore.fetchBudgetList(budgetId, page, pageSize);
-
-            if (!response) return;
-            budgetItems.value = response.data || [];
-
-            pagination.value.total = response.pagination?.totalBudgetItems ?? 0;
-            pagination.value.totalPages = response.pagination?.totalPages ?? 1;
+        const fetchBudgetList = async () => {
+            if (!latestBudgetId.value) return;
+            await budgetStore.fetchBudgetItems(pagination.value.page, pagination.value.pageSize);
+            // Add rowIndex based on pagination
+            budgetItems.value = budgetStore.budgetItems.map((item, index) => ({
+                ...item,
+                rowIndex: (pagination.value.page - 1) * pagination.value.pageSize + index + 1
+            }));
+            pagination.value.total = budgetStore.pagination.total;
+            pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
 
         watch(selectedVersion, async (newVersion) => {
             const selected = versions.value.find((v) => v.value === newVersion);
             if (selected) {
                 latestBudgetId.value = selected.id!;
-                await fetchBudgetList(selected.id!);
+                await fetchBudgetList();
             }
         });
 
@@ -141,13 +141,13 @@ export default defineComponent({
 
         async function handlePageChange(page: number) {
             pagination.value.page = page;
-            if (latestBudgetId.value) await fetchBudgetList(latestBudgetId.value);
+            await fetchBudgetList();
         }
 
         async function handlePageSizeChange(size: number) {
             pagination.value.pageSize = size;
             pagination.value.page = 1;
-            if (latestBudgetId.value) await fetchBudgetList(latestBudgetId.value);
+            await fetchBudgetList();
         }
 
         // ---------------------------

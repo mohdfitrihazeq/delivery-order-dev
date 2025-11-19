@@ -10,6 +10,7 @@ export interface GetBudgetsParams {
 
 export interface GetBudgetsResponse {
     success: boolean;
+    message?: string;
     data: any[];
     pagination: {
         total: number;
@@ -77,7 +78,18 @@ const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResp
     }
 };
 
+const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
+    try {
+        const response = await axiosInstance.get<GetBudgetsResponse>('/budget', { params });
+        return response.data;
+    } catch (error) {
+        showError(error, 'Failed to fetch budget version list.');
+        throw error;
+    }
+};
+
 export const budgetService = {
     getBudgets,
-    getBudgetItems
+    getBudgetItems,
+    getBudgetVersion
 };
