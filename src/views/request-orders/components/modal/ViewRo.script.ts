@@ -1,4 +1,5 @@
-import type { Order } from '@/types/request-order.type';
+import { requestOrderService } from '@/services/requestOrder.service';
+import type { AttachmentItem, Order } from '@/types/request-order.type';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import { defineComponent, PropType, ref, watch } from 'vue';
@@ -26,6 +27,7 @@ export default defineComponent({
     emits: ['update:visible', 'approve', 'reject'],
     setup(props, { emit }) {
         const localVisible = ref(props.visible);
+        const existingAttachments = ref<AttachmentItem[]>([]);
 
         // Sync prop changes from parent
         watch(
@@ -39,6 +41,18 @@ export default defineComponent({
         watch(localVisible, (val) => {
             emit('update:visible', val);
         });
+
+        watch(
+            () => props.order,
+            (newOrder) => {
+                if (newOrder && Array.isArray(newOrder.attachments)) {
+                    existingAttachments.value = newOrder.attachments as AttachmentItem[];
+                } else {
+                    existingAttachments.value = [];
+                }
+            },
+            { immediate: true }
+        );
 
         function handleClose(): void {
             localVisible.value = false;
@@ -54,11 +68,27 @@ export default defineComponent({
             localVisible.value = false;
         }
 
+        function previewAttachment(file: File | AttachmentItem) {
+            if (!(file instanceof File)) {
+                requestOrderService.previewAttachment(file);
+            }
+        }
+
+        function formatSize(size: number): string {
+            if (!size) return '';
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            return (size / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+        }
+
         return {
             localVisible,
             handleClose,
             handleApprove,
-            handleReject
+            handleReject,
+            existingAttachments,
+            previewAttachment,
+            formatSize
         };
     }
 });

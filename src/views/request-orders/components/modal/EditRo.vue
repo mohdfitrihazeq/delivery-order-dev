@@ -78,6 +78,7 @@
                             <div v-for="(file, index) in existingAttachments" :key="`existing-${index}`" class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
                                 <i class="pi pi-file"></i>
                                 <span class="text-sm">{{ file.filename }}</span>
+                                <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
                                 <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" />
                                 <Button icon="pi pi-times" text rounded severity="danger" @click="removeExistingAttachment(index)" />
                             </div>
