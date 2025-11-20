@@ -146,7 +146,7 @@ export default defineComponent({
 
                             if (isPurchasingRole) {
                                 if (row.status === 'Pending') {
-                                    rowActions.push('approve', 'reject');
+                                    rowActions.push('approve', 'reject', 'edit');
                                 }
                                 rowActions.push('delete');
                             }

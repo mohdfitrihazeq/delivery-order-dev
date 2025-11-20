@@ -56,10 +56,6 @@
             <div class="card p-4 mb-6 shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Order Items <span class="text-red-600 font-bold">*</span></h2>
-                    <div class="flex gap-2">
-                        <Button label="Add Bulk Items" icon="pi pi-box" outlined @click="openBulkItemModal" :disabled="budgetType !== 'Budgeted Item'" />
-                        <Button label="+ Add Item" @click="addItem" />
-                    </div>
                 </div>
                 <div v-if="showValidation && items.length === 0" class="mt-6">
                     <Message severity="error" icon="pi pi-times-circle" text="At least one item is required">At least one item is required</Message>
@@ -71,7 +67,7 @@
                             <div class="text-5xl mb-2">📦</div>
                             <p>No items added yet</p>
                             <div class="flex gap-2 justify-center mt-4">
-                                <Button label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" :disabled="budgetType !== 'Budgeted Item'" />
+                                <Button v-if="budgetType === 'Budgeted Item'" label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" />
                                 <Button label="+ Add First Item" @click="addItem" />
                             </div>
                         </div>
