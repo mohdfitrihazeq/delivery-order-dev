@@ -123,17 +123,23 @@ export default defineComponent({
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
 
-        watch(selectedVersion, async (newVersion) => {
-            const selected = versions.value.find((v) => v.value === newVersion);
+        const previousVersion = ref<string | null>(null);
 
-            if (selected) {
+        watch(selectedVersion, async (newVersion) => {
+            // Ignore first run (initial load)
+            if (previousVersion.value !== null && previousVersion.value !== newVersion) {
                 toast.add({
                     severity: 'info',
                     summary: 'Version Changed',
-                    detail: `Switched to version: ${selected.label}`,
+                    detail: `Switched to version: Version ${newVersion}`,
                     life: 2000
                 });
+            }
 
+            previousVersion.value = newVersion;
+
+            const selected = versions.value.find((v) => v.value === newVersion);
+            if (selected) {
                 latestBudgetId.value = selected.id!;
                 await fetchBudgetList();
             }
