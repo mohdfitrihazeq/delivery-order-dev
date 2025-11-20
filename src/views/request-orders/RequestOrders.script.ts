@@ -1,20 +1,20 @@
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { useDashboard } from '@/composables/useDashboard';
+import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import type { TableColumn } from '@/types/table.type';
+import { showError } from '@/utils/showError.utils';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
-import { computed, defineComponent, ref, watch, onMounted } from 'vue';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { Order } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
 import RoSummary from './components/summary/RoSummary.vue';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import { requestOrderService } from '@/services/requestOrder.service';
-import { showError } from '@/utils/showError.utils';
-import { useDashboard } from '@/composables/useDashboard';
 
 export default defineComponent({
     name: 'RequestOrders',
@@ -125,7 +125,40 @@ export default defineComponent({
             let actions = [...baseActions];
 
             if (isPurchasingRole) {
-                actions = [...actions, 'approve', 'reject', 'delete'];
+                actions = [...baseActions, 'delete'];
+
+                // Only show approve/reject if order is Pending
+                return [
+                    { field: 'rowIndex', header: '#', sortable: true },
+                    { field: 'roNumber', header: 'RO Number', sortable: true },
+                    { field: 'requestedBy', header: 'Requested By', sortable: true },
+                    { field: 'roDate', header: 'RO Date', sortable: true },
+                    { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
+                    { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+                    { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
+                    { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
+                    {
+                        field: 'actions',
+                        header: 'Actions',
+                        action: true,
+                        actions: (row: Order) => {
+                            const rowActions = ['view'];
+
+                            if (isPurchasingRole) {
+                                if (row.status === 'Pending') {
+                                    rowActions.push('approve', 'reject');
+                                }
+                                rowActions.push('delete');
+                            }
+
+                            if (isPmPdRole) {
+                                rowActions.push('edit');
+                            }
+
+                            return rowActions;
+                        }
+                    }
+                ];
             }
 
             if (isPmPdRole) {

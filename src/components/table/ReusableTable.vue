@@ -135,8 +135,17 @@ function handleExport() {
     document.body.removeChild(link);
 }
 
-function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
-    const actions: ActionType[] = row.actions || defaultActions || [];
+function openMenu(event: Event, row: TableRow, columnActions?: ActionType[] | ((row: TableRow) => ActionType[])) {
+    let actions: ActionType[] = [];
+
+    if (typeof columnActions === 'function') {
+        actions = columnActions(row);
+    } else if (Array.isArray(columnActions)) {
+        actions = columnActions;
+    } else if (Array.isArray(row.actions)) {
+        actions = row.actions;
+    }
+
     if (!actions.length) return;
 
     currentRow.value = row;
