@@ -131,6 +131,19 @@ export default defineComponent({
             purchaseStore.setPageSize(pageSize);
         };
 
+        const manualSearch = ref('');
+
+        function handleManualSearch() {
+            if (!manualSearch.value.trim()) {
+                filteredCards.value = allCards.value; // reset
+                return;
+            }
+
+            const keyword = manualSearch.value.toLowerCase();
+
+            filteredCards.value = allCards.value.filter((card) => card.title.toLowerCase().includes(keyword) || card.content.toLowerCase().includes(keyword));
+        }
+
         return {
             selectedCard,
             allCards,
@@ -146,7 +159,9 @@ export default defineComponent({
             setPageSize,
             displayStart,
             displayEnd,
-            purchaseStore
+            purchaseStore,
+            handleManualSearch,
+            manualSearch
         };
     }
 });
