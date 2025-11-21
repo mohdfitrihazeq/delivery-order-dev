@@ -1,9 +1,9 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import type { Order } from '@/types/request-order.type';
+import { formatDate, formatDateTime } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
-import { formatDate, formatDateTime } from '@/utils/dateHelper';
 
 export const useRequestOrderStore = defineStore('requestOrder', () => {
     const orders = ref<Order[]>([]);
@@ -89,6 +89,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 id: o.Id,
                 roNumber: o.DocNo,
                 requestedBy: o.CreatedBy,
+                status: o.Status,
                 roDate: formatDate(o.RequestOrderDate),
                 deliveryDate: formatDate(o.requestorderitems?.[0]?.DeliveryDate),
                 requestedAt: formatDateTime(o.CreatedAt),

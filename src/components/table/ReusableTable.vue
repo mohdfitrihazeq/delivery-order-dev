@@ -57,6 +57,9 @@ const props = defineProps<{
     selection?: TableRow[];
 }>();
 
+// for hide unwanted column
+const visibleColumns = computed(() => props.columns.filter((c) => c.visible !== false));
+
 const emit = defineEmits<{
     'update:selection': [value: TableRow[]];
 }>();
@@ -135,8 +138,17 @@ function handleExport() {
     document.body.removeChild(link);
 }
 
-function openMenu(event: Event, row: TableRow, defaultActions?: ActionType[]) {
-    const actions: ActionType[] = row.actions || defaultActions || [];
+function openMenu(event: Event, row: TableRow, columnActions?: ActionType[] | ((row: TableRow) => ActionType[])) {
+    let actions: ActionType[] = [];
+
+    if (typeof columnActions === 'function') {
+        actions = columnActions(row);
+    } else if (Array.isArray(columnActions)) {
+        actions = columnActions;
+    } else if (Array.isArray(row.actions)) {
+        actions = row.actions;
+    }
+
     if (!actions.length) return;
 
     currentRow.value = row;
@@ -230,7 +242,7 @@ const displayEnd = computed(() => {
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 
-            <Column v-for="(col, idx) in props.columns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
+            <Column v-for="(col, idx) in visibleColumns" :key="idx" :field="col.field" :header="col.header" :sortable="col.sortable" :frozen="col.frozen" :style="col.style">
                 <!-- 1. Slot-based body (status, TotalAmount, etc.) -->
                 <template v-if="col.bodySlot && !col.action" #body="slotProps">
                     <slot :name="col.bodySlot" :data="slotProps.data" />

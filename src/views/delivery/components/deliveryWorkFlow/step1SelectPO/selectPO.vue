@@ -20,8 +20,13 @@
             <template #content>
                 <Form v-slot="$form" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                     <!-- AutoComplete Search -->
-                    <div class="grid grid-cols-1 gap-4 p-3">
-                        <AutoComplete v-model="selectedCard" :suggestions="filteredCards" field="title" option-label="title" forceSelection dropdown placeholder="Search PO number..." @complete="handlePOSearch" />
+                    <!-- Search Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-3">
+                        <!-- AutoComplete Search -->
+                        <AutoComplete v-model="selectedCard" :suggestions="filteredCards" field="title" option-label="title" forceSelection dropdown placeholder="Search Supplier Name..." @complete="handlePOSearch" />
+
+                        <!-- Manual PO Number Search -->
+                        <InputText v-model="manualSearch" placeholder="Search by PO Number..." class="w-full" @input="handleManualSearch" />
                     </div>
 
                     <!-- Cards List -->
@@ -78,7 +83,6 @@
 
                     <!-- Navigation Buttons -->
                     <div class="flex justify-end mt-4 gap-2">
-                        <Button type="button" label="Back" severity="secondary" @click="goBack" />
                         <Button type="submit" label="Next" severity="primary" />
                     </div>
                 </Form>

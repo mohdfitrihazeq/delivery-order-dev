@@ -1,10 +1,13 @@
 import { requestOrderService } from '@/services/requestOrder.service';
-import type { CreateRequestOrderPayload } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
+import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
 import { Motion } from '@motionone/vue';
+import AutoComplete from 'primevue/autocomplete';
 import { usePrimeVue } from 'primevue/config';
 import FileUpload from 'primevue/fileupload';
 import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
+import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { ComponentPublicInstance, computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -12,10 +15,6 @@ import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../typ
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
 import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
-import { getCurrentUsername, getCurrentProjectName, getCurrentProjectId } from '@/utils/contextHelper';
-import { useConfirm } from 'primevue/useconfirm';
-import ConfirmDialog from 'primevue/confirmdialog';
-import AutoComplete from 'primevue/autocomplete';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -365,43 +364,66 @@ export default defineComponent({
         };
 
         const handleSelectedItems = (selectedBudgetItems: BudgetItem[]) => {
-            const newItems: Item[] = selectedBudgetItems.map((budgetItem) => ({
-                itemCode: budgetItem.itemCode,
-                itemType: budgetItem.itemType,
-                description: budgetItem.description,
-                location: budgetItem.location,
-                uom: budgetItem.uom,
-                budgetItemId: budgetItem.id,
-                quantity: budgetItem.quantity.toString(),
-                deliveryDate: null,
-                notes: '',
-                remark: '',
-                price: budgetItem.price,
-                showNotes: false,
-                showRemark: false
-            }));
-
-            items.value.push(...newItems);
+            const duplicates: string[] = [];
+            const newUniqueItems: Item[] = [];
 
             selectedBudgetItems.forEach((budgetItem) => {
-                const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
-                if (!existingOption) {
-                    itemOptions.value.push({
-                        label: budgetItem.itemCode,
-                        value: budgetItem.itemCode,
+                const exists = items.value.some((i) => i.itemCode === budgetItem.itemCode);
+
+                if (exists) {
+                    duplicates.push(budgetItem.itemCode);
+                } else {
+                    newUniqueItems.push({
+                        itemCode: budgetItem.itemCode,
+                        itemType: budgetItem.itemType,
                         description: budgetItem.description,
                         location: budgetItem.location,
-                        uom: budgetItem.uom
+                        uom: budgetItem.uom,
+                        budgetItemId: budgetItem.id,
+                        quantity: budgetItem.quantity.toString(),
+                        deliveryDate: null,
+                        notes: '',
+                        remark: '',
+                        price: budgetItem.price,
+                        showNotes: false,
+                        showRemark: false
                     });
+
+                    // Also add to itemOptions if not exist
+                    const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
+                    if (!existingOption) {
+                        itemOptions.value.push({
+                            label: budgetItem.itemCode,
+                            value: budgetItem.itemCode,
+                            description: budgetItem.description,
+                            location: budgetItem.location,
+                            uom: budgetItem.uom
+                        });
+                    }
                 }
             });
 
-            toast.add({
-                severity: 'success',
-                summary: 'Items Added Successfully',
-                detail: `${selectedBudgetItems.length} ${selectedBudgetItems.length === 1 ? 'item has' : 'items have'} been added from budget`,
-                life: 3000
-            });
+            // Add only unique items
+            if (newUniqueItems.length > 0) {
+                items.value.push(...newUniqueItems);
+
+                toast.add({
+                    severity: 'success',
+                    summary: 'Items Added',
+                    detail: `${newUniqueItems.length} item(s) added from budget`,
+                    life: 2500
+                });
+            }
+
+            // Show duplicate message
+            if (duplicates.length > 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Duplicate Items',
+                    detail: `These items were already added: ${duplicates.join(', ')}. Only new items were added.`,
+                    life: 9000
+                });
+            }
         };
 
         function removeAttachment(index: number) {
@@ -546,6 +568,7 @@ export default defineComponent({
                 const payload: CreateRequestOrderPayload = {
                     ProjectId: projectId,
                     DocNo: roNumber.value,
+                    TotalAmount: grandTotal.value,
                     DebtorId: 1,
                     RequestOrderDate: formatDateToAPI(calendarValue.value),
                     Terms: 'Net 30',

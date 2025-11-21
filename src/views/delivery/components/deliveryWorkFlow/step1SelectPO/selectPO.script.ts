@@ -66,9 +66,32 @@ export default defineComponent({
         const isSelected = (card: PurchaseOrderCard) => selectedCard.value?.id === card.id;
 
         const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
-            if (!event.valid || !selectedCard.value) return;
+            let hasError = false;
+
+            if (!event.valid) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Form Incomplete',
+                    detail: 'Please fill in all required fields.',
+                    life: 2500
+                });
+                hasError = true;
+            }
+
+            if (!selectedCard.value) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No PO Selected',
+                    detail: 'Please select a Purchase Order before continuing.',
+                    life: 2500
+                });
+                hasError = true;
+            }
+
+            if (hasError) return;
 
             const fullPO = purchaseStore.purchaseOrders.find((po) => po.id?.toString() === selectedCard.value?.id);
+
             if (!fullPO) return;
 
             emit('update', {
@@ -78,6 +101,7 @@ export default defineComponent({
             });
 
             emit('next-step');
+
             toast.add({
                 severity: 'info',
                 summary: 'Purchase Order Confirmed',
@@ -107,6 +131,19 @@ export default defineComponent({
             purchaseStore.setPageSize(pageSize);
         };
 
+        const manualSearch = ref('');
+
+        function handleManualSearch() {
+            if (!manualSearch.value.trim()) {
+                filteredCards.value = allCards.value; // reset
+                return;
+            }
+
+            const keyword = manualSearch.value.toLowerCase();
+
+            filteredCards.value = allCards.value.filter((card) => card.title.toLowerCase().includes(keyword) || card.content.toLowerCase().includes(keyword));
+        }
+
         return {
             selectedCard,
             allCards,
@@ -122,7 +159,9 @@ export default defineComponent({
             setPageSize,
             displayStart,
             displayEnd,
-            purchaseStore
+            purchaseStore,
+            handleManualSearch,
+            manualSearch
         };
     }
 });

@@ -121,6 +121,8 @@ export interface PreviewSummary {
 export interface CreateRequestOrderPayload {
     DocNo: string;
     DebtorId: number;
+    TotalAmount: number;
+    CreatedBy: string;
     RequestOrderDate: string;
     Terms: string;
     RefDoc: string;
@@ -136,7 +138,7 @@ export interface CreateRequestOrderPayload {
         Quantity: number;
         OrgBgtQty: number;
         BgtBalQty: number;
-        TOtalPOQty: number;
+        TotalPOQty: number;
         Rate?: number;
         Notes: string;
         Reason: string;

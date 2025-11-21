@@ -9,7 +9,7 @@
                     <span class="text-gray-600 dark:text-gray-400">Total Items:</span>
                     <span class="ml-2 font-medium">{{ summaryData.totalItems }}</span>
                 </div>
-                <div>
+                <div style="display: none">
                     <span class="text-gray-600 dark:text-gray-400">Total Amount:</span>
                     <span class="ml-2 font-medium">{{ formatCurrency(summaryData.totalAmount) }}</span>
                 </div>
