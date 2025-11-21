@@ -1,3 +1,4 @@
+import type { FormValues, UploadFile } from '@/types/delivery.type';
 import Form, { FormResolverOptions, FormSubmitEvent } from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
@@ -12,7 +13,6 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { FormValues, UploadFile } from '@/types/delivery.type';
 
 export default defineComponent({
     name: 'DeliveryFormCard',
@@ -72,8 +72,25 @@ export default defineComponent({
             errors.driverPlate = '';
             errors.deliveryDate = '';
 
-            if (!values.driverPlate?.trim()) errors.driverPlate = 'Driver Plate Number is required.';
-            if (!values.deliveryDate) errors.deliveryDate = 'Delivery Date is required.';
+            if (!values.driverPlate?.trim()) {
+                errors.driverPlate = 'Driver Plate Number is required.';
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Driver Plate Number Missing',
+                    detail: errors.driverPlate,
+                    life: 2500
+                });
+            }
+
+            if (!values.deliveryDate) {
+                errors.deliveryDate = 'Delivery Date is required.';
+                toast.add({
+                    severity: 'warn',
+                    summary: 'Delivery Date Missing',
+                    detail: errors.deliveryDate,
+                    life: 2500
+                });
+            }
 
             return { values, errors };
         };

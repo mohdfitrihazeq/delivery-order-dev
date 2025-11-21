@@ -410,6 +410,17 @@ export default defineComponent({
             store.fetchOrders();
         }
 
+        // Search
+        const filters = ref({
+            global: { value: null as string | null, matchMode: 'contains' }
+        });
+        const search = ref('');
+
+        const handleSearch = (value: string) => {
+            search.value = value;
+            filters.value.global.value = value;
+        };
+
         return {
             activeTab,
             tabItems,
@@ -441,7 +452,9 @@ export default defineComponent({
             handlePageSizeChange,
             startingIndex,
             totalCounts,
-            useDashboard
+            useDashboard,
+            handleSearch,
+            onSearchWrapper: handleSearch
         };
     }
 });
