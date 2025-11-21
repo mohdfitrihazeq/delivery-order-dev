@@ -7,6 +7,7 @@ export interface TableColumn {
     frozen?: boolean;
     style?: string;
     bodySlot?: string;
+    visible?: boolean;
     body?: (row: any) => any;
     action?: boolean;
     actions?: ActionType[] | ((row: any) => ActionType[]);

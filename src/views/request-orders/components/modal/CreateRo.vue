@@ -71,7 +71,7 @@
             </template>
         </ReusableTable>
 
-        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
+        <div class="pt-3 mt-2 border-t text-right text-lg font-semibold" style="display: none">Total: {{ grandTotal.toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}</div>
 
         <!-- Footer -->
         <template #footer>

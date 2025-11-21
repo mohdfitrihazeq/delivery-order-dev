@@ -86,13 +86,17 @@
                             <p>No items added yet</p>
                             <div class="flex gap-2 justify-center mt-4">
                                 <Button v-if="budgetType === 'Budgeted Item'" label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" />
-                                <Button label="+ Add First Item" @click="addItem" />
+                                <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="addItem" />
                             </div>
                         </div>
                     </Motion>
 
                     <!-- DataTable -->
                     <Motion v-else :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :exit="{ opacity: 0 }" :transition="{ duration: 0.6 }" class="overflow-x-auto">
+                        <div class="flex gap-2 justify-end mt-4">
+                            <Button v-if="budgetType === 'Budgeted Item'" label="Add from Budget" icon="pi pi-box" outlined @click="openBulkItemModal" />
+                            <Button v-if="budgetType === 'Unbudgeted Item'" label="+ Add First Item" @click="addItem" />
+                        </div>
                         <DataTable :value="items" class="rounded-lg" scrollable scrollHeight="400px">
                             <Column field="itemCode" header="Item Code" style="min-width: 120px; width: 20%">
                                 <template #body="{ data }">
@@ -135,13 +139,13 @@
                                 </template>
                             </Column>
 
-                            <Column field="price" header="Price" style="min-width: 140px; width: 140px">
+                            <Column field="price" header="Price" style="min-width: 140px; width: 140px; display: none">
                                 <template #body="{ data }">
                                     <InputNumber v-model="data.price" mode="currency" currency="MYR" locale="en-MY" class="w-full" :minFractionDigits="2" />
                                 </template>
                             </Column>
 
-                            <Column header="Total" style="min-width: 130px; width: 130px; text-align: right">
+                            <Column header="Total" style="min-width: 130px; width: 130px; text-align: right; display: none">
                                 <template #body="{ data }">
                                     <span class="font-semibold pr-2">
                                         {{
@@ -170,7 +174,7 @@
                     </Motion>
                 </Presence>
 
-                <div class="pt-3 mt-2 border-t text-right text-lg font-semibold">Total: {{ grandTotal.toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
+                <div class="pt-3 mt-2 border-t text-right text-lg font-semibold" style="display: none">Total: {{ grandTotal.toLocaleString('en-MY', { style: 'currency', currency: 'MYR' }) }}</div>
 
                 <!-- Attachments and Remark remain unchanged -->
                 <div class="mt-4">

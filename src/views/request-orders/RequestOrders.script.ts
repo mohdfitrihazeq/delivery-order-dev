@@ -171,7 +171,7 @@ export default defineComponent({
                 { field: 'requestedBy', header: 'Requested By', sortable: true },
                 { field: 'roDate', header: 'RO Date', sortable: true },
                 { field: 'deliveryDate', header: 'Delivery Date', sortable: true },
-                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount' },
+                { field: 'totalAmount', header: 'Total Amount', sortable: true, bodySlot: 'totalAmount', visible: false },
                 { field: 'budgetType', header: 'Budget Type', sortable: true, bodySlot: 'budgetType' },
                 { field: 'status', header: 'Status', sortable: true, bodySlot: 'status' },
                 {

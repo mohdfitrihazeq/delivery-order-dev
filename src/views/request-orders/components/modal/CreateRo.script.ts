@@ -223,8 +223,8 @@ export default defineComponent({
             { field: 'itemType', header: 'Item Type', sortable: true, bodySlot: 'itemTypeSlot' },
             { field: 'uom', header: 'UOM', sortable: false },
             { field: 'quantity', header: 'Quantity', sortable: true },
-            { field: 'price', header: 'Price', sortable: true, bodySlot: 'priceSlot' },
-            { field: 'total', header: 'Total', bodySlot: 'totalSlot' }
+            { field: 'price', header: 'Price', sortable: true, bodySlot: 'priceSlot', visible: false },
+            { field: 'total', header: 'Total', bodySlot: 'totalSlot', visible: false }
         ];
 
         return {
