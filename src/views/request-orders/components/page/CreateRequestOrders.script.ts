@@ -1,5 +1,5 @@
 import { requestOrderService } from '@/services/requestOrder.service';
-import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
 import { Motion } from '@motionone/vue';
 import AutoComplete from 'primevue/autocomplete';
@@ -62,6 +62,7 @@ export default defineComponent({
         const showValidation = ref(false);
         const confirm = useConfirm();
         const budgetSwitching = ref(false);
+        const currentProject = getCurrentProjectName();
 
         // Load draft data if coming from draft modal
         onMounted(async () => {
@@ -167,6 +168,9 @@ export default defineComponent({
                 filteredSubconList.value = allMockSubcons.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
             }
         };
+
+        // expandedRows for item table
+        const expandedRows = ref<{ [key: string]: boolean }>({});
 
         watch(
             budgetType,
@@ -299,9 +303,11 @@ export default defineComponent({
             return `${formattedSize} ${sizes[i]}`;
         };
 
+        let tempIdCounter = 0;
+
         const addItem = () => {
             items.value.push({
-                itemCode: '',
+                itemCode: `temp_${++tempIdCounter}`, // Temporary unique ID
                 budgetItemId: 0,
                 description: '',
                 location: '',
@@ -342,16 +348,46 @@ export default defineComponent({
                 command: () => {
                     items.value.splice(index, 1);
                     menuRefs.value.splice(index, 1);
+                    delete expandedRows.value[item.itemCode]; // clean up
                 }
             },
             {
                 label: item.showNotes ? 'Hide Note' : 'Add Note',
                 icon: 'pi pi-file',
-                command: () => {
-                    item.showNotes = !item.showNotes;
-                }
+                command: () => toggleNotes(item)
             }
         ];
+
+        const toggleNotes = (item: Item) => {
+            // Toggle the showNotes flag
+            item.showNotes = !item.showNotes;
+
+            if (item.showNotes) {
+                expandedRows.value = {
+                    ...expandedRows.value,
+                    [item.itemCode]: true
+                };
+            } else {
+                setTimeout(() => {
+                    const newExpandedRows = { ...expandedRows.value };
+                    delete newExpandedRows[item.itemCode];
+                    expandedRows.value = newExpandedRows;
+                }, 300);
+            }
+        };
+        const updateNotes = (itemCode: string, value: string) => {
+            const item = items.value.find((i) => i.itemCode === itemCode);
+            if (item) {
+                item.notes = value;
+            }
+        };
+
+        const typing = ref(false);
+
+        const handleNoteInput = () => {
+            typing.value = true;
+            setTimeout(() => (typing.value = false), 150);
+        };
 
         const setMenuRef = (el: MenuInstance | null, index: number) => {
             if (el) menuRefs.value[index] = el;
@@ -532,26 +568,42 @@ export default defineComponent({
             if (!canSubmit.value) {
                 showValidation.value = true;
 
-                let errorMessage = 'Please ensure all required fields are filled before previewing:';
-                if (items.value.length === 0) {
-                    errorMessage += ' At least one item is required.';
-                }
                 if (!roNumber.value.trim()) {
-                    errorMessage += ' RO Number is required.';
-                }
-                if (!budgetType.value) {
-                    errorMessage += ' Budget Type is required.';
-                }
-                if (!calendarValue.value) {
-                    errorMessage += ' RO Date is required.';
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'RO Number is required.',
+                        life: 4000
+                    });
                 }
 
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Validation Error',
-                    detail: errorMessage,
-                    life: 4000
-                });
+                if (!budgetType.value) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'Budget Type is required.',
+                        life: 4000
+                    });
+                }
+
+                if (!calendarValue.value) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'RO Date is required.',
+                        life: 4000
+                    });
+                }
+
+                if (items.value.length === 0) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'At least one item is required.',
+                        life: 4000
+                    });
+                }
+
                 return;
             }
 
@@ -587,6 +639,7 @@ export default defineComponent({
                         OrgBgtQty: parseFloat(item.OrgBgtQty) || 0,
                         BgtBalQty: parseFloat(item.BgtBalQty) || 0,
                         Rate: item.price || 0,
+                        Notes: item.notes || '',
                         DeliveryDate: formatDateToAPI(item.deliveryDate)
                     }))
                 };
@@ -767,7 +820,11 @@ export default defineComponent({
             filteredSubconList,
             subconId,
             handleSubconSearch,
-            downloadAttachment
+            downloadAttachment,
+            expandedRows,
+            updateNotes,
+            handleNoteInput,
+            currentProject
         };
     }
 });
