@@ -238,7 +238,14 @@ const displayEnd = computed(() => {
     </div>
 
     <template v-else>
-        <DataTable v-model:selection="selectedRows" :value="props.value" class="overflow-hidden dark:text-white" tableStyle="min-width: 50rem" :selection-mode="props.selectionMode" data-key="itemCode">
+        <DataTable
+            v-model:selection="selectedRows"
+            :value="props.value"
+            class="overflow-hidden dark:text-white"
+            tableStyle="min-width: 50rem"
+            :selection-mode="props.selectionMode"
+            :data-key="(row) => `${row.id}-${row.Id}-${row.location1}-${row.location2}`"
+        >
             <!-- Checkbox Column -->
             <Column v-if="props.selectionMode === 'checkbox'" selection-mode="multiple" style="width: 3rem" />
 

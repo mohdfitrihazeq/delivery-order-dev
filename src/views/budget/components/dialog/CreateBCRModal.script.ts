@@ -46,7 +46,6 @@ export default defineComponent({
         });
 
         const budgetStore = useBudgetStore();
-
         const loadLatestBudgetVersion = (): number | null => {
             const v = localStorage.getItem('latestBudgetVersion');
             return v ? Number(v) : null;
@@ -88,6 +87,7 @@ export default defineComponent({
         const paginatedItems = computed(() => {
             return filteredItems.value.map((item, index) => ({
                 ...item,
+                Id: item.Id || item.itemCode || index,
                 rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
             }));
         });

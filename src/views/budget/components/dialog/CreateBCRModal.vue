@@ -54,6 +54,7 @@
             :onPageSizeChange="handlePageSizeChange"
             :selection-mode="'checkbox'"
             v-model:selection="selectedItems"
+            dataKey="Id"
             emptyTitle="No budget items found"
         >
             <template #itemTypeSlot="{ data }">

@@ -93,14 +93,28 @@
                             </Column>
 
                             <!-- Description -->
-                            <Column field="description" header="Description">
+                            <Column field="description" header="Description" style="min-width: 20rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.description" class="w-full" disabled />
                                 </template>
                             </Column>
 
+                            <!-- Location 1 -->
+                            <Column field="location1" header="Location 1" style="min-width: 9rem">
+                                <template #body="slotProps">
+                                    <InputText v-model="slotProps.data.location1" class="w-full" disabled />
+                                </template>
+                            </Column>
+
+                            <!-- Location 2 -->
+                            <Column field="location2" header="Location 2" style="min-width: 9rem">
+                                <template #body="slotProps">
+                                    <InputText v-model="slotProps.data.location2" class="w-full" disabled />
+                                </template>
+                            </Column>
+
                             <!-- Units -->
-                            <Column field="uom" header="Units">
+                            <Column field="uom" header="Units" style="min-width: 8rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.uom" class="w-full" disabled />
                                 </template>

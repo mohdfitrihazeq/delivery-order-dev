@@ -98,6 +98,7 @@ export interface BudgetChangeRequestPayload {
 }
 
 export interface TableItem {
+    id: number;
     itemCode: string;
     description: string;
     uom: string;
@@ -106,4 +107,6 @@ export interface TableItem {
     orderedQty: number;
     newOrder: number;
     remark: string;
+    location1?: string;
+    location2?: string;
 }

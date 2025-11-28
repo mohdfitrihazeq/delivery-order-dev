@@ -61,19 +61,33 @@ export default defineComponent({
         const openMeterial = () => (showBulkItemModal.value = true);
         const handleBulkItems = (selectedMaterials: any[]) => {
             selectedMaterials.forEach((mat) => {
-                if (!items.value.some((i) => i.itemCode === mat.itemCode)) {
-                    items.value.push({
-                        itemCode: mat.itemCode || mat.ItemCode,
-                        description: mat.description || mat.Name || '',
-                        uom: mat.uom || mat.Uom || '',
-                        unitPrice: Number(mat.price || mat.UnitPrice || 0),
-                        budgetQty: 0,
-                        orderedQty: Number(mat.Quantity || mat.quantity || 0),
-                        newOrder: Number(mat.newOrder || mat.NewOrder || 0),
-                        remark: mat.remark || mat.Remark || ''
+                const isDuplicate = items.value.some((i) => i.id === mat.id);
+
+                if (isDuplicate) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Duplicate Item',
+                        detail: `Item with ID ${mat.id} already added.`,
+                        life: 3000
                     });
+                    return;
                 }
+
+                items.value.push({
+                    id: mat.id || mat.Id || 0,
+                    itemCode: mat.itemCode || mat.ItemCode,
+                    location1: mat.location1 || '',
+                    location2: mat.location2 || '',
+                    description: mat.description || mat.Name || '',
+                    uom: mat.uom || mat.Uom || '',
+                    unitPrice: Number(mat.price || mat.UnitPrice || 0),
+                    budgetQty: 0,
+                    orderedQty: Number(mat.Quantity || mat.quantity || 0),
+                    newOrder: Number(mat.newOrder || mat.NewOrder || 0),
+                    remark: mat.remark || mat.Remark || ''
+                });
             });
+
             showBulkItemModal.value = false;
         };
 
