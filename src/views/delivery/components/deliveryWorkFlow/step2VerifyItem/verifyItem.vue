@@ -50,7 +50,7 @@
                 </template>
 
                 <template #content>
-                    <Form v-slot="$form" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
+                    <Form @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full sm:w-full">
                         <div class="grid grid-cols-1 gap-4 p-3">
                             <Card v-for="(item, index) in itemList" :key="index" class="border rounded-lg shadow-sm">
                                 <template #title>

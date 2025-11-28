@@ -1,7 +1,7 @@
+import { requestOrderService } from '@/services/requestOrder.service';
+import type { MenuItemType } from '@/types/sidebar.type';
 import { computed, defineComponent, onMounted, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
-import type { MenuItemType } from '@/types/sidebar.type';
-import { requestOrderService } from '@/services/requestOrder.service';
 
 export default defineComponent({
     components: { MenuItem },
@@ -44,7 +44,7 @@ export default defineComponent({
                         label: 'Request Orders',
                         icon: 'pi pi-fw pi-shopping-cart',
                         to: '/request-orders',
-                        badge: computed(() => pendingCount.value)
+                        badge: pendingCount.value
                     },
                     { label: 'Purchase Orders', icon: 'pi pi-fw pi-book', to: '/purchase-orders' },
                     { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }

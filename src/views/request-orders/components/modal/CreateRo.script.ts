@@ -42,23 +42,11 @@ export default defineComponent({
         const selectedElement = ref<string | null>(null);
         const selectedItemType = ref<string | null>(null);
 
-        // Selection
+        // Selection - PrimeVue expects array, so use array directly
         const selectedItems = ref<BudgetItem[]>([]);
 
         // Budget store
         const budgetStore = useBudgetStore();
-
-        const pagination = ref({
-            page: 1,
-            pageSize: 10,
-            total: 0,
-            totalPages: 0
-        });
-
-        onMounted(() => {
-            budgetStore.fetchBudgets();
-            budgetStore.fetchBudgetItems(currentVersion.value ?? 0, pagination.value.page, pagination.value.pageSize);
-        });
 
         const loadLatestBudgetVersion = (): number | null => {
             const v = localStorage.getItem('latestBudgetVersion');
@@ -71,15 +59,16 @@ export default defineComponent({
             if (!currentVersion.value) return;
             loading.value = true;
             try {
-                await budgetStore.fetchBudgetItems(currentVersion.value, pagination.value.page, pagination.value.pageSize);
-                pagination.value.total = budgetStore.pagination.total;
-                pagination.value.totalPages = budgetStore.pagination.totalPages;
+                await budgetStore.fetchBudgetItems(currentVersion.value, budgetStore.pagination.page, budgetStore.pagination.pageSize);
             } catch (error) {
                 console.error('Error loading budget items:', error);
             } finally {
                 loading.value = false;
             }
         };
+
+        // Use store's pagination directly
+        const pagination = computed(() => budgetStore.pagination);
 
         // All budget items from store
         const allBudgetItems = computed(() => budgetStore.budgetItems);
@@ -104,21 +93,23 @@ export default defineComponent({
             return items;
         });
 
-        // Apply pagination to filtered items
-        const paginatedItems = computed(() => {
-            return allBudgetItems.value.map((item, index) => ({
-                ...item,
-                rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
-            }));
-        });
-
         // Update pagination when filters change
-        watch([searchTerm, selectedLocation, selectedElement, selectedItemType], () => {
-            // Optionally reset page to 1 for local filters
-            pagination.value.page = 1;
+        watch([searchTerm, selectedLocation, selectedElement, selectedItemType], async () => {
+            budgetStore.pagination.page = 1;
         });
 
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
+        // ✅ FIXED: Keep selected items that are still in the budget
+        watch(
+            () => allBudgetItems.value,
+            (newItems) => {
+                const validIds = new Set(newItems.map((item) => item.id));
+                selectedItems.value = selectedItems.value.filter((selected) => validIds.has(selected.id));
+            }
+        );
+
+        const grandTotal = computed(() => {
+            return selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0);
+        });
 
         const locationOptions = computed<FilterOption[]>(() => {
             const locations = [...new Set(allBudgetItems.value.map((item) => item.location))];
@@ -158,7 +149,7 @@ export default defineComponent({
             selectedLocation.value = null;
             selectedElement.value = null;
             selectedItemType.value = null;
-            pagination.value.page = 1;
+            budgetStore.pagination.page = 1;
         };
 
         const addSelectedItems = () => {
@@ -181,7 +172,6 @@ export default defineComponent({
         watch(localVisible, async (visible) => {
             if (visible) {
                 if (!currentVersion.value) {
-                    // fallback in case version not set
                     currentVersion.value = loadLatestBudgetVersion();
                 }
                 if (currentVersion.value) {
@@ -191,26 +181,34 @@ export default defineComponent({
         });
 
         const handlePageChange = async (page: number) => {
-            pagination.value.page = page;
-            await budgetStore.fetchBudgetItems(page, pagination.value.pageSize);
+            budgetStore.pagination.page = page;
+            await fetchBudgetItems();
         };
 
         const handlePageSizeChange = async (pageSize: number) => {
-            pagination.value.pageSize = pageSize;
-            pagination.value.page = 1;
-            await budgetStore.fetchBudgetItems(1, pageSize);
+            budgetStore.pagination.pageSize = pageSize;
+            budgetStore.pagination.page = 1;
+            await fetchBudgetItems();
         };
+
+        // Add rowIndex to items
+        const paginatedItems = computed(() => {
+            return budgetStore.budgetItems.map((item, index) => ({
+                ...item,
+                rowIndex: (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1
+            }));
+        });
 
         const handleSearch = (value: string) => {
             searchTerm.value = value;
-            pagination.value.page = 1;
+            budgetStore.pagination.page = 1;
         };
 
         const handleFilterChange = (filters: Record<string, any>) => {
             selectedLocation.value = filters.location || null;
             selectedElement.value = filters.element || null;
             selectedItemType.value = filters.itemType || null;
-            pagination.value.page = 1;
+            budgetStore.pagination.page = 1;
         };
 
         // Define ReusableTable columns
@@ -222,16 +220,28 @@ export default defineComponent({
             { field: 'element', header: 'Element', sortable: false },
             { field: 'itemType', header: 'Item Type', sortable: true, bodySlot: 'itemTypeSlot' },
             { field: 'uom', header: 'UOM', sortable: false },
-            { field: 'quantity', header: 'Quantity', sortable: true },
+            { field: 'qty', header: 'Quantity', sortable: true },
             { field: 'price', header: 'Price', sortable: true, bodySlot: 'priceSlot', visible: false },
             { field: 'total', header: 'Total', bodySlot: 'totalSlot', visible: false }
         ];
+
+        onMounted(() => {
+            budgetStore.fetchBudgets();
+        });
+
+        const displayItems = computed(() => {
+            // Don't create new objects - mutate the existing ones with rowIndex
+            budgetStore.budgetItems.forEach((item, index) => {
+                (item as any).rowIndex = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize + index + 1;
+            });
+            return budgetStore.budgetItems;
+        });
 
         return {
             modalTitle,
             loading,
             localVisible,
-            paginatedItems,
+            paginatedItems: displayItems,
             filteredItems,
             selectedItems,
             allBudgetItems,

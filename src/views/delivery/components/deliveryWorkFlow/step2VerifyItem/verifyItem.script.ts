@@ -53,24 +53,26 @@ export default defineComponent({
         watch(
             () => props.selectedPo,
             (newPo) => {
-                if (!newPo || !newPo.items) {
+                if (!newPo?.items?.length) {
                     itemList.value = [];
                     poNumber.value = null;
                     return;
                 }
+
                 itemList.value = newPo.items.map((i: PurchaseOrderItem) => ({
-                    id: i.id,
-                    purchaseOrderId: newPo.id,
-                    requestOrderId: i.requestOrderId ?? null,
-                    name: i.description || i.code || 'Unnamed Item',
-                    order: i.code || '',
+                    id: i.id ?? i.Id,
+                    purchaseOrderId: newPo.id ?? newPo.Id,
+                    requestOrderId: i.requestOrderId ?? 0,
+                    name: i.description ?? i.Name ?? 'Unnamed Item',
+                    order: i.code ?? i.ItemCode ?? '',
                     status: 'Pending',
                     location: '',
                     category: '',
                     type: '',
                     delivered: 0,
-                    total: Number(i.qty) || 0
+                    total: Number(i.qty ?? i.Quantity) || 0
                 }));
+
                 poNumber.value = newPo.poNumber ?? newPo.DocNo ?? null;
             },
             { immediate: true }
@@ -79,32 +81,23 @@ export default defineComponent({
         // ---------------------------
         // 3. METHODS
         // ---------------------------
-        const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
+        const onFormSubmit = (event: FormSubmitEvent) => {
             if (event.valid) {
-                if (itemList.value.length > 0) {
-                    const minimalItems = itemList.value.map((i) => ({
-                        purchaseOrderItemId: i.id,
-                        requestOrderId: i.requestOrderId,
-                        delivered: i.delivered
-                    }));
+                const minimalItems = itemList.value.map((i) => ({
+                    purchaseOrderItemId: i.id,
+                    requestOrderId: i.requestOrderId,
+                    delivered: i.delivered
+                }));
 
-                    emit('update', minimalItems);
-                    emit('next-step');
+                emit('update', minimalItems);
+                emit('next-step');
 
-                    toast.add({
-                        severity: 'success',
-                        summary: 'Form submitted',
-                        detail: `PO ${poNumber.value} with ${minimalItems.length} items submitted.`,
-                        life: 3000
-                    });
-                } else {
-                    toast.add({
-                        severity: 'warn',
-                        summary: 'No Items',
-                        detail: 'No items found for this PO. Please select a valid Purchase Order.',
-                        life: 3000
-                    });
-                }
+                toast.add({
+                    severity: 'success',
+                    summary: 'Form submitted',
+                    detail: `PO ${poNumber.value} with ${minimalItems.length} items submitted.`,
+                    life: 3000
+                });
             } else {
                 toast.add({
                     severity: 'error',

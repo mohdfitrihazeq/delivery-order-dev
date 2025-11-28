@@ -43,7 +43,7 @@
                         <label class="block text-sm text-gray-600 mb-1"> Subcon <span class="text-red-600 font-bold">*</span> </label>
                         <div class="flex flex-col gap-2">
                             <AutoComplete v-model="selectedSubcon" :suggestions="filteredSubconList" field="name" option-label="name" forceSelection dropdown placeholder="Search Subcon" @complete="handleSubconSearch" />
-                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle">Subcon is required for Unbudgeted Items</Message> />
+                            <Message v-if="showValidation && !selectedSubcon" severity="error" icon="pi pi-times-circle">Subcon is required for Unbudgeted Items</Message>
                         </div>
                     </div>
                 </Motion>
@@ -101,9 +101,9 @@
                     </template>
                 </Column>
 
-                <Column field="quantity" header="Quantity" style="min-width: 110px; width: 110px">
+                <Column field="qty" header="Quantity" style="min-width: 110px; width: 110px">
                     <template #body="{ data }">
-                        <InputNumber v-model.number="data.quantity" class="w-full" :min="0" />
+                        <InputNumber v-model.number="data.qty" class="w-full" :min="0" />
                     </template>
                 </Column>
 
@@ -165,7 +165,7 @@
                             <i class="pi pi-file"></i>
                             <span class="text-sm">{{ file.filename }}</span>
                             <Button icon="pi pi-eye" text rounded severity="info" @click="previewAttachment(file)" />
-                            <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index, 'existing')" />
+                            <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index)" />
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
                                 <i class="pi pi-file"></i>
                                 <span class="text-sm">{{ file.name }}</span>
                                 <span v-if="file.size" class="text-xs text-gray-500">({{ formatSize(file.size) }})</span>
-                                <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index, 'new')" />
+                                <Button icon="pi pi-times" text rounded severity="danger" @click="removeAttachment(index)" />
                             </div>
                         </div>
                     </template>

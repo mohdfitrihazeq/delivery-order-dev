@@ -95,6 +95,7 @@ export const useBudgetStore = defineStore('budget', () => {
             };
 
             const response = await budgetService.getBudgetItems(params);
+            console.log('Budget items response:', response);
             budgetItems.value = response.data.map((item: any) => ({
                 id: item.Id,
                 budgetId: item.BudgetId,
@@ -114,7 +115,7 @@ export const useBudgetStore = defineStore('budget', () => {
                 subSubElement: item.SubSubElement,
 
                 uom: item.Unit,
-                quantity: Number(item.Quantity),
+                qty: Number(item.Quantity),
                 price: Number(item.Rate),
                 total: Number(item.Quantity) * Number(item.Rate),
                 unit: item.Unit,

@@ -1,16 +1,16 @@
+import { requestOrderService } from '@/services/requestOrder.service';
+import type { DraftRO } from '@/types/request-order.type';
+import { showError } from '@/utils/showError.utils';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { requestOrderService } from '@/services/requestOrder.service';
-import { showError } from '@/utils/showError.utils';
-import type { DraftRO } from '../../types/request-order.type';
 
 export default defineComponent({
     name: 'ViewDraftRo',
@@ -127,13 +127,13 @@ export default defineComponent({
         const handleContinue = (draft: DraftRO) => {
             router.push({
                 path: '/request-orders/create',
-                query: { draftId: draft.id?.toString() ?? '', mode: 'edit-draft' }
+                query: { draftId: draft.draftId?.toString() ?? '', mode: 'edit-draft' }
             });
 
             toast.add({
                 severity: 'info',
                 summary: 'Draft Loaded',
-                detail: `Continuing draft ${draft.DocNo}`,
+                detail: `Continuing draft ${draft.roNumber}`,
                 life: 3000
             });
 
@@ -151,7 +151,8 @@ export default defineComponent({
                 rejectLabel: 'Cancel',
                 accept: async () => {
                     try {
-                        await requestOrderService.deleteRequestOrder(draft.id);
+                        await requestOrderService.deleteRequestOrder(Number(draft.draftId));
+
                         toast.add({
                             severity: 'success',
                             summary: 'Draft Deleted',

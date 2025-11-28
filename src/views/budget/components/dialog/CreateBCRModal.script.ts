@@ -92,7 +92,7 @@ export default defineComponent({
             }));
         });
 
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0));
 
         const locationOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.location))].map((l) => ({ label: l || 'N/A', value: l })));
 

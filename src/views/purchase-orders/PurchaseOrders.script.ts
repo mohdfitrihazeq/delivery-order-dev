@@ -6,11 +6,12 @@ import POSummaryData from '@/components/summaryCard/SummaryCard.vue';
 import BaseTabUnderLine from '@/components/tab/BaseTabUnderLine.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
 import router from '@/router';
+import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 import type { CardItem } from '@/types/card.type';
+import type { PurchaseOrderWithStatus } from '@/types/purchase.type';
 import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
-import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
 
 export default defineComponent({
     name: 'PurchaseOrders',
@@ -28,9 +29,9 @@ export default defineComponent({
         const store = usePurchaseOrderStore();
 
         // Lists from DB
-        const pendingList = ref([]);
-        const partiallyList = ref([]);
-        const completedList = ref([]);
+        const pendingList = ref<PurchaseOrderWithStatus[]>([]);
+        const partiallyList = ref<PurchaseOrderWithStatus[]>([]);
+        const completedList = ref<PurchaseOrderWithStatus[]>([]);
 
         const poSummaryData = ref<CardItem[]>([]);
 
@@ -88,12 +89,17 @@ export default defineComponent({
             try {
                 await store.fetchPurchaseOrders();
 
-                const purchaseOrdersWithStatus = store.purchaseOrders.map((po) => ({
+                const purchaseOrdersWithStatus: PurchaseOrderWithStatus[] = store.purchaseOrders.map((po) => ({
                     ...po,
-                    poNumber: po.poNumber,
-                    supplier: po.supplier || '',
-                    totalAmount: po.purchaseorderitems?.reduce((sum, item) => sum + item.Quantity * item.Rate, 0) || 0,
-                    status: 'pending'
+                    poNumber: po.DocNo,
+                    supplier: po.SupplierId?.toString() || '',
+                    totalAmount:
+                        po.PurchaseOrderItems?.reduce((sum, item) => {
+                            const quantity = typeof item.Quantity === 'string' ? parseFloat(item.Quantity) : item.Quantity;
+                            const price = item.Price || 0;
+                            return sum + quantity * price;
+                        }, 0) || 0,
+                    status: 'Pending'
                 }));
 
                 pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending');
@@ -207,11 +213,11 @@ export default defineComponent({
         /** -------------------------
          *  ACTIONS
          * ------------------------*/
-        const viewPO = (po: any) => {
+        const viewPO = (po: PurchaseOrderWithStatus & { no?: number }) => {
             router.push({
                 name: 'ViewDetailsPO',
                 params: { poNumber: po.poNumber },
-                query: { id: po.id }
+                query: { id: po.Id }
             });
         };
 

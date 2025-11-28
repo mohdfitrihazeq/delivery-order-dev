@@ -1,4 +1,6 @@
 import { usePurchaseOrderStore } from '@/stores/purchase-order/purchaseOrder.store';
+import { PurchaseOrderCard } from '@/types/delivery.type';
+import type { PurchaseOrderItem } from '@/types/purchase.type';
 import Form, { FormSubmitEvent } from '@primevue/forms/form';
 import AutoComplete from 'primevue/autocomplete';
 import Badge from 'primevue/badge';
@@ -8,14 +10,6 @@ import Message from 'primevue/message';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref } from 'vue';
-
-interface PurchaseOrderCard {
-    id: string;
-    title: string;
-    content: string;
-    badges: string[];
-    icon: string;
-}
 
 export default defineComponent({
     name: 'SelectPO',
@@ -37,12 +31,14 @@ export default defineComponent({
         const fetchPage = async () => {
             await purchaseStore.fetchPurchaseOrders();
             allCards.value = purchaseStore.purchaseOrders.map((po) => ({
-                id: po.id?.toString() ?? '',
-                title: po.poNumber ?? '',
-                content: `${po.items?.length ?? 0} items`,
-                badges: po.items?.map((i: any) => i.code ?? '').filter(Boolean) ?? [],
+                id: po.Id?.toString() ?? '',
+                title: po.DocNo ?? '',
+                content: `${po.PurchaseOrderItems?.length ?? 0} items`,
+                badges: po.PurchaseOrderItems?.map((i: PurchaseOrderItem) => i.ItemCode ?? '').filter(Boolean) ?? [],
                 icon: 'pi-box'
             }));
+            filteredCards.value = [...allCards.value];
+
             filteredCards.value = [...allCards.value];
         };
 
@@ -65,7 +61,7 @@ export default defineComponent({
 
         const isSelected = (card: PurchaseOrderCard) => selectedCard.value?.id === card.id;
 
-        const onFormSubmit = (event: FormSubmitEvent<Record<string, any>>) => {
+        const onFormSubmit = (event: FormSubmitEvent<Record<string, unknown>>) => {
             let hasError = false;
 
             if (!event.valid) {
@@ -90,14 +86,14 @@ export default defineComponent({
 
             if (hasError) return;
 
-            const fullPO = purchaseStore.purchaseOrders.find((po) => po.id?.toString() === selectedCard.value?.id);
+            const fullPO = purchaseStore.purchaseOrders.find((po) => po.Id.toString() === selectedCard.value?.id);
 
             if (!fullPO) return;
 
             emit('update', {
-                id: fullPO.id,
-                poNumber: fullPO.poNumber,
-                items: fullPO.items
+                id: fullPO.Id,
+                poNumber: fullPO.DocNo,
+                items: fullPO.PurchaseOrderItems
             });
 
             emit('next-step');
@@ -105,7 +101,7 @@ export default defineComponent({
             toast.add({
                 severity: 'info',
                 summary: 'Purchase Order Confirmed',
-                detail: `Selected PO: ${fullPO.poNumber}`,
+                detail: `Selected PO: ${fullPO.DocNo}`,
                 life: 2000
             });
         };

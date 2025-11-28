@@ -10,7 +10,7 @@ import Badge from 'primevue/badge';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-import type { Order } from '../../types/request-order.type';
+import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
 import ViewDraftRo from './components/modal/ViewDraftRo.vue';
 import ViewRo from './components/modal/ViewRo.vue';
@@ -121,13 +121,12 @@ export default defineComponent({
 
         // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            const baseActions = ['view'];
-            let actions = [...baseActions];
+            const baseActions: ActionType[] = ['view'];
+            let actions: ActionType[] = [...baseActions];
 
             if (isPurchasingRole) {
                 actions = [...baseActions, 'delete'];
 
-                // Only show approve/reject if order is Pending
                 return [
                     { field: 'rowIndex', header: '#', sortable: true },
                     { field: 'roNumber', header: 'RO Number', sortable: true },
@@ -142,7 +141,7 @@ export default defineComponent({
                         header: 'Actions',
                         action: true,
                         actions: (row: Order) => {
-                            const rowActions = ['view'];
+                            const rowActions: ActionType[] = ['view'];
 
                             if (isPurchasingRole) {
                                 if (row.status === 'Pending') {
@@ -287,7 +286,7 @@ export default defineComponent({
             });
         }
 
-        function handleSaveOrder(formData: any): void {
+        function handleSaveOrder(formData: Partial<Order>): void {
             if (selectedOrder.value) {
                 Object.assign(selectedOrder.value, formData);
                 store.fetchOrders();
@@ -400,7 +399,7 @@ export default defineComponent({
             store.fetchOrders();
         }
 
-        function handleFilterChange(filters: Record<string, any>): void {
+        function handleFilterChange(filters: RequestOrdersFilters): void {
             store.filters.status = filters.status ?? '';
             store.filters.budgetType = filters.budgetType ?? '';
             store.filters.search = filters.search ?? '';

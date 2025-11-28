@@ -90,8 +90,12 @@ export const useDeliveryStore = defineStore('deliveryStore', () => {
             showSuccess(response.message || 'Delivery order created successfully.');
             await fetchDeliveryOrders();
             return true;
-        } catch (error: any) {
-            showError(error, 'Failed to create delivery order.');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                showError(error.message, 'Failed to create delivery order.');
+            } else {
+                showError('An unexpected error occurred.', 'Failed to create delivery order.');
+            }
             return false;
         } finally {
             loading.value = false;

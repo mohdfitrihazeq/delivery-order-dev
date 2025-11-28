@@ -72,13 +72,31 @@
                     </template>
                 </Column>
 
-                <Column field="quantity" header="QTY" style="min-width: 80px; text-align: center">
+                <Column field="qty" header="QTY" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
-                        {{ data.quantity }}
+                        {{ data.qty }}
                     </template>
                 </Column>
 
-                <Column field="price" header="APPLY" style="min-width: 120px; text-align: right">
+                <Column field="QtyReq" header="QtyReq" style="min-width: 80px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.QtyReq || '' }}
+                    </template>
+                </Column>
+
+                <Column field="QtyOrd" header="QtyOrd" style="min-width: 80px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.QtyOrd || '' }}
+                    </template>
+                </Column>
+
+                <Column field="QtyDelivered" header="QtyDelivered" style="min-width: 100px; text-align: center">
+                    <template #body="{ data }">
+                        {{ data.QtyDelivered || '' }}
+                    </template>
+                </Column>
+
+                <Column field="price" header="APPLY" style="min-width: 120px; text-align: right; display: none">
                     <template #body="{ data }">
                         <div>
                             <div>{{ formatCurrency(data.price) }}</div>
