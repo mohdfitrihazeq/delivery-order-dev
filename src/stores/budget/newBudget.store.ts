@@ -95,7 +95,6 @@ export const useBudgetStore = defineStore('budget', () => {
             };
 
             const response = await budgetService.getBudgetItems(params);
-            console.log('Budget items response:', response);
             budgetItems.value = response.data.map((item: any) => ({
                 id: item.Id,
                 budgetId: item.BudgetId,

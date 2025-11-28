@@ -80,6 +80,7 @@ export interface Order {
     id: number;
     roNumber: string;
     requestedBy: string;
+    location?: string;
     roDate: string;
     deliveryDate: string | Date | null;
     totalAmount: string;
@@ -136,7 +137,7 @@ export interface CreateRequestOrderItem {
     Rate?: number;
     Notes: string;
     Reason: string;
-    DeliveryDate: string;
+    DeliveryDate: string | null;
     ItemCode: string;
     ItemType: string;
     Note?: string;
@@ -157,6 +158,15 @@ export interface CreateRequestOrderPayload {
     Remark: string;
     Currency: string;
     Items: CreateRequestOrderItem[];
+    PrType?: string;
+    Attachment?: string | null;
+    requestorderitems?: RequestOrderItemResponse[];
+}
+
+export interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
 }
 
 export interface CreateRequestOrderResponse {
@@ -258,6 +268,7 @@ export interface RequestOrderItemResponse {
     ItemCode: string;
     ItemType: string;
     Description: string;
+    Location: string;
     Unit?: string;
     Uom?: string;
     Quantity: number | string;

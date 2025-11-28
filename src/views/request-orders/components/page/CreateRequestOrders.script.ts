@@ -1,5 +1,5 @@
 import { requestOrderService } from '@/services/requestOrder.service';
-import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, DraftAttachment, PreviewSummary } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
 import { formatDateToAPI } from '@/utils/dateHelper';
 import { Motion } from '@motionone/vue';
@@ -65,66 +65,65 @@ export default defineComponent({
         const budgetSwitching = ref(false);
         const currentProject = getCurrentProjectName();
 
-        // Load draft data if coming from draft modal
         onMounted(async () => {
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
                 const draftId = route.query.draftId as string;
 
                 try {
-                    // Make sure to type the response correctly
-                    const draft: CreateRequestOrderPayload = await requestOrderService.getRequestOrderById(draftId);
-                    console.log('Loaded draft data:', draft);
+                    const res = await requestOrderService.getRequestOrderById(draftId);
+                    const draft = res.data;
+
                     if (!draft) return;
 
-                    // Basic fields
                     roNumber.value = draft.DocNo;
-                    budgetType.value = draft.BudgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+                    budgetType.value = draft.PrType === 'Budgeted' || draft.BudgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+
                     overallRemark.value = draft.Remark || '';
                     if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
 
-                    // Items
-                    items.value = draft.Items.map((item) => ({
+                    const draftItems = Array.isArray(draft.Items) && draft.Items.length > 0 ? draft.Items : Array.isArray(draft.requestorderitems) ? draft.requestorderitems : [];
+
+                    items.value = draftItems.map((item: any) => ({
                         itemCode: item.ItemCode || '',
-                        itemType: item.ItemType || 'CO', // required
+                        itemType: item.ItemType || 'CO',
                         budgetItemId: item.BudgetItemId ?? null,
                         nonBudgetItemId: item.NonBudgetItemId ?? null,
                         description: item.Description || '',
-                        location: '',
-                        uom: item.Uom,
-                        qty: item.Quantity,
-                        price: item.Rate ?? 0,
+                        location: item.Location ?? '',
+                        uom: item.Uom || item.Unit || '',
+                        qty: Number(item.Quantity) || 0,
+                        price: Number(item.Rate) || 0,
                         deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : null,
                         notes: item.Notes || '',
-                        remark: item.Reason || '',
+                        remark: item.Remark || item.Reason || '',
                         showNotes: false,
                         showRemark: false,
-                        isBudgeted: draft.BudgetType === 'Budgeted'
+                        isBudgeted: draft.PrType === 'Budgeted' || draft.BudgetType === 'Budgeted'
                     }));
 
-                    // Attachments
-                    const attachmentData = (draft as { Attachment?: string }).Attachment;
-
-                    if (attachmentData) {
-                        const parsedAttachments: DraftAttachment[] = JSON.parse(attachmentData);
-                        existingAttachments.value = parsedAttachments.map((att) => ({
-                            filename: att.filename,
-                            path: att.path.replace(/\\/g, '/'),
-                            size: att.size,
-                            type: att.type
-                        }));
-
-                        attachments.value = [...existingAttachments.value];
+                    if (draft.Attachment) {
+                        try {
+                            const parsed = JSON.parse(draft.Attachment);
+                            existingAttachments.value = parsed.map((att: any) => ({
+                                filename: att.filename,
+                                path: att.path.replace(/\\/g, '/'),
+                                size: att.size,
+                                type: att.type
+                            }));
+                            attachments.value = [...existingAttachments.value];
+                        } catch (e) {
+                            console.error('Failed to parse attachment JSON');
+                        }
                     }
 
                     toast.add({
                         severity: 'info',
                         summary: 'Draft Loaded',
-                        detail: `Loaded draft ${draft.DocNo} with ${attachments.value.length} attachment(s)`,
+                        detail: `Loaded draft ${draft.DocNo}`,
                         life: 3000
                     });
-                } catch (error: unknown) {
+                } catch (error) {
                     console.error('Failed to load draft:', error);
-
                     toast.add({
                         severity: 'error',
                         summary: 'Failed to Load Draft',
@@ -445,7 +444,6 @@ export default defineComponent({
                         showRemark: false,
                         isBudgeted: true
                     });
-                    console.log('Adding item from budget:', budgetItem);
                     // Add to itemOptions if not exist
                     const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
                     if (!existingOption) {
@@ -669,7 +667,7 @@ export default defineComponent({
                         Rate: item.price ?? 0,
                         Notes: item.notes ?? '',
                         Reason: '',
-                        DeliveryDate: formatDateToAPI(item.deliveryDate ? new Date(item.deliveryDate) : null) || ''
+                        DeliveryDate: item.deliveryDate ? formatDateToAPI(new Date(item.deliveryDate)) : null
                     }))
                 };
                 const isDraft = !!route.query.draftId; // check if editing a draft

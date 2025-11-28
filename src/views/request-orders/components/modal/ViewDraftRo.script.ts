@@ -127,7 +127,7 @@ export default defineComponent({
         const handleContinue = (draft: DraftRO) => {
             router.push({
                 path: '/request-orders/create',
-                query: { draftId: draft.draftId?.toString() ?? '', mode: 'edit-draft' }
+                query: { draftId: draft.id?.toString() ?? '', mode: 'edit-draft' }
             });
 
             toast.add({

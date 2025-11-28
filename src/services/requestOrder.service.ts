@@ -1,5 +1,5 @@
 // src/services/requestOrder.service.ts
-import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersParams, GetRequestOrdersResponse } from '@/types/request-order.type';
+import type { ApiResponse, AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, GetRequestOrdersParams, GetRequestOrdersResponse } from '@/types/request-order.type';
 import { showError } from '@/utils/showNotification.utils';
 import type { AxiosError } from 'axios';
 import { isRef, unref } from 'vue';
@@ -171,12 +171,14 @@ const getRequestOrders = async (params?: GetRequestOrdersParams): Promise<GetReq
 /**
  * Fetch a request order by ID
  */
-const getRequestOrderById = async (id: string): Promise<CreateRequestOrderPayload> => {
+const getRequestOrderById = async (id: string): Promise<ApiResponse<CreateRequestOrderPayload>> => {
     try {
         const response = await axiosInstance.get(`/requestOrder/${id}`);
+        console.log('Request order details response:', response.data);
+
         return response.data;
     } catch (error: unknown) {
-        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || 'Failed to fetch request order details';
+        const message = (error as AxiosError<{ message: string }>).response?.data?.message || 'Failed to fetch request order details';
         showError(error, message);
         throw error;
     }
