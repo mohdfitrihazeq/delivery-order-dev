@@ -6,7 +6,7 @@ import { reactive, ref } from 'vue';
 
 export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     const purchaseOrders = ref<PurchaseOrder[]>([]);
-    const selectedPurchaseOrder = ref<PurchaseOrder | null>(null);
+    const selectedPurchaseOrder = ref<PurchaseOrderView | null>(null);
     const loading = ref(false);
 
     const filters = reactive({
@@ -51,7 +51,6 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             };
 
             const response: PurchaseOrderResponse = await purchaseService.getPurchaseOrders(params);
-            console.log('Fetched purchase orders:', response);
 
             if (!response.success) {
                 showError(response.message || 'Failed to fetch purchase orders');
@@ -102,28 +101,62 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     async function fetchPurchaseOrderById(id: string): Promise<PurchaseOrderView | null> {
         loading.value = true;
         try {
-            // NOTE: service returns PurchaseOrder directly
-            const o = await purchaseService.getPurchaseOrderById(id);
+            const response = await purchaseService.getPurchaseOrderById(id);
+            if (!response) return null;
 
-            if (!o) return null;
+            const wrapped = response as any;
+            const o = wrapped.data as PurchaseOrder;
+
+            const rawItems = (o.purchaseorderitems ?? o.PurchaseOrderItems ?? []) as PurchaseOrderItem[];
+            const mappedItems = rawItems.map((item: any) => ({
+                Id: item.Id,
+                PurchaseOrderId: item.PurchaseOrderId,
+                SoDocNo: item.SoDocNo,
+                RoDocNo: item.RoDocNo,
+                ItemCode: item.ItemCode,
+                Name: item.Name,
+                Uom: item.Uom || '',
+                Quantity: item.Quantity,
+                Price: item.Price || 0,
+                Discount: item.Discount,
+                DeliveryDate: item.DeliveryDate,
+                CreatedAt: item.CreatedAt,
+                CreatedBy: item.CreatedBy,
+                UpdatedAt: item.UpdatedAt,
+                UpdatedBy: item.UpdatedBy,
+
+                // Frontend-friendly aliases
+                code: item.ItemCode,
+                description: item.Name,
+                uom: item.Uom || '',
+                qty: Number(item.Quantity),
+                price: item.Price || 0,
+                amount: Number(item.Quantity) * (item.Price || 0),
+                deliveryDate: item.DeliveryDate || null,
+                note: item.RoDocNo || ''
+            }));
 
             const order: PurchaseOrderView = {
-                ...o,
-                poNumber: o.DocNo, // alias for frontend
-                poDate: formatDate(o.PoDate), // alias for frontend
-                items: o.PurchaseOrderItems.map((item: PurchaseOrderItem) => ({
-                    ...item,
-                    code: item.ItemCode,
-                    description: item.Name,
-                    uom: item.Uom || '',
-                    qty: Number(item.Quantity),
-                    price: item.Price || 0,
-                    amount: Number(item.Quantity) * (item.Price || 0),
-                    deliveryDate: item.DeliveryDate || null,
-                    note: item.RoDocNo || ''
-                }))
+                Id: o.Id,
+                SupplierId: o.SupplierId,
+                DocNo: o.DocNo,
+                Status: o.Status,
+                PoDate: o.PoDate,
+                TotalAmount: o.TotalAmount,
+                GstAmount: o.GstAmount,
+                Remark: o.Remark,
+                CreatedAt: o.CreatedAt,
+                CreatedBy: o.CreatedBy,
+                UpdatedAt: o.UpdatedAt,
+                UpdatedBy: o.UpdatedBy,
+
+                // Frontend-friendly aliases
+                poNumber: o.DocNo,
+                poDate: formatDate(o.PoDate),
+                items: mappedItems
             };
 
+            console.log('Mapped purchase order:', order);
             selectedPurchaseOrder.value = order;
             return order;
         } catch (error: unknown) {

@@ -1,4 +1,3 @@
-// src/types/purchase.type.ts
 export interface PurchaseOrderItem {
     Id: number;
     PurchaseOrderId: number;
@@ -22,6 +21,7 @@ export interface PurchaseOrderItem {
     code?: string;
     description?: string;
     qty?: number;
+    purchaseorderitems?: PurchaseOrderItem[];
 }
 
 export interface PurchaseOrder {
@@ -38,6 +38,7 @@ export interface PurchaseOrder {
     UpdatedAt?: string | null;
     UpdatedBy?: string | null;
     PurchaseOrderItems: PurchaseOrderItem[];
+    purchaseorderitems?: PurchaseOrderItem[];
 
     // Frontend-friendly aliases
     id?: number;
@@ -95,11 +96,6 @@ export interface PurchaseOrderWithStatus extends PurchaseOrder {
     status: string;
 }
 
-export interface PurchaseOrderView extends PurchaseOrder {
-    poNumber: string;
-    items: PurchaseOrderItemView[];
-}
-
 export interface PurchaseOrderItemView extends PurchaseOrderItem {
     code: string;
     description: string;
@@ -111,19 +107,7 @@ export interface PurchaseOrderItemView extends PurchaseOrderItem {
     note: string;
 }
 
-// src/types/purchase.type.ts
-export interface PurchaseOrderItemView extends PurchaseOrderItem {
-    code: string;
-    description: string;
-    uom: string;
-    qty: number;
-    price: number;
-    amount: number;
-    deliveryDate: string | null;
-    note: string;
-}
-
-export interface PurchaseOrderView extends Omit<PurchaseOrder, 'PurchaseOrderItems' | 'PoDate' | 'DocNo'> {
+export interface PurchaseOrderView extends Omit<PurchaseOrder, 'PurchaseOrderItems' | 'purchaseorderitems'> {
     poNumber: string; // frontend convenience alias for DocNo
     poDate: string; // frontend convenience alias for PoDate
     items: PurchaseOrderItemView[];

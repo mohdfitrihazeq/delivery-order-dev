@@ -88,7 +88,6 @@ export default defineComponent({
             isLoading.value = true;
             try {
                 await store.fetchPurchaseOrders();
-                console.log('Store purchase orders:', store.purchaseOrders);
 
                 const purchaseOrdersWithStatus: PurchaseOrderWithStatus[] = store.purchaseOrders.map((po) => ({
                     ...po,

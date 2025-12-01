@@ -41,28 +41,30 @@ export default defineComponent({
             }, 0);
         });
 
-        // --- Table data ---
-        const items = computed(() =>
-            (purchaseOrder.value?.items || []).map((item) => {
-                const qty = Number(item.Quantity || 0);
+        const itemsList = computed(() => {
+            const po = purchaseOrder.value;
+            if (!po || !po.items) return [];
+
+            return po.items.map((item: any) => {
+                const qty = Number(item.qty || 0);
                 const received = Math.floor(qty * 0.7);
                 const remaining = qty - received;
                 return {
                     no: 0,
                     code: item.code,
                     description: item.description,
-                    ordered: item.qty,
+                    ordered: qty,
                     received,
                     remaining,
-                    unitPrice: item.Price,
-                    roNumber: item.RoDocNo,
-                    deliveryDate: item.DeliveryDate || 'N/A',
-                    status: received === item.qty ? 'Completed' : 'Partial'
+                    unitPrice: item.price,
+                    roNumber: item.note,
+                    deliveryDate: item.deliveryDate || 'N/A',
+                    status: received === qty ? 'Completed' : 'Partial'
                 };
-            })
-        );
+            });
+        });
 
-        const itemsWithNo = computed(() => items.value.map((item, i) => ({ ...item, no: i + 1 })));
+        const itemsWithNo = computed(() => itemsList.value.map((item, i) => ({ ...item, no: i + 1 })));
 
         const itemsColumns = ref([
             { field: 'no', header: 'No', bodySlot: 'no' },
