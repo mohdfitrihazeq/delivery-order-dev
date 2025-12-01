@@ -1,48 +1,12 @@
 <script setup lang="ts">
-import Dropdown from 'primevue/dropdown';
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import LoginForm from './components/form/LoginForm.vue';
 import { useLoginCardAnimation } from './index.script';
 
 const { loginCard } = useLoginCardAnimation();
 
-const demoAccounts = [
-    { role: 'PM', id: 'pm_user', pwd: 'pm123' },
-    { role: 'Site', id: 'site_user', pwd: 'site123' },
-    { role: 'Purchasing', id: 'purchasing_user', pwd: 'purchase123' }
-];
-
-const selectedDemo = ref<any>(null);
-const useRealAPI = ref(false);
-
 const loginUsername = ref('');
 const loginPassword = ref('');
-
-watch(selectedDemo, (val) => {
-    if (!useRealAPI.value) {
-        if (val) {
-            loginUsername.value = val.id;
-            loginPassword.value = val.pwd;
-        } else {
-            loginUsername.value = '';
-            loginPassword.value = '';
-        }
-    }
-});
-
-watch(useRealAPI, (val) => {
-    if (val) {
-        selectedDemo.value = null;
-        loginUsername.value = '';
-        loginPassword.value = '';
-    } else {
-        selectedDemo.value = demoAccounts[0];
-    }
-});
-
-const selectedDetails = computed(() => {
-    return selectedDemo.value ? `id: ${selectedDemo.value.id} | pwd: ${selectedDemo.value.pwd}` : 'Select a demo account to view credentials';
-});
 </script>
 
 <template>
@@ -65,25 +29,8 @@ const selectedDetails = computed(() => {
                 <h1 class="text-2xl font-bold text-center mb-1 bg-gradient-to-r from-cyan-700 to-blue-400 bg-clip-text text-transparent">DO SYSTEM</h1>
                 <p class="text-center text-gray-500 mb-6">Delivery order management system</p>
 
-                <!-- API Mode Checkbox -->
-                <div class="mb-4 p-3 bg-gray-100 rounded-lg">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" v-model="useRealAPI" class="mr-2" />
-                        <span class="text-sm text-gray-700">Use Real API (for testing with local backend)</span>
-                    </label>
-                </div>
-
-                <!-- Demo Accounts Dropdown -->
-                <div class="mt-3 border rounded-lg bg-gray-50 p-4 text-sm text-gray-700 mb-6">
-                    <p class="font-semibold mb-4 text-center text-blue-600">Demo Accounts</p>
-                    <Dropdown v-model="selectedDemo" :options="demoAccounts" optionLabel="role" placeholder="Select a role" class="w-full" :disabled="useRealAPI" />
-                    <p class="mt-3 text-center text-gray-700">
-                        {{ selectedDetails }}
-                    </p>
-                </div>
-
                 <!-- Login Form -->
-                <LoginForm v-model:modelValueUsername="loginUsername" v-model:modelValuePassword="loginPassword" :useRealAPI="useRealAPI" />
+                <LoginForm v-model:modelValueUsername="loginUsername" v-model:modelValuePassword="loginPassword" />
             </div>
         </div>
     </div>

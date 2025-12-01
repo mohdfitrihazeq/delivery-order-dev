@@ -1,21 +1,8 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
-import { defineEmits, defineProps, watch } from 'vue';
 import { useLoginForm } from './LoginForm.script';
 
-const props = defineProps<{
-    modelValueUsername?: string;
-    modelValuePassword?: string;
-    useRealAPI?: boolean;
-}>();
-
-const emit = defineEmits(['update:modelValueUsername', 'update:modelValuePassword', 'update:useRealAPI']);
-
-const { username, password, showPassword, togglePasswordVisibility, handleSubmit, isLoading, useRealAPI } = useLoginForm(props);
-
-watch(username, (val) => emit('update:modelValueUsername', val));
-watch(password, (val) => emit('update:modelValuePassword', val));
-watch(useRealAPI, (val) => emit('update:useRealAPI', val));
+const { username, password, showPassword, togglePasswordVisibility, handleSubmit, isLoading } = useLoginForm();
 </script>
 
 <template>
