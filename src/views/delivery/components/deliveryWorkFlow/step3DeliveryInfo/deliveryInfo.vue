@@ -10,7 +10,7 @@
         <Card class="mt-6 border">
             <template #title> <i class="pi pi-truck"></i> Delivery Information </template>
             <template #content>
-                <Form v-slot="$form" :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
+                <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 mt-1 w-full">
                     <div class="grid grid-cols-2 gap-4 p-3">
                         <div class="flex flex-col">
                             <label for="driverPlate">Driver Plate Number</label>

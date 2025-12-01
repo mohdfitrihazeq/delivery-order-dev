@@ -139,6 +139,12 @@ export default defineComponent({
 
             filteredCards.value = allCards.value.filter((card) => card.title.toLowerCase().includes(keyword) || card.content.toLowerCase().includes(keyword));
         }
+        const handlePageSizeChange = (event: Event) => {
+            const target = event.target as HTMLSelectElement;
+            if (target?.value) {
+                setPageSize(Number(target.value));
+            }
+        };
 
         return {
             selectedCard,
@@ -157,7 +163,8 @@ export default defineComponent({
             displayEnd,
             purchaseStore,
             handleManualSearch,
-            manualSearch
+            manualSearch,
+            handlePageSizeChange
         };
     }
 });

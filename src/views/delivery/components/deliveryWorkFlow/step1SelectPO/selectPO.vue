@@ -62,7 +62,7 @@
                     <div class="flex justify-between items-center mt-4 gap-2" v-if="purchaseStore.pagination">
                         <div class="flex items-center gap-2">
                             <span>Rows per page:</span>
-                            <select :value="purchaseStore.pagination?.pageSize ?? 10" @change="setPageSize(Number(($event.target as HTMLSelectElement).value))" class="border rounded px-2 py-1">
+                            <select :value="purchaseStore.pagination?.pageSize ?? 10" @change="handlePageSizeChange" class="border rounded px-2 py-1">
                                 <option v-for="size in [10, 25, 50, 100]" :key="size" :value="size">{{ size }}</option>
                             </select>
                         </div>
