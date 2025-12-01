@@ -42,14 +42,13 @@ export default defineComponent({
             emit('update:visible', val);
         });
 
+        const localOrder = ref<Order | null>(props.order);
+
         watch(
             () => props.order,
             (newOrder) => {
-                if (newOrder && Array.isArray(newOrder.attachments)) {
-                    existingAttachments.value = newOrder.attachments as AttachmentItem[];
-                } else {
-                    existingAttachments.value = [];
-                }
+                localOrder.value = newOrder;
+                existingAttachments.value = newOrder?.attachments ?? [];
             },
             { immediate: true }
         );
@@ -88,7 +87,8 @@ export default defineComponent({
             handleReject,
             existingAttachments,
             previewAttachment,
-            formatSize
+            formatSize,
+            localOrder
         };
     }
 });

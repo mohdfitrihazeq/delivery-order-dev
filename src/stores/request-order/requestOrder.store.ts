@@ -103,7 +103,7 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
             const response = await requestOrderService.getRequestOrderById(id);
             if (!response) return null;
 
-            const o = response as unknown as RequestOrderResponse;
+            const o = response.data as unknown as RequestOrderResponse;
 
             let parsedAttachments: AttachmentItem[] = [];
             if (o.Attachment) {

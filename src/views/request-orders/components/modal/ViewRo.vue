@@ -2,35 +2,37 @@
 
 <template>
     <Dialog v-model:visible="localVisible" modal header="Details" class="w-11/12 md:w-2/3">
-        <div v-if="order">
+        <div v-if="localOrder">
             <h6 class="text-lg font-bold mb-6">
-                Request Order : <span class="text-gray-500 font-normal">{{ order.roNumber }}</span>
+                Request Order :
+                <span class="text-gray-500 font-normal">{{ localOrder.roNumber }}</span>
             </h6>
 
             <div class="grid grid-cols-2 gap-4 text-sm mb-6">
                 <div>
                     <p class="font-semibold">Status</p>
-                    <p>{{ order.status }}</p>
+                    <p>{{ localOrder.status }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Requested At</p>
-                    <p>{{ order.requestedAt }}</p>
+                    <p>{{ localOrder.requestedAt }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Requested By</p>
-                    <p>{{ order.requestedBy }}</p>
+                    <p>{{ localOrder.requestedBy }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Budget Type</p>
-                    <p>{{ order.budgetType }}</p>
+                    <p>{{ localOrder.budgetType }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">RO Date</p>
-                    <p>{{ order.roDate }}</p>
+                    <p>{{ localOrder.roDate }}</p>
                 </div>
             </div>
 
             <h3 class="font-semibold mb-2">Requested Items</h3>
+
             <table class="w-full border text-sm">
                 <thead>
                     <tr class="bg-gray-100">
@@ -43,19 +45,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, idx) in order.items || []" :key="idx">
+                    <tr v-for="(item, idx) in localOrder.items" :key="idx">
                         <td class="p-2">{{ item.code }}</td>
                         <td class="p-2">{{ item.description }}</td>
                         <td class="p-2">{{ item.uom }}</td>
                         <td class="p-2">{{ item.qty }}</td>
                         <td class="p-2">{{ item.deliveryDate }}</td>
-                        <td class="p-2">{{ item.description }}</td>
+                        <td class="p-2">{{ item.note }}</td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="mt-4">
-                <!-- Show existing attachments -->
                 <div v-if="existingAttachments.length > 0" class="mb-4">
                     <h4 class="text-sm font-semibold mb-2">Attachments</h4>
                     <div class="flex flex-wrap gap-2">
@@ -68,17 +69,17 @@
                     </div>
                 </div>
 
-                <!-- Show message if no attachments -->
                 <div v-else class="text-gray-500 italic text-sm">No attachments available.</div>
             </div>
         </div>
 
         <template #footer>
             <div class="flex justify-end gap-2">
-                <template v-if="isPurchasingRole && order?.status === 'Pending'">
+                <template v-if="isPurchasingRole && localOrder?.status === 'Pending'">
                     <Button label="Reject Request" severity="danger" outlined icon="pi pi-times" @click="handleReject" />
                     <Button label="Approve Request" severity="success" icon="pi pi-check" @click="handleApprove" />
                 </template>
+
                 <template v-else>
                     <Button label="Close" severity="secondary" icon="pi pi-times" @click="handleClose" />
                 </template>

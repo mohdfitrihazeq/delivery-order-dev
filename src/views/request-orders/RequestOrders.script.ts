@@ -9,6 +9,8 @@ import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
+import { nextTick } from 'vue';
+
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import type { ActionType, Order, RequestOrdersFilters } from '../../types/request-order.type';
 import EditRo from './components/modal/EditRo.vue';
@@ -224,7 +226,8 @@ export default defineComponent({
         async function openOrderDetails(order: Order): Promise<void> {
             const fullOrder = await store.fetchOrderById(String(order.id));
             if (fullOrder) {
-                selectedOrder.value = fullOrder;
+                selectedOrder.value = { ...fullOrder };
+                await nextTick();
                 showDetailsModal.value = true;
             }
         }
