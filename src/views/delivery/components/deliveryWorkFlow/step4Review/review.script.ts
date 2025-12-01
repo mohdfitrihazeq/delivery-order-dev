@@ -71,12 +71,13 @@ export default defineComponent({
             const po = selectPO.value;
             if (!po || !po.PurchaseOrderItems) return [];
 
-            return po.PurchaseOrderItems.map((item) => ({
-                ItemCode: item.itemCode,
-                Name: item.name ?? item.itemCode,
-                Price: item.price,
-                Quantity: item.quantity,
-                SoDocNo: po.DocNo
+            return po.PurchaseOrderItems.map((item: any) => ({
+                ItemCode: item.ItemCode ?? item.code ?? item.itemCode,
+                Name: item.Name ?? item.description ?? item.name,
+                Price: item.Price ?? item.price,
+                Quantity: Number(item.Quantity ?? item.qty),
+                Uom: item.Uom ?? item.uom,
+                SoDocNo: item.SoDocNo ?? po.DocNo
             }));
         });
 
