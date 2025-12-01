@@ -88,6 +88,7 @@ export default defineComponent({
             isLoading.value = true;
             try {
                 await store.fetchPurchaseOrders();
+                console.log('Store purchase orders:', store.purchaseOrders);
 
                 const purchaseOrdersWithStatus: PurchaseOrderWithStatus[] = store.purchaseOrders.map((po) => ({
                     ...po,
@@ -99,7 +100,7 @@ export default defineComponent({
                             const price = item.Price || 0;
                             return sum + quantity * price;
                         }, 0) || 0,
-                    status: 'Pending'
+                    status: po.Status || 'Pending'
                 }));
 
                 pendingList.value = purchaseOrdersWithStatus.filter((po) => po.status.toLowerCase() === 'pending');

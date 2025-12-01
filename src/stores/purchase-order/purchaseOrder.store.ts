@@ -51,32 +51,36 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
             };
 
             const response: PurchaseOrderResponse = await purchaseService.getPurchaseOrders(params);
+            console.log('Fetched purchase orders:', response);
 
             if (!response.success) {
                 showError(response.message || 'Failed to fetch purchase orders');
                 return;
             }
 
-            purchaseOrders.value = response.data.map((output: PurchaseOrder) => ({
-                ...output,
-                // Map backend fields to frontend-friendly names if needed
-                poNumber: output.DocNo,
-                totalAmount: output.TotalAmount || 0,
-                supplierName: output.SupplierId?.toString() || '',
-                status: output.Status,
-                poDate: formatDate(output.PoDate),
-                items: output.PurchaseOrderItems.map((item: PurchaseOrderItem) => ({
-                    ...item,
-                    qty: Number(item.Quantity),
-                    code: item.ItemCode,
-                    description: item.Name,
-                    uom: item.Uom || '',
-                    price: item.Price || 0,
-                    amount: Number(item.Quantity) * (item.Price || 0),
-                    deliveryDate: item.DeliveryDate || null,
-                    note: item.RoDocNo || ''
-                }))
-            }));
+            purchaseOrders.value = response.data.map((output: any) => {
+                const items = output.purchaseorderitems || output.PurchaseOrderItems || [];
+
+                return {
+                    ...output,
+                    poNumber: output.DocNo,
+                    totalAmount: output.TotalAmount || 0,
+                    supplierName: output.SupplierId?.toString() || '',
+                    status: output.Status,
+                    poDate: formatDate(output.PoDate),
+                    PurchaseOrderItems: items.map((item: any) => ({
+                        ...item,
+                        qty: Number(item.Quantity),
+                        code: item.ItemCode,
+                        description: item.Name,
+                        uom: item.Uom || '',
+                        price: item.Price || 0,
+                        amount: Number(item.Quantity) * (item.Price || 0),
+                        deliveryDate: item.DeliveryDate || null,
+                        note: item.RoDocNo || ''
+                    }))
+                };
+            });
 
             if (response.pagination) {
                 pagination.total = response.pagination.total;
