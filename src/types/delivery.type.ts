@@ -34,6 +34,10 @@ export interface DeliveryOrder {
     UpdatedAt?: string | null;
     UpdatedBy?: string | null;
     ProjectId: number;
+    // BE return lowercase
+    deliveryorderitems?: DeliveryOrderItem[];
+
+    // optional: keep both casing for safety
     DeliveryOrderItems?: DeliveryOrderItem[];
 }
 
