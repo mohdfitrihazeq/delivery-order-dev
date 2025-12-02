@@ -49,14 +49,14 @@
 
         <ReusableTable
             :value="paginatedItems"
+            dataKey="id"
             :columns="columns"
+            :selection-mode="'checkbox'"
+            v-model:selection="selectedItems"
             :loading="loading"
             :pagination="pagination"
             :onPageChange="handlePageChange"
             :onPageSizeChange="handlePageSizeChange"
-            :selection-mode="'checkbox'"
-            v-model:selection="selectedItems"
-            emptyTitle="No budget items found"
         >
             <template #itemTypeSlot="{ data }">
                 <Tag :value="data.itemType" :severity="getItemTypeSeverity(data.itemType)" />
@@ -67,7 +67,7 @@
             </template>
 
             <template #totalSlot="{ data }">
-                {{ (data.price * data.quantity).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
+                {{ (data.price * data.qty).toLocaleString(undefined, { style: 'currency', currency: 'MYR' }) }}
             </template>
         </ReusableTable>
 

@@ -1,4 +1,3 @@
-// src/types/delivery.type.ts
 export interface DeliveryOrderItem {
     Id: number;
     DeliveryOrderId: number;
@@ -35,13 +34,25 @@ export interface DeliveryOrder {
     UpdatedAt?: string | null;
     UpdatedBy?: string | null;
     ProjectId: number;
+    // BE return lowercase
+    deliveryorderitems?: DeliveryOrderItem[];
+
+    // optional: keep both casing for safety
     DeliveryOrderItems?: DeliveryOrderItem[];
+}
+
+export interface Pagination {
+    total: number;
+    totalPages: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface DeliveryOrderResponse {
     success: boolean;
     message: string;
     data: DeliveryOrder[];
+    pagination?: Pagination;
 }
 
 export interface SingleDeliveryOrderResponse {
@@ -64,11 +75,26 @@ export interface VerifyPurchaseOrderItem {
     total: number;
 }
 
-export interface Step1SelectPO {
-    DocNo: string;
-    purchaseOrderId: number;
-    PurchaseOrderItems: Array<Record<string, any>>;
+export interface PurchaseOrderItem {
+    id: number;
+    itemCode: string;
+    name: string;
+    quantity: number;
+    uom: string;
+    price?: number;
+    [key: string]: unknown;
 }
+
+export interface Step1SelectPO {
+    id: number;
+    DocNo: string;
+    poNumber?: string;
+    purchaseOrderId: number;
+    PurchaseOrderItems: PurchaseOrderItem[];
+
+    items?: PurchaseOrderItem[];
+}
+
 export interface Step2VerifyItem {
     purchaseOrderItemId: number;
     requestOrderId: number;
@@ -100,4 +126,12 @@ export interface UploadFile {
     type?: string;
     raw: File;
     preview?: string;
+}
+
+export interface PurchaseOrderCard {
+    id: string;
+    title: string;
+    content: string;
+    badges: string[];
+    icon: string;
 }

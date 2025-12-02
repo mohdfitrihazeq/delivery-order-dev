@@ -1,6 +1,7 @@
 const config = {
     hosts: {
-        backendApi: import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'
+        backendApi: import.meta.env.VITE_BACKEND_URL || 'https://dosystem-api-production.up.railway.app/'
+        // backendApi: 'https://dosystem-api-production.up.railway.app'
     },
 
     getFromLocalStorage: (key: string): string | null => {

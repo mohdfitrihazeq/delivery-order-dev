@@ -1,40 +1,17 @@
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useToast } from 'primevue/usetoast';
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-export function useLoginForm(props?: { modelValueUsername?: string; modelValuePassword?: string; useRealAPI?: boolean }) {
-    const username = ref(props?.modelValueUsername || '');
-    const password = ref(props?.modelValuePassword || '');
-    const useRealAPI = ref(props?.useRealAPI ?? true);
+export function useLoginForm() {
+    const username = ref('');
+    const password = ref('');
     const showPassword = ref(false);
     const isLoading = ref(false);
 
     const router = useRouter();
     const toast = useToast();
     const authStore = useAuthStore();
-
-    // Sync props with local state
-    if (props) {
-        watch(
-            () => props.modelValueUsername,
-            (val) => {
-                if (val !== undefined) username.value = val;
-            }
-        );
-        watch(
-            () => props.modelValuePassword,
-            (val) => {
-                if (val !== undefined) password.value = val;
-            }
-        );
-        watch(
-            () => props.useRealAPI,
-            (val) => {
-                if (val !== undefined) useRealAPI.value = val;
-            }
-        );
-    }
 
     const togglePasswordVisibility = () => {
         showPassword.value = !showPassword.value;
@@ -57,7 +34,7 @@ export function useLoginForm(props?: { modelValueUsername?: string; modelValuePa
             // Minimal delay so spinner is visible
             await new Promise((r) => setTimeout(r, 300));
 
-            const success = await authStore.login(username.value, password.value, useRealAPI.value);
+            const success = await authStore.login(username.value, password.value, true);
 
             if (success) {
                 await nextTick();
@@ -97,7 +74,6 @@ export function useLoginForm(props?: { modelValueUsername?: string; modelValuePa
         showPassword,
         togglePasswordVisibility,
         handleSubmit,
-        isLoading,
-        useRealAPI
+        isLoading
     };
 }

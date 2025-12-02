@@ -1,5 +1,5 @@
 import { requestOrderService } from '@/services/requestOrder.service';
-import type { Order } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload, GetRequestOrdersResponse, Order, OrderItem, RequestOrderItemResponse, RequestOrderResponse } from '@/types/request-order.type';
 import { formatDate, formatDateTime } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
@@ -24,7 +24,13 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         total: 0,
         totalPages: 0
     });
-    const totalCounts = ref({ pending: 0, approved: 0, rejected: 0, totalValue: 0 });
+
+    const totalCounts = ref({
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        totalValue: 0
+    });
 
     async function fetchOrders() {
         loading.value = true;
@@ -39,29 +45,37 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 pageSize: pagination.pageSize
             };
 
-            const response = await requestOrderService.getRequestOrders(params);
+            const response: GetRequestOrdersResponse = await requestOrderService.getRequestOrders(params);
 
-            orders.value = response.data.map(
-                (output: any): Order => ({
-                    id: output.Id,
-                    roNumber: output.DocNo,
-                    requestedBy: output.CreatedBy,
-                    roDate: formatDate(output.RequestOrderDate),
-                    deliveryDate: formatDate(output.RequestOrderItems?.[0]?.DeliveryDate || ''),
-                    totalAmount: output.TotalAmount,
-                    budgetType: output.PrType,
-                    status: output.Status,
-                    requestedAt: formatDateTime(output.CreatedAt),
-                    items: (output.RequestOrderItems || []).map((item: any) => ({
-                        code: item.BudgetItemId || item.NonBudgetItemId || '',
-                        description: item.Description,
-                        uom: item.Uom,
-                        qty: item.Quantity,
-                        deliveryDate: formatDate(item.DeliveryDate),
-                        note: item.Notes
-                    }))
-                })
-            );
+            orders.value = response.data.map((output): Order => {
+                const apiOutput = output as unknown as RequestOrderResponse;
+
+                return {
+                    id: apiOutput.Id,
+                    roNumber: apiOutput.DocNo,
+                    requestedBy: apiOutput.CreatedBy,
+                    roDate: formatDate(apiOutput.RequestOrderDate),
+                    deliveryDate: formatDate(apiOutput.RequestOrderItems?.[0]?.DeliveryDate || ''),
+                    totalAmount: String(apiOutput.TotalAmount),
+                    budgetType: apiOutput.PrType,
+                    status: apiOutput.Status,
+                    requestedAt: formatDateTime(apiOutput.CreatedAt),
+                    items: (apiOutput.RequestOrderItems || []).map(
+                        (item): OrderItem => ({
+                            code: String(item.BudgetItemId || item.NonBudgetItemId || ''),
+                            description: item.Description,
+                            uom: item.Uom || item.Unit || '',
+                            qty: Number(item.Quantity),
+                            deliveryDate: formatDate(item.DeliveryDate),
+                            note: item.Notes || '',
+                            notes: item.Notes,
+                            budgetItemId: item.BudgetItemId,
+                            nonBudgetItemId: item.NonBudgetItemId,
+                            remark: item.Remark
+                        })
+                    )
+                };
+            });
 
             if (response.pagination) {
                 pagination.total = response.pagination.total;
@@ -69,7 +83,13 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 pagination.page = response.pagination.page;
                 pagination.pageSize = response.pagination.pageSize;
             }
-            totalCounts.value = response.counts || { pending: 0, approved: 0, rejected: 0, totalValue: 0 };
+
+            totalCounts.value = response.counts || {
+                pending: 0,
+                approved: 0,
+                rejected: 0,
+                totalValue: 0
+            };
         } catch (error) {
             showError(error, 'Failed to fetch request orders');
         } finally {
@@ -81,9 +101,19 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         loading.value = true;
         try {
             const response = await requestOrderService.getRequestOrderById(id);
-            if (!response?.data) return null;
-            const o = response.data;
-            const parsedAttachments = o.Attachment ? JSON.parse(o.Attachment) : [];
+            if (!response) return null;
+
+            const o = response.data as unknown as RequestOrderResponse;
+
+            let parsedAttachments: AttachmentItem[] = [];
+            if (o.Attachment) {
+                try {
+                    parsedAttachments = JSON.parse(o.Attachment) as AttachmentItem[];
+                } catch (error) {
+                    console.error('Failed to parse attachments:', error);
+                    parsedAttachments = [];
+                }
+            }
 
             const order: Order = {
                 id: o.Id,
@@ -91,21 +121,26 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 requestedBy: o.CreatedBy,
                 status: o.Status,
                 roDate: formatDate(o.RequestOrderDate),
-                deliveryDate: formatDate(o.requestorderitems?.[0]?.DeliveryDate),
+                deliveryDate: formatDate(o.requestorderitems?.[0]?.DeliveryDate || o.RequestOrderItems?.[0]?.DeliveryDate),
+                totalAmount: String(o.TotalAmount),
                 requestedAt: formatDateTime(o.CreatedAt),
-                items: (o.requestorderitems || o.RequestOrderItems || []).map((item: any) => ({
+                items: ((o.requestorderitems ?? o.RequestOrderItems ?? []) as RequestOrderItemResponse[]).map((item) => ({
                     code: item.ItemCode || '',
-                    itemType: item.ItemType || '',
-                    description: item.Description || '',
-                    uom: item.Unit || '',
+                    description: item.Description,
+                    location: item.Location,
+                    uom: item.Unit || item.Uom || '',
                     qty: Number(item.Quantity),
                     deliveryDate: formatDate(item.DeliveryDate),
                     note: item.Notes || '',
-                    remark: item.Remark || '',
+                    notes: item.Notes,
+                    remark: item.Remark,
                     budgetItemId: item.BudgetItemId ?? null,
-                    nonBudgetItemId: item.NonBudgetItemId ?? null
+                    nonBudgetItemId: item.NonBudgetItemId ?? null,
+                    reason: item.Reason,
+                    rate: item.Rate
                 })),
-                debtorId: o.DebtorId ?? null,
+
+                debtorId: o.DebtorId ?? undefined,
                 remark: o.Remark ?? '',
                 terms: o.Terms ?? 'Net 30',
                 refDoc: o.RefDoc ?? 'RQ-001',
@@ -124,7 +159,11 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
         }
     }
 
-    async function updateOrder(id: string, payload: any, attachments?: File[]) {
+    async function updateOrder(
+        id: string,
+        payload: CreateRequestOrderPayload, // Changed from UpdateRequestOrderPayload
+        attachments?: File[]
+    ) {
         loading.value = true;
         try {
             const response = await requestOrderService.updateRequestOrder(id, payload, attachments);

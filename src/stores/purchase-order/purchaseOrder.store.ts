@@ -1,12 +1,12 @@
 import { purchaseService } from '@/services/purchaseOrder.service';
-import type { PurchaseOrder } from '@/types/purchase.type';
+import type { CreatePurchaseOrderPayload, PurchaseOrder, PurchaseOrderItem, PurchaseOrderResponse, PurchaseOrderView } from '@/types/purchase.type';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 
 export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
     const purchaseOrders = ref<PurchaseOrder[]>([]);
-    const selectedPurchaseOrder = ref<PurchaseOrder | null>(null);
+    const selectedPurchaseOrder = ref<PurchaseOrderView | null>(null);
     const loading = ref(false);
 
     const filters = reactive({
@@ -33,7 +33,7 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 month: '2-digit',
                 day: '2-digit'
             });
-        } catch (error) {
+        } catch {
             return 'N/A';
         }
     };
@@ -50,93 +50,138 @@ export const usePurchaseOrderStore = defineStore('purchaseOrder', () => {
                 pageSize: pagination.pageSize
             };
 
-            const response = await purchaseService.getPurchaseOrders(params);
-            purchaseOrders.value = response.data.map(
-                (output: any): PurchaseOrder => ({
-                    id: output.Id,
-                    projectId: output.ProjectId,
+            const response: PurchaseOrderResponse = await purchaseService.getPurchaseOrders(params);
+
+            if (!response.success) {
+                showError(response.message || 'Failed to fetch purchase orders');
+                return;
+            }
+
+            purchaseOrders.value = response.data.map((output: any) => {
+                const items = output.purchaseorderitems || output.PurchaseOrderItems || [];
+
+                return {
+                    ...output,
                     poNumber: output.DocNo,
-                    supplierName: output.SupplierName,
-                    createdBy: output.CreatedBy,
-                    poDate: formatDate(output.PoDate),
-                    totalAmount: output.TotalAmount,
+                    totalAmount: output.TotalAmount || 0,
+                    supplierName: output.SupplierId?.toString() || '',
                     status: output.Status,
-                    createdAt: output.CreatedAt,
-                    items: (output.PurchaseOrderItems || output.purchaseorderitems || []).map((item: any) => ({
-                        id: item.Id,
-                        code: item.ItemCode || '',
-                        description: item.Description || '',
-                        uom: item.Uom || item.Unit || '',
-                        qty: Number(item.Quantity) || 0,
-                        price: item.Price || item.UnitPrice || 0,
-                        amount: item.Amount || 0,
+                    poDate: formatDate(output.PoDate),
+                    PurchaseOrderItems: items.map((item: any) => ({
+                        ...item,
+                        qty: Number(item.Quantity),
+                        code: item.ItemCode,
+                        description: item.Name,
+                        uom: item.Uom || '',
+                        price: item.Price || 0,
+                        amount: Number(item.Quantity) * (item.Price || 0),
                         deliveryDate: item.DeliveryDate || null,
-                        note: item.Notes || ''
+                        note: item.RoDocNo || ''
                     }))
-                })
-            );
+                };
+            });
+
             if (response.pagination) {
                 pagination.total = response.pagination.total;
                 pagination.totalPages = response.pagination.totalPages;
                 pagination.page = response.pagination.page;
                 pagination.pageSize = response.pagination.pageSize;
             }
-        } catch (error) {
-            showError(error, 'Failed to fetch purchase orders');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                showError(error.message, 'Failed to fetch purchase orders');
+            } else {
+                showError('An unexpected error occurred', 'Failed to fetch purchase orders');
+            }
         } finally {
             loading.value = false;
         }
     }
 
-    async function fetchPurchaseOrderById(id: string): Promise<PurchaseOrder | null> {
+    async function fetchPurchaseOrderById(id: string): Promise<PurchaseOrderView | null> {
         loading.value = true;
         try {
             const response = await purchaseService.getPurchaseOrderById(id);
-            if (!response?.data) return null;
+            if (!response) return null;
 
-            const o = response.data;
-            const parsedAttachments = o.Attachment ? JSON.parse(o.Attachment) : [];
+            const wrapped = response as any;
+            const o = wrapped.data as PurchaseOrder;
 
-            const order: PurchaseOrder = {
-                id: o.Id,
+            const rawItems = (o.purchaseorderitems ?? o.PurchaseOrderItems ?? []) as PurchaseOrderItem[];
+            const mappedItems = rawItems.map((item: any) => ({
+                Id: item.Id,
+                PurchaseOrderId: item.PurchaseOrderId,
+                SoDocNo: item.SoDocNo,
+                RoDocNo: item.RoDocNo,
+                ItemCode: item.ItemCode,
+                Name: item.Name,
+                Uom: item.Uom || '',
+                Quantity: item.Quantity,
+                Price: item.Price || 0,
+                Discount: item.Discount,
+                DeliveryDate: item.DeliveryDate,
+                CreatedAt: item.CreatedAt,
+                CreatedBy: item.CreatedBy,
+                UpdatedAt: item.UpdatedAt,
+                UpdatedBy: item.UpdatedBy,
+
+                // Frontend-friendly aliases
+                code: item.ItemCode,
+                description: item.Name,
+                uom: item.Uom || '',
+                qty: Number(item.Quantity),
+                price: item.Price || 0,
+                amount: Number(item.Quantity) * (item.Price || 0),
+                deliveryDate: item.DeliveryDate || null,
+                note: item.RoDocNo || ''
+            }));
+
+            const order: PurchaseOrderView = {
+                Id: o.Id,
+                SupplierId: o.SupplierId,
+                DocNo: o.DocNo,
+                Status: o.Status,
+                PoDate: o.PoDate,
+                TotalAmount: o.TotalAmount,
+                GstAmount: o.GstAmount,
+                Remark: o.Remark,
+                CreatedAt: o.CreatedAt,
+                CreatedBy: o.CreatedBy,
+                UpdatedAt: o.UpdatedAt,
+                UpdatedBy: o.UpdatedBy,
+
+                // Frontend-friendly aliases
                 poNumber: o.DocNo,
-                supplierName: o.SupplierName || 'N/A',
-                createdBy: o.CreatedBy,
                 poDate: formatDate(o.PoDate),
-                totalAmount: o.TotalAmount,
-                status: o.Status || 'Pending',
-                createdAt: o.CreatedAt,
-                items: (o.purchaseorderitems || []).map((item: any) => ({
-                    code: item.ItemCode || '',
-                    description: item.Name || '',
-                    uom: item.Uom || '',
-                    qty: Number(item.Quantity),
-                    price: item.Price || 0,
-                    amount: Number(item.Quantity) * (item.Price || 0),
-                    deliveryDate: item.DeliveryDate || null,
-                    note: item.Notes || '',
-                    roNumber: item.RoDocNo || ''
-                })),
-                attachments: parsedAttachments
+                items: mappedItems
             };
 
+            console.log('Mapped purchase order:', order);
             selectedPurchaseOrder.value = order;
             return order;
-        } catch (error) {
-            showError(error, 'Failed to fetch purchase order details');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                showError(error.message, 'Failed to fetch purchase order details');
+            } else {
+                showError('An unexpected error occurred', 'Failed to fetch purchase order details');
+            }
             return null;
         } finally {
             loading.value = false;
         }
     }
 
-    async function updatePurchaseOrder(id: string, payload: any, attachments?: File[]) {
+    async function updatePurchaseOrder(id: string, payload: CreatePurchaseOrderPayload, attachments?: File[]) {
         loading.value = true;
         try {
             const response = await purchaseService.updatePurchaseOrder(id, payload, attachments);
             return response;
-        } catch (error) {
-            showError(error, 'Failed to update purchase order');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                showError(error.message, 'Failed to update purchase order');
+            } else {
+                showError('An unexpected error occurred', 'Failed to update purchase order');
+            }
             throw error;
         } finally {
             loading.value = false;

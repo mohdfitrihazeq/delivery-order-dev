@@ -75,7 +75,7 @@ export default defineComponent({
         const downloadCSV = () => console.log('Download CSV');
         const exportImage = () => console.log('Export Image');
 
-        const handleLocationSelection = (key: string) => {
+        const handleLocationSelection = (key: 'location_1') => {
             console.log('Selected parent for', key, selectedParents.value[key]);
         };
 

@@ -1,6 +1,6 @@
+import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
 
 export function usePurchasingDashboard() {
     const router = useRouter();
@@ -65,9 +65,9 @@ export function usePurchasingDashboard() {
                 .map((o) => ({
                     id: o.id,
                     requestOrderNo: o.roNumber,
-                    status: o.status || 'Unknown',
+                    status: String(o.status || 'Unknown'),
                     createdAt: o.requestedAt,
-                    updatedAt: o.deliveryDate
+                    updatedAt: o.deliveryDate ? (o.deliveryDate instanceof Date ? o.deliveryDate.toISOString() : String(o.deliveryDate)) : undefined
                 }));
         } catch (err) {
             console.error('Failed to fetch recent activity:', err);

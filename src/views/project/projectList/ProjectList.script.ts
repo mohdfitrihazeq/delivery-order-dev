@@ -1,4 +1,5 @@
 // ProjectList.script.ts
+import { Company, ProjectRow } from '@/types/project.type';
 import { Motion } from '@motionone/vue';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
@@ -11,7 +12,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const search = ref('');
-        const selectedCompany = ref(null);
+        const selectedCompany = ref<Company | null>(null);
 
         const companyList = ref([
             { no: 0, company: 'All' },
@@ -26,10 +27,10 @@ export default defineComponent({
         ]);
 
         const filteredProjectList = computed(() => {
-            return projectList.value.filter((p) => (!search.value || p.projectName.toLowerCase().includes(search.value.toLowerCase())) && (!selectedCompany.value || p.companyNo === selectedCompany.value.no));
+            return projectList.value.filter((p) => (!search.value || p.projectName.toLowerCase().includes(search.value.toLowerCase())) && (!selectedCompany.value || p.companyNo === Number(selectedCompany.value.no)));
         });
 
-        function handleAction(type: 'view', row: any) {
+        function handleAction(type: 'view', row: ProjectRow) {
             if (type === 'view') {
                 router.push(`/projectDetail/${row.id}`);
             }

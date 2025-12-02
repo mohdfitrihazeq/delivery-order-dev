@@ -72,32 +72,9 @@ export default defineComponent({
             errors.driverPlate = '';
             errors.deliveryDate = '';
 
-            if (!values.driverPlate?.trim()) {
-                errors.driverPlate = 'Driver Plate Number is required.';
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Driver Plate Number Missing',
-                    detail: errors.driverPlate,
-                    life: 2500
-                });
-            }
-
-            if (!values.deliveryDate) {
-                errors.deliveryDate = 'Delivery Date is required.';
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Delivery Date Missing',
-                    detail: errors.deliveryDate,
-                    life: 2500
-                });
-            }
-
             return { values, errors };
         };
 
-        // -------------------------------------------------------
-        // MAIN ATTACHMENT HANDLERS
-        // -------------------------------------------------------
         const onSelectedFiles = (event: { files: File[] }) => {
             deliveryAttachments.value.push(
                 ...event.files.map((f) => ({
@@ -124,9 +101,6 @@ export default defineComponent({
             totalSizePercent.value = (totalSize.value / 10_000_000) * 100;
         };
 
-        // -------------------------------------------------------
-        // EVIDENCE ATTACHMENT HANDLERS
-        // -------------------------------------------------------
         const onSelectedEvidenceFiles = (event: { files: File[] }) => {
             evidenceFiles.value.push(
                 ...event.files.map((f) => ({
@@ -158,7 +132,39 @@ export default defineComponent({
 
         const onFormSubmit = async (event: FormSubmitEvent<Record<string, any>>) => {
             const values = event.values as FormValues;
-            if (!event.valid) return;
+
+            errors.driverPlate = '';
+            errors.deliveryDate = '';
+
+            if (!values.driverPlate?.trim()) {
+                errors.driverPlate = 'Driver Plate Number is required.';
+            }
+
+            if (!values.deliveryDate) {
+                errors.deliveryDate = 'Delivery Date is required.';
+            }
+
+            if (errors.driverPlate || errors.deliveryDate) {
+                if (errors.driverPlate) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Driver Plate Number Missing',
+                        detail: errors.driverPlate,
+                        life: 2500
+                    });
+                }
+
+                if (errors.deliveryDate) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Delivery Date Missing',
+                        detail: errors.deliveryDate,
+                        life: 2500
+                    });
+                }
+
+                return;
+            }
 
             const dataToEmit = {
                 PlateNo: values.driverPlate,

@@ -30,6 +30,7 @@ export interface BudgetOption {
 }
 
 export interface BudgetItem {
+    id: number;
     itemCode: string;
     description: string;
     location: string;
@@ -56,12 +57,30 @@ export interface OrderItem {
     budgetItemId?: number | null;
     nonBudgetItemId?: number | null;
     remark?: string;
+    reason?: string;
+    rate?: number;
+}
+
+export interface RequestOrderItemDetail {
+    Id: number;
+    RequestOrderId: number;
+    BudgetItemId: number | null;
+    NonBudgetItemId: number | null;
+    Description: string;
+    Unit: string;
+    Quantity: number | string;
+    Notes?: string | null;
+    Remark?: string | null;
+    DeliveryDate: string | Date | null;
+    ItemCode: string;
+    ItemType: string;
 }
 
 export interface Order {
     id: number;
     roNumber: string;
     requestedBy: string;
+    location?: string;
     roDate: string;
     deliveryDate: string | Date | null;
     totalAmount: string;
@@ -69,26 +88,14 @@ export interface Order {
     status: 'Approved' | 'Pending' | 'Rejected';
     requestedAt: string;
     items: OrderItem[];
-    RequestOrderItems?: Array<{
-        Id: number;
-        RequestOrderId: number;
-        BudgetItemId: number | null;
-        NonBudgetItemId: number | null;
-        Description: string;
-        Unit: string;
-        Quantity: number | string;
-        Notes?: string | null;
-        Remark?: string | null;
-        DeliveryDate: string | Date | null;
-        ItemCode: string;
-        ItemType: string;
-    }>;
+    RequestOrderItems?: RequestOrderItemDetail[];
     debtorId?: number;
     remark?: string;
     terms?: string;
     refDoc?: string;
     currency?: string;
-    attachments?: any[];
+    attachments?: AttachmentItem[];
+    isUrgent?: boolean;
 }
 
 export interface PreviewItem {
@@ -110,6 +117,7 @@ export interface PreviewSummary {
     budgetType: string;
     project: string;
     roDate: string;
+    globalDeliveryDate: string;
     roNumber: string;
     requestedBy: string;
     items: PreviewItem[];
@@ -118,7 +126,26 @@ export interface PreviewSummary {
     remark?: string;
 }
 
+export interface CreateRequestOrderItem {
+    BudgetItemId: number | null;
+    NonBudgetItemId: number | null;
+    Description: string;
+    Uom: string;
+    Quantity: number;
+    OrgBgtQty: number;
+    BgtBalQty: number;
+    TotalPOQty: number;
+    Rate?: number;
+    Notes: string;
+    Reason: string;
+    DeliveryDate: string | null;
+    ItemCode: string;
+    ItemType: string;
+    Note?: string;
+}
+
 export interface CreateRequestOrderPayload {
+    ProjectId?: number;
     DocNo: string;
     DebtorId: number;
     TotalAmount: number;
@@ -126,32 +153,26 @@ export interface CreateRequestOrderPayload {
     RequestOrderDate: string;
     Terms: string;
     RefDoc: string;
+    Status: 'Approved' | 'Pending' | 'Rejected';
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
     Remark: string;
     Currency: string;
-    Items: Array<{
-        BudgetItemId: number | null;
-        NonBudgetItemId: number | null;
-        Description: string;
-        Uom: string;
-        Quantity: number;
-        OrgBgtQty: number;
-        BgtBalQty: number;
-        TotalPOQty: number;
-        Rate?: number;
-        Notes: string;
-        Reason: string;
-        DeliveryDate: string;
-        ItemCode: string;
-        ItemType: string;
-        Note?: string;
-    }>;
+    Items: CreateRequestOrderItem[];
+    PrType?: string;
+    Attachment?: string | null;
+    requestorderitems?: RequestOrderItemResponse[];
+}
+
+export interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
 }
 
 export interface CreateRequestOrderResponse {
     success: boolean;
-    data?: any;
+    data?: CreateRequestOrderPayload;
     message?: string;
 }
 
@@ -165,29 +186,9 @@ export interface EditFormItem {
     deliveryDate: string | Date | null;
     notes?: string;
     remark?: string;
+    reason?: string;
+    rate?: number;
 }
-
-export interface EditForm {
-    roNumber: string;
-    requestedBy: string;
-    roDate: Date | null;
-    deliveryDate: Date | null;
-    totalAmount: number;
-    budgetType: string;
-    remark?: string;
-    terms?: string;
-    refDoc?: string;
-    currency?: string;
-    items: EditFormItem[];
-    attachments: Array<File | AttachmentItem>;
-}
-
-export type AttachmentItem = {
-    filename: string;
-    path: string;
-    type: string;
-    size: number;
-};
 
 export interface EditForm {
     roNumber: string;
@@ -205,6 +206,7 @@ export interface EditForm {
 }
 
 export interface DraftRO {
+    id: number;
     draftId: string;
     project: string;
     budgetType: string;
@@ -213,12 +215,12 @@ export interface DraftRO {
     lastModified: string;
     roNumber: string;
     roDate: string;
-    items: any[];
+    items: Item[];
     overallRemark?: string;
     attachments?: File[];
 }
 
-// in service file
+// Attachment interface
 export interface AttachmentItem {
     filename: string;
     path: string;
@@ -226,23 +228,119 @@ export interface AttachmentItem {
     type?: string;
 }
 
-export interface GetRequestOrdersParams {
-    projectId?: number;
-    status?: string;
-    search?: string;
-    startDate?: string;
-    endDate?: string;
-    page?: number;
-    pageSize?: number;
+export interface RequestOrdersCounts {
+    pending: number;
+    approved: number;
+    rejected: number;
+    totalValue: number;
+}
+
+export interface PaginationInfo {
+    total: number;
+    totalPages: number;
+    page: number;
+    pageSize: number;
 }
 
 export interface GetRequestOrdersResponse {
     success: boolean;
-    data: any[];
-    pagination: {
-        total: number;
-        totalPages: number;
-        page: number;
-        pageSize: number;
-    };
+    data: CreateRequestOrderPayload[];
+    pagination: PaginationInfo;
+    counts?: RequestOrdersCounts;
 }
+
+export interface GetRequestOrdersParams {
+    page?: number;
+    pageSize?: number;
+    status?: string;
+    search?: string;
+    budgetType?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+}
+
+// Define the API response types
+export interface RequestOrderItemResponse {
+    Id: number;
+    BudgetItemId: number | null;
+    NonBudgetItemId: number | null;
+    ItemCode: string;
+    ItemType: string;
+    Description: string;
+    Location: string;
+    Unit?: string;
+    Uom?: string;
+    Quantity: number | string;
+    DeliveryDate: string | Date | null;
+    Notes?: string;
+    Remark?: string;
+    Reason?: string;
+    Rate?: number;
+}
+
+export interface RequestOrderResponse {
+    Id: number;
+    DocNo: string;
+    CreatedBy: string;
+    RequestOrderDate: string | Date;
+    TotalAmount: number | string;
+    PrType: string;
+    Status: 'Approved' | 'Pending' | 'Rejected';
+    CreatedAt: string | Date;
+    DebtorId?: number | null;
+    Remark?: string | null;
+    Terms?: string | null;
+    RefDoc?: string | null;
+    Currency?: string | null;
+    Attachment?: string | null;
+    RequestOrderItems?: RequestOrderItemResponse[];
+    requestorderitems?: RequestOrderItemResponse[];
+}
+
+export interface UpdateRequestOrderPayload {
+    DocNo: string;
+    DebtorId: number;
+    TotalAmount: number;
+    RequestOrderDate: string;
+    Terms: string;
+    RefDoc: string;
+    Status: 'Approved' | 'Pending' | 'Rejected';
+    BudgetType: 'Budgeted' | 'NonBudgeted';
+    Type: string;
+    Remark: string;
+    Currency: string;
+    Items: Array<{
+        BudgetItemId: number | null;
+        NonBudgetItemId: number | null;
+        Description: string;
+        Uom: string;
+        Quantity: number;
+        Notes: string;
+        Reason: string;
+        DeliveryDate: string;
+        ItemCode: string;
+        ItemType: string;
+    }>;
+}
+
+// Define the type for parsed attachments
+export interface DraftAttachment {
+    filename: string;
+    path: string;
+    size?: number;
+    type?: string;
+}
+
+// filtering
+export interface RequestOrdersFilters {
+    status?: string;
+    budgetType?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+// action type
+export type ActionType = 'view' | 'edit' | 'delete' | 'approve' | 'reject';

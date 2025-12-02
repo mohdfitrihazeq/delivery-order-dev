@@ -1,6 +1,7 @@
 import { requestOrderService } from '@/services/requestOrder.service';
 import { useRequestOrderStore } from '@/stores/request-order/requestOrder.store';
-import type { AttachmentItem, EditForm, Order } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload, EditForm, Order } from '@/types/request-order.type';
+import { formatDateToAPI } from '@/utils/dateHelper';
 import { storeToRefs } from 'pinia';
 import Button from 'primevue/button';
 import Column from 'primevue/column';
@@ -14,7 +15,6 @@ import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, PropType, ref, watch } from 'vue';
-import { formatDateToAPI } from '@/utils/dateHelper';
 
 export default defineComponent({
     name: 'EditRo',
@@ -94,8 +94,8 @@ export default defineComponent({
                 editForm.value = {
                     roNumber: newOrder.roNumber,
                     requestedBy: newOrder.requestedBy,
-                    roDate: newOrder.roDate ? newOrder.roDate : null,
-                    deliveryDate: newOrder.deliveryDate ? newOrder.deliveryDate : null,
+                    roDate: newOrder.roDate ? new Date(newOrder.roDate) : null,
+                    deliveryDate: newOrder.deliveryDate ? new Date(newOrder.deliveryDate) : null,
                     totalAmount: Number(newOrder.totalAmount),
                     budgetType: newOrder.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
                     remark: newOrder.remark || '',
@@ -108,7 +108,7 @@ export default defineComponent({
                         description: item.Description || item.description || '',
                         uom: item.Unit || item.uom || '',
                         qty: Number(item.Quantity ?? item.qty ?? 0),
-                        deliveryDate: item.DeliveryDate ? item.DeliveryDate : item.deliveryDate ? item.deliveryDate : null,
+                        deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : item.deliveryDate ? new Date(item.deliveryDate) : null,
                         notes: item.Notes ?? item.notes ?? item.note ?? '',
                         remark: item.Remark ?? item.remark ?? '',
                         budgetItemId: item.BudgetItemId ?? item.budgetItemId ?? null,
@@ -124,26 +124,32 @@ export default defineComponent({
         async function handleSave(): Promise<void> {
             if (!props.order) return;
 
-            const existingAttachments = editForm.value.existingAttachments || [];
-            const filesToUpload: File[] = Array.isArray(newAttachments.value) ? [...newAttachments.value] : [];
+            // const filesToUpload: File[] = Array.isArray(newAttachments.value) ? [...newAttachments.value] : [];
 
-            const payload = {
+            const payload: CreateRequestOrderPayload = {
                 DocNo: editForm.value.roNumber || '',
                 DebtorId: props.order.debtorId || 1,
+                TotalAmount: editForm.value.totalAmount || 0,
+                CreatedBy: editForm.value.requestedBy || 'Unknown',
                 RequestOrderDate: formatDateToAPI(editForm.value.roDate),
                 Terms: editForm.value.terms || 'Net 30',
                 RefDoc: editForm.value.refDoc || '',
+                Status: props.order.status as 'Approved' | 'Pending' | 'Rejected',
                 BudgetType: editForm.value.budgetType === 'Budgeted' ? 'Budgeted' : 'NonBudgeted',
                 Currency: 'MYR',
                 Type: 'requestOrder',
                 Remark: editForm.value.remark || '',
-                Attachment: existingAttachments,
                 Items: (editForm.value.items || []).map((item) => ({
                     BudgetItemId: item.budgetItemId ?? null,
                     NonBudgetItemId: item.nonBudgetItemId ?? null,
                     Description: item.description || '',
                     Uom: item.uom || '',
                     Quantity: Number(item.qty ?? 0),
+                    OrgBgtQty: 0,
+                    BgtBalQty: 0,
+                    TotalPOQty: 0,
+                    ItemCode: item.code || '',
+                    ItemType: 'default',
                     Rate: item.rate ?? 0,
                     Notes: item.notes || '',
                     Reason: item.reason || '',
@@ -152,7 +158,7 @@ export default defineComponent({
             };
 
             try {
-                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), payload, filesToUpload);
+                const result = await requestOrderService.updateRequestOrder(props.order.id.toString(), payload, newAttachments.value);
 
                 if (result.success) {
                     toast.add({
@@ -222,7 +228,7 @@ export default defineComponent({
                 nonBudgetItemId: null,
                 description: '',
                 uom: '',
-                quantity: 0,
+                qty: 0,
                 deliveryDate: null,
                 notes: '',
                 remark: ''

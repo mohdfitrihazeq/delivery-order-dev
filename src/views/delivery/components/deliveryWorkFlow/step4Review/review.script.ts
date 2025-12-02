@@ -2,7 +2,7 @@ import ReusableTable from '@/components/table/ReusableTable.vue';
 import { useDeliveryStore } from '@/stores/delivery/delivery.store';
 import type { DeliveryFlow } from '@/types/delivery.type';
 import type { TableColumn } from '@/types/table.type';
-import Form, { FormSubmitEvent } from '@primevue/forms/form';
+import Form from '@primevue/forms/form';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
@@ -67,15 +67,20 @@ export default defineComponent({
         // ---------------------------
 
         // for ReusableTable
-        const deliveredItems = computed(() =>
-            (selectPO.value?.items ?? []).map((item) => ({
-                ItemCode: item.code,
-                Name: item.description || item.code,
-                Price: item.price,
-                Quantity: item.qty,
-                SoDocNo: selectPO.value?.poNumber
-            }))
-        );
+        const deliveredItems = computed(() => {
+            const po = selectPO.value;
+            if (!po || !po.PurchaseOrderItems) return [];
+
+            return po.PurchaseOrderItems.map((item: any) => ({
+                ItemCode: item.ItemCode ?? item.code ?? item.itemCode,
+                Name: item.Name ?? item.description ?? item.name,
+                Price: item.Price ?? item.price,
+                Quantity: Number(item.Quantity ?? item.qty),
+                Uom: item.Uom ?? item.uom,
+                SoDocNo: item.SoDocNo ?? po.DocNo
+            }));
+        });
+
         const hasDeliveredItems = computed(() => deliveredItems.value.length > 0);
 
         const formatDate = (dateStr?: string) => {
@@ -86,7 +91,11 @@ export default defineComponent({
         // ---------------------------
         // 3. SUBMIT FUNCTION
         // ---------------------------
-        const onFormSubmit = async (event: FormSubmitEvent<Record<string, any>>) => {
+
+        const onFormSubmit = async (event: { valid: boolean; originalEvent: Event }) => {
+            // Prevent native form submission
+            event.originalEvent?.preventDefault?.();
+
             if (!deliveryInfo.value || !selectPO.value) {
                 toast.add({
                     severity: 'warn',
@@ -96,14 +105,15 @@ export default defineComponent({
                 });
                 return;
             }
+
             const payload = {
-                PurchaseOrderId: selectPO.value?.id,
-                DocNo: selectPO.value?.poNumber,
-                Date: deliveryInfo.value?.Date,
-                PlateNo: deliveryInfo.value?.PlateNo,
-                Remarks: deliveryInfo.value?.Remarks,
+                PurchaseOrderId: selectPO.value.id ?? selectPO.value.purchaseOrderId,
+                DocNo: selectPO.value.poNumber ?? selectPO.value.DocNo,
+                Date: deliveryInfo.value.Date,
+                PlateNo: deliveryInfo.value.PlateNo,
+                Remarks: deliveryInfo.value.Remarks,
                 Items: JSON.stringify(
-                    verifyItem.value?.map((item) => ({
+                    verifyItem.value.map((item) => ({
                         PurchaseOrderItemId: item.purchaseOrderItemId,
                         RequestOrderItemId: item.requestOrderId,
                         Quantity: item.quantity
@@ -114,21 +124,17 @@ export default defineComponent({
             const formData = new FormData();
             Object.entries(payload).forEach(([key, value]) => {
                 if (value !== undefined && value !== null) {
-                    formData.append(key, value as string);
+                    formData.append(key, String(value));
                 }
             });
 
-            if (deliveryInfo.value?.attachments?.length) {
-                deliveryInfo.value.attachments.forEach((file: File) => {
-                    formData.append('attachments', file);
-                });
+            if (deliveryInfo.value.attachments?.length) {
+                deliveryInfo.value.attachments.forEach((file) => formData.append('attachments', file));
             }
 
             try {
                 const success = await deliveryStore.createDeliveryOrder(formData);
-                if (success) {
-                    router.push('/deliveries');
-                }
+                if (success) router.push('/deliveries');
             } catch (err) {
                 console.error(err);
             }
@@ -144,7 +150,10 @@ export default defineComponent({
                 if (newData.selectPO) {
                     selectPO.value = {
                         id: newData.selectPO.id ?? newData.selectPO.purchaseOrderId,
-                        poNumber: newData.selectPO.poNumber ?? newData.selectPO.DocNo,
+                        poNumber: newData.selectPO.poNumber ?? newData.selectPO.DocNo ?? '',
+                        DocNo: newData.selectPO.DocNo ?? '',
+                        purchaseOrderId: newData.selectPO.purchaseOrderId ?? newData.selectPO.id ?? 0,
+                        PurchaseOrderItems: newData.selectPO.PurchaseOrderItems ?? newData.selectPO.items ?? [],
                         items: newData.selectPO.items ?? newData.selectPO.PurchaseOrderItems ?? []
                     };
                 } else {

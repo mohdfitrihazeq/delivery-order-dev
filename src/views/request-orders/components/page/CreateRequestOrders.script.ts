@@ -1,6 +1,7 @@
 import { requestOrderService } from '@/services/requestOrder.service';
-import type { AttachmentItem, CreateRequestOrderPayload } from '@/types/request-order.type';
+import type { AttachmentItem, CreateRequestOrderPayload, CreateRequestOrderResponse, PreviewSummary } from '@/types/request-order.type';
 import { getCurrentProjectId, getCurrentProjectName, getCurrentUsername } from '@/utils/contextHelper';
+import { formatDateToAPI } from '@/utils/dateHelper';
 import { Motion } from '@motionone/vue';
 import AutoComplete from 'primevue/autocomplete';
 import { usePrimeVue } from 'primevue/config';
@@ -14,7 +15,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { BudgetItem, BudgetOption, Item, ItemOption } from '../../../../types/request-order.type';
 import BudgetInfoCard from '../card/BudgetInfoCard.vue';
 import CreateROModal from '../modal/CreateRo.vue';
-import PreviewRo, { type PreviewSummary } from '../modal/PreviewRo.vue';
+import PreviewRo from '../modal/PreviewRo.vue';
 
 type MenuInstance = ComponentPublicInstance & {
     toggle: (event: Event) => void;
@@ -63,8 +64,8 @@ export default defineComponent({
         const confirm = useConfirm();
         const budgetSwitching = ref(false);
         const currentProject = getCurrentProjectName();
+        const globalDeliveryDate = ref<Date | null>(null);
 
-        // Load draft data if coming from draft modal
         onMounted(async () => {
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
                 const draftId = route.query.draftId as string;
@@ -72,49 +73,58 @@ export default defineComponent({
                 try {
                     const res = await requestOrderService.getRequestOrderById(draftId);
                     const draft = res.data;
-                    console.log('Loaded draft data:', draft);
+
                     if (!draft) return;
 
-                    // Basic fields
                     roNumber.value = draft.DocNo;
-                    budgetType.value = draft.PrType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+                    budgetType.value = draft.PrType === 'Budgeted' || draft.BudgetType === 'Budgeted' ? 'Budgeted Item' : 'Unbudgeted Item';
+
                     overallRemark.value = draft.Remark || '';
                     if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
 
-                    // Items
-                    items.value = (draft.requestorderitems || draft.RequestOrderItems || []).map((item: any) => ({
+                    const draftItems = Array.isArray(draft.Items) && draft.Items.length > 0 ? draft.Items : Array.isArray(draft.requestorderitems) ? draft.requestorderitems : [];
+
+                    items.value = draftItems.map((item: any) => ({
                         itemCode: item.ItemCode || '',
-                        budgetId: item.BudgetItemId || 0,
+                        itemType: item.ItemType || 'CO',
+                        budgetItemId: item.BudgetItemId ?? null,
+                        nonBudgetItemId: item.NonBudgetItemId ?? null,
                         description: item.Description || '',
-                        location: item.Location || '',
+                        location: item.Location ?? '',
                         uom: item.Uom || item.Unit || '',
-                        quantity: item.Quantity?.toString() || '',
-                        price: Number(item.Rate ?? 0),
+                        qty: Number(item.Quantity) || 0,
+                        price: Number(item.Rate) || 0,
                         deliveryDate: item.DeliveryDate ? new Date(item.DeliveryDate) : null,
                         notes: item.Notes || '',
-                        remark: item.Remark || '',
+                        remark: item.Remark || item.Reason || '',
                         showNotes: false,
-                        showRemark: false
+                        showRemark: false,
+                        isBudgeted: draft.PrType === 'Budgeted' || draft.BudgetType === 'Budgeted'
                     }));
 
                     if (draft.Attachment) {
-                        const parsedAttachments = JSON.parse(draft.Attachment);
-                        existingAttachments.value = parsedAttachments.map((att: any) => ({
-                            filename: att.filename,
-                            path: att.path.replace(/\\/g, '/'),
-                            size: att.size,
-                            type: att.type
-                        }));
-                        attachments.value = [...existingAttachments.value];
+                        try {
+                            const parsed = JSON.parse(draft.Attachment);
+                            existingAttachments.value = parsed.map((att: any) => ({
+                                filename: att.filename,
+                                path: att.path.replace(/\\/g, '/'),
+                                size: att.size,
+                                type: att.type
+                            }));
+                            attachments.value = [...existingAttachments.value];
+                        } catch (e) {
+                            console.error('Failed to parse attachment JSON');
+                        }
                     }
 
                     toast.add({
                         severity: 'info',
                         summary: 'Draft Loaded',
-                        detail: `Loaded draft ${draft.DocNo} with ${attachments.value.length} attachment(s)`,
+                        detail: `Loaded draft ${draft.DocNo}`,
                         life: 3000
                     });
                 } catch (error) {
+                    console.error('Failed to load draft:', error);
                     toast.add({
                         severity: 'error',
                         summary: 'Failed to Load Draft',
@@ -296,11 +306,18 @@ export default defineComponent({
         const formatSize = (bytes: number) => {
             const k = 1024;
             const dm = 3;
-            const sizes = $primevue.config.locale.fileSizeTypes;
+
+            // Fallback sizes if $primevue or locale is undefined
+            const sizes = $primevue?.config?.locale?.fileSizeTypes ?? ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
             if (bytes === 0) return `0 ${sizes[0]}`;
+
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-            return `${formattedSize} ${sizes[i]}`;
+
+            const sizeLabel = sizes[i] ?? 'Bytes';
+
+            return `${formattedSize} ${sizeLabel}`;
         };
 
         let tempIdCounter = 0;
@@ -308,17 +325,20 @@ export default defineComponent({
         const addItem = () => {
             items.value.push({
                 itemCode: `temp_${++tempIdCounter}`, // Temporary unique ID
-                budgetItemId: 0,
+                itemType: '',
                 description: '',
                 location: '',
                 uom: '',
-                quantity: '1',
+                qty: 1,
                 price: 0,
                 deliveryDate: null,
                 notes: '',
                 remark: '',
                 showNotes: false,
-                showRemark: false
+                showRemark: false,
+                isBudgeted: false,
+                budgetItemId: 0,
+                nonBudgetItemId: null
             });
         };
 
@@ -416,16 +436,16 @@ export default defineComponent({
                         location: budgetItem.location,
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
-                        quantity: budgetItem.quantity.toString(),
-                        deliveryDate: null,
+                        qty: budgetItem.qty,
+                        deliveryDate: globalDeliveryDate.value,
                         notes: '',
                         remark: '',
                         price: budgetItem.price,
                         showNotes: false,
-                        showRemark: false
+                        showRemark: false,
+                        isBudgeted: true
                     });
-
-                    // Also add to itemOptions if not exist
+                    // Add to itemOptions if not exist
                     const existingOption = itemOptions.value.find((opt) => opt.value === budgetItem.itemCode);
                     if (!existingOption) {
                         itemOptions.value.push({
@@ -442,7 +462,7 @@ export default defineComponent({
             // Add only unique items
             if (newUniqueItems.length > 0) {
                 items.value.push(...newUniqueItems);
-
+                console.log('Items after adding from budget:', items.value);
                 toast.add({
                     severity: 'success',
                     summary: 'Items Added',
@@ -486,14 +506,15 @@ export default defineComponent({
             requestOrderService.downloadAttachment(file);
         }
 
-        const onSelectedFiles = (event) => {
+        const onSelectedFiles = (event: { files: File[] }) => {
             attachments.value = event.files;
             let totalSizeTemp = 0;
             let valid = true;
 
             attachments.value.forEach((file) => {
-                totalSizeTemp += file.size;
-                if (file.size > MAX_FILE_SIZE) valid = false;
+                const size = file.size || 0; // default to 0 if undefined
+                totalSizeTemp += size;
+                if (size > MAX_FILE_SIZE) valid = false;
             });
 
             totalSize.value = totalSizeTemp;
@@ -522,7 +543,7 @@ export default defineComponent({
         const grandTotal = computed(() => {
             return items.value.reduce((sum, item) => {
                 const price = item.price ?? 0;
-                const qty = parseFloat(item.quantity) || 0;
+                const qty = item.qty ?? 0;
                 return sum + price * qty;
             }, 0);
         });
@@ -537,9 +558,10 @@ export default defineComponent({
         });
 
         const previewSummary = computed<PreviewSummary>(() => {
-            const data = {
+            const data: PreviewSummary = {
                 totalItems: items.value.length,
                 totalAmount: grandTotal.value,
+                globalDeliveryDate: globalDeliveryDate.value ? globalDeliveryDate.value.toLocaleDateString('en-GB') : '',
                 budgetType: budgetType.value,
                 project: getCurrentProjectName() || '',
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
@@ -548,12 +570,12 @@ export default defineComponent({
                 items: items.value.map((item) => ({
                     itemCode: item.itemCode,
                     itemType: item.itemType || '',
-                    budgetItemId: item.budgetItemId ?? item.budgetId ?? null,
                     description: item.description,
                     uom: item.uom,
-                    quantity: item.quantity,
-                    price: item.price,
-                    deliveryDate: item.deliveryDate,
+                    qty: item.qty,
+                    price: item.price ?? 0,
+                    // convert string to Date
+                    deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
                     location: item.location,
                     notes: item.notes,
                     remark: item.remark
@@ -595,6 +617,15 @@ export default defineComponent({
                     });
                 }
 
+                if (!globalDeliveryDate.value) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'Delivery Date is required.',
+                        life: 4000
+                    });
+                }
+
                 if (items.value.length === 0) {
                     toast.add({
                         severity: 'warn',
@@ -613,8 +644,6 @@ export default defineComponent({
 
         const submitRequestOrder = async () => {
             try {
-                const formatDateToAPI = (date: Date | null) => (date ? new Date(date).toISOString() : null);
-
                 const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
@@ -622,25 +651,32 @@ export default defineComponent({
                     DocNo: roNumber.value,
                     TotalAmount: grandTotal.value,
                     DebtorId: 1,
-                    RequestOrderDate: formatDateToAPI(calendarValue.value),
+                    RequestOrderDate: formatDateToAPI(calendarValue.value) ?? '',
                     Terms: 'Net 30',
                     RefDoc: '',
                     BudgetType: budgetType.value === 'Budgeted Item' ? 'Budgeted' : 'NonBudgeted',
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
+                    CreatedBy: getCurrentUsername() || 'Unknown User',
+                    Status: 'Pending',
+                    Currency: 'MYR',
                     Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId ?? item.budgetId ?? null,
+                        BudgetItemId: item.budgetItemId ?? null,
                         NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
                         Uom: item.uom,
                         ItemCode: item.itemCode,
                         ItemType: item.itemType,
-                        Quantity: parseFloat(item.quantity) || 0,
-                        OrgBgtQty: parseFloat(item.OrgBgtQty) || 0,
-                        BgtBalQty: parseFloat(item.BgtBalQty) || 0,
-                        Rate: item.price || 0,
-                        Notes: item.notes || '',
-                        DeliveryDate: formatDateToAPI(item.deliveryDate)
+                        Quantity: item.qty,
+                        // later adjust when the api is ready for the OrgBgtQty, BgtBalQty, TotalPOQty
+                        OrgBgtQty: 0,
+                        BgtBalQty: 0,
+                        TotalPOQty: 0,
+                        //
+                        Rate: item.price ?? 0,
+                        Notes: item.notes ?? '',
+                        Reason: '',
+                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
                 const isDraft = !!route.query.draftId; // check if editing a draft
@@ -673,12 +709,14 @@ export default defineComponent({
                         life: 5000
                     });
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Submit failed:', error);
+                const errorMessage = error instanceof Error ? error.message : String(error);
+
                 toast.add({
                     severity: 'error',
                     summary: 'Submission Error',
-                    detail: error.message || 'An unexpected error occurred',
+                    detail: errorMessage,
                     life: 5000
                 });
             }
@@ -714,32 +752,37 @@ export default defineComponent({
             showValidation.value = false;
 
             try {
-                const formatDateToAPI = (date: Date | null): string => {
-                    if (!date) return new Date().toISOString().split('T')[0];
-                    return date.toISOString().split('T')[0];
-                };
                 const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
                     ProjectId: projectId,
                     DocNo: roNumber.value,
                     DebtorId: 1,
-                    RequestOrderDate: formatDateToAPI(calendarValue.value),
+                    RequestOrderDate: calendarValue.value instanceof Date ? formatDateToAPI(calendarValue.value) : formatDateToAPI(new Date()),
                     Terms: 'Net 30',
                     RefDoc: '',
                     BudgetType: budgetType.value === 'Budgeted Item' ? 'Budgeted' : 'NonBudgeted',
                     Type: 'requestOrder',
                     Remark: overallRemark.value || '',
+                    CreatedBy: getCurrentUsername() || 'Unknown User',
+                    Status: 'Pending',
+                    Currency: 'MYR',
+                    TotalAmount: grandTotal.value,
                     Items: items.value.map((item) => ({
-                        BudgetItemId: item.budgetItemId || null,
-                        NonBudgetItemId: item.budgetItemId || null,
+                        BudgetItemId: item.budgetItemId ?? null,
+                        NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
                         Uom: item.uom,
-                        Quantity: parseFloat(item.quantity) || 0,
-                        Rate: item.price || 0,
-                        DeliveryDate: formatDateToAPI(item.deliveryDate),
                         ItemCode: item.itemCode,
-                        ItemType: item.itemType || 'CO'
+                        ItemType: item.itemType || 'CO',
+                        Quantity: item.qty, // corrected
+                        OrgBgtQty: 0,
+                        BgtBalQty: 0,
+                        TotalPOQty: 0,
+                        Rate: item.price ?? 0,
+                        Notes: item.notes ?? '',
+                        Reason: '',
+                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
 
@@ -752,6 +795,9 @@ export default defineComponent({
                         detail: `RO ${roNumber.value} has been saved as draft successfully`,
                         life: 3000
                     });
+                    setTimeout(() => {
+                        router.push('/request-orders');
+                    }, 1000);
                 } else {
                     toast.add({
                         severity: 'error',
@@ -760,15 +806,24 @@ export default defineComponent({
                         life: 5000
                     });
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Save draft failed:', error);
+                const errorMessage = error instanceof Error ? error.message : String(error);
+
                 toast.add({
                     severity: 'error',
                     summary: 'Save Draft Error',
-                    detail: error.message || 'An unexpected error occurred while saving draft',
+                    detail: errorMessage,
                     life: 5000
                 });
             }
+        }
+        function applyDeliveryDateToAll(value: Date | Date[] | (Date | null)[] | null | undefined) {
+            const date = value instanceof Date ? value : null;
+
+            items.value.forEach((item) => {
+                item.deliveryDate = date;
+            });
         }
 
         return {
@@ -824,7 +879,10 @@ export default defineComponent({
             expandedRows,
             updateNotes,
             handleNoteInput,
-            currentProject
+            currentProject,
+            formatDateToAPI,
+            applyDeliveryDateToAll,
+            globalDeliveryDate
         };
     }
 });

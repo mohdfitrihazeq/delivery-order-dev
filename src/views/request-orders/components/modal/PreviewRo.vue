@@ -26,6 +26,10 @@
                     <span class="ml-2 font-medium">{{ summaryData.roDate }}</span>
                 </div>
                 <div>
+                    <span class="text-gray-600 dark:text-gray-400">Delivery Date:</span>
+                    <span class="ml-2 font-medium">{{ summaryData.globalDeliveryDate }}</span>
+                </div>
+                <div>
                     <span class="text-gray-600 dark:text-gray-400">RO Number:</span>
                     <span class="ml-2 font-medium">{{ summaryData.roNumber }}</span>
                 </div>
@@ -76,9 +80,9 @@
                     </template>
                 </Column>
 
-                <Column field="quantity" header="QTY" style="min-width: 80px; text-align: center">
+                <Column field="qty" header="QTY" style="min-width: 80px; text-align: center">
                     <template #body="{ data }">
-                        {{ data.quantity }}
+                        {{ data.qty }}
                     </template>
                 </Column>
 

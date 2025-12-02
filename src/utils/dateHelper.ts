@@ -24,7 +24,15 @@ export function formatDateTime(date: string | Date | null | undefined): string {
 }
 
 export function formatDateToAPI(date: string | Date | null | undefined): string {
-    if (!date) return new Date().toISOString().split('T')[0];
+    if (!date) return '';
+
     const d = date instanceof Date ? date : new Date(date);
-    return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+    if (isNaN(d.getTime())) return '';
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    // Return YYYY-MM-DD without timezone shift
+    return `${year}-${month}-${day}`;
 }

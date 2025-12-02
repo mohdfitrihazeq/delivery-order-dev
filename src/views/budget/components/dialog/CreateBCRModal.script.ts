@@ -46,7 +46,6 @@ export default defineComponent({
         });
 
         const budgetStore = useBudgetStore();
-
         const loadLatestBudgetVersion = (): number | null => {
             const v = localStorage.getItem('latestBudgetVersion');
             return v ? Number(v) : null;
@@ -88,11 +87,12 @@ export default defineComponent({
         const paginatedItems = computed(() => {
             return filteredItems.value.map((item, index) => ({
                 ...item,
+                Id: item.Id || item.itemCode || index,
                 rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
             }));
         });
 
-        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0), 0));
+        const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0));
 
         const locationOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.location))].map((l) => ({ label: l || 'N/A', value: l })));
 
