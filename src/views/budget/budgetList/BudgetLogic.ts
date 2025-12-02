@@ -5,6 +5,7 @@ import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { formatCurrency } from '@/utils/format.utils';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 
@@ -193,6 +194,8 @@ export default defineComponent({
             showImportModal,
             pagination,
             filters,
+            formatCurrency,
+
             handleImportClick,
             handlePageChange,
             handlePageSizeChange,
