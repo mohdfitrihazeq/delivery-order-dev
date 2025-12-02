@@ -1,4 +1,4 @@
-import { budgetService } from '@/services/budgetService.service';
+import { budgetService } from '@/services/newBudget.service';
 import { useToast } from 'primevue/usetoast';
 import { ref, watch } from 'vue';
 import * as XLSX from 'xlsx';
