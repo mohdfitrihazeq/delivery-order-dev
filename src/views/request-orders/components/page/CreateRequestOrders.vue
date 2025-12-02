@@ -37,6 +37,14 @@
                     </div>
                 </div>
 
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1"> Delivery Date <span class="text-red-600 font-bold">*</span> </label>
+                    <div class="flex flex-col gap-2">
+                        <DatePicker :showIcon="true" :showButtonBar="true" v-model="globalDeliveryDate" :invalid="showValidation && !globalDeliveryDate" placeholder="Select Delivery Date" @update:modelValue="applyDeliveryDateToAll" />
+                        <Message v-if="showValidation && !globalDeliveryDate" severity="error" icon="pi pi-times-circle"> Delivery Date is required </Message>
+                    </div>
+                </div>
+
                 <!-- Subcon AutoComplete for Unbudgeted Items -->
                 <Motion v-if="budgetType === 'Unbudgeted Item'" :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 1 }">
                     <div>
@@ -101,7 +109,7 @@
                     </template>
                 </Column>
 
-                <Column field="qty" header="Quantity" style="min-width: 110px; width: 110px">
+                <Column field="qty" header="Quantity" style="min-width: 70px; width: 70px">
                     <template #body="{ data }">
                         <InputNumber v-model.number="data.qty" class="w-full" :min="0" />
                     </template>
@@ -126,11 +134,11 @@
                     </template>
                 </Column>
 
-                <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
+                <!-- <Column field="deliveryDate" header="Delivery Date" style="min-width: 150px; width: 150px">
                     <template #body="{ data }">
                         <DatePicker v-model="data.deliveryDate" placeholder="mm/dd/yyyy" dateFormat="mm/dd/yy" class="w-full" />
                     </template>
-                </Column>
+                </Column> -->
 
                 <Column header="Action" style="min-width: 60px; width: 60px; text-align: center">
                     <template #body="{ data, index }">

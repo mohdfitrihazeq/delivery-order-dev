@@ -64,6 +64,7 @@ export default defineComponent({
         const confirm = useConfirm();
         const budgetSwitching = ref(false);
         const currentProject = getCurrentProjectName();
+        const globalDeliveryDate = ref<Date | null>(null);
 
         onMounted(async () => {
             if (route.query.mode === 'edit-draft' && route.query.draftId) {
@@ -436,7 +437,7 @@ export default defineComponent({
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
                         qty: budgetItem.qty,
-                        deliveryDate: null,
+                        deliveryDate: globalDeliveryDate.value,
                         notes: '',
                         remark: '',
                         price: budgetItem.price,
@@ -560,6 +561,7 @@ export default defineComponent({
             const data: PreviewSummary = {
                 totalItems: items.value.length,
                 totalAmount: grandTotal.value,
+                globalDeliveryDate: globalDeliveryDate.value ? globalDeliveryDate.value.toLocaleDateString('en-GB') : '',
                 budgetType: budgetType.value,
                 project: getCurrentProjectName() || '',
                 roDate: calendarValue.value ? calendarValue.value.toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
@@ -615,6 +617,15 @@ export default defineComponent({
                     });
                 }
 
+                if (!globalDeliveryDate.value) {
+                    toast.add({
+                        severity: 'warn',
+                        summary: 'Validation Error',
+                        detail: 'Delivery Date is required.',
+                        life: 4000
+                    });
+                }
+
                 if (items.value.length === 0) {
                     toast.add({
                         severity: 'warn',
@@ -633,8 +644,6 @@ export default defineComponent({
 
         const submitRequestOrder = async () => {
             try {
-                const formatDateToAPI = (date: Date | null) => (date ? new Date(date).toISOString() : null);
-
                 const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
@@ -667,7 +676,7 @@ export default defineComponent({
                         Rate: item.price ?? 0,
                         Notes: item.notes ?? '',
                         Reason: '',
-                        DeliveryDate: item.deliveryDate ? formatDateToAPI(new Date(item.deliveryDate)) : null
+                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
                 const isDraft = !!route.query.draftId; // check if editing a draft
@@ -807,6 +816,13 @@ export default defineComponent({
                 });
             }
         }
+        function applyDeliveryDateToAll(value: Date | Date[] | (Date | null)[] | null | undefined) {
+            const date = value instanceof Date ? value : null;
+
+            items.value.forEach((item) => {
+                item.deliveryDate = date;
+            });
+        }
 
         return {
             roNumber,
@@ -862,7 +878,9 @@ export default defineComponent({
             updateNotes,
             handleNoteInput,
             currentProject,
-            formatDateToAPI
+            formatDateToAPI,
+            applyDeliveryDateToAll,
+            globalDeliveryDate
         };
     }
 });

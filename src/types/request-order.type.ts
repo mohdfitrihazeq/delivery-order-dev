@@ -117,6 +117,7 @@ export interface PreviewSummary {
     budgetType: string;
     project: string;
     roDate: string;
+    globalDeliveryDate: string;
     roNumber: string;
     requestedBy: string;
     items: PreviewItem[];

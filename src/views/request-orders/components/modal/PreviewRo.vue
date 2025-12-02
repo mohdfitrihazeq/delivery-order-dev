@@ -26,6 +26,10 @@
                     <span class="ml-2 font-medium">{{ summaryData.roDate }}</span>
                 </div>
                 <div>
+                    <span class="text-gray-600 dark:text-gray-400">Delivery Date:</span>
+                    <span class="ml-2 font-medium">{{ summaryData.globalDeliveryDate }}</span>
+                </div>
+                <div>
                     <span class="text-gray-600 dark:text-gray-400">RO Number:</span>
                     <span class="ml-2 font-medium">{{ summaryData.roNumber }}</span>
                 </div>
