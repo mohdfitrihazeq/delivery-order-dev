@@ -1,7 +1,7 @@
-import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
 import type { TableColumn } from '@/types/table.type';
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
@@ -122,6 +122,13 @@ export default defineComponent({
             pagination.value.total = budgetStore.pagination.total;
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
+        const filteredItems = computed(() => {
+            if (!search.value) return budgetItems.value;
+
+            const keyword = search.value.toLowerCase();
+
+            return budgetItems.value.filter((item) => Object.values(item).some((val) => String(val).toLowerCase().includes(keyword)));
+        });
 
         const previousVersion = ref<string | null>(null);
 
@@ -149,7 +156,6 @@ export default defineComponent({
             search.value = value;
             filters.value.global = { value };
         }
-
         function handleImportClick() {
             showImportModal.value = true;
         }
@@ -179,6 +185,7 @@ export default defineComponent({
             versions,
             viewOptions,
             budgetItems,
+            filteredItems,
             columns,
             selectedVersion,
             viewMode,

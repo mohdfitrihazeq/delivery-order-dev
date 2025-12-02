@@ -6,7 +6,7 @@ import Tag from 'primevue/tag';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import ReusableTable from '@/components/table/ReusableTable.vue';
-import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { TableColumn } from '@/types/table.type';
 import type { BudgetItem, FilterOption } from '../../../../types/request-order.type';
 

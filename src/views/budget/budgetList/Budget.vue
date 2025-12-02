@@ -37,7 +37,7 @@
             </div>
             <div v-else>
                 <ReusableTable
-                    :value="budgetItems"
+                    :value="filteredItems"
                     :columns="columns"
                     emptyTitle="Budget List Data"
                     :pagination="pagination"

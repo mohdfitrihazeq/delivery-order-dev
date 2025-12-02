@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth/auth.store';
-import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
