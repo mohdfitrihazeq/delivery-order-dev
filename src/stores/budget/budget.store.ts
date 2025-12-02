@@ -1,43 +1,29 @@
 import { budgetService } from '@/services/newBudget.service';
+import { Budget, BudgetItem, BudgetVersion, Pagination } from '@/types/newBudget.type';
 import { getCurrentProjectId } from '@/utils/contextHelper';
 import { formatDate } from '@/utils/dateHelper';
 import { showError } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+export const mapPagination = (p: any): Pagination => ({
+    total: p?.total ?? p?.totalBudgetItems ?? 0,
+    totalPages: p?.totalPages ?? 1,
+    page: p?.page ?? 1,
+    pageSize: p?.pageSize ?? 10
+});
+
 export const useBudgetStore = defineStore('budget', () => {
-    const budgets = ref<any[]>([]);
-    const budgetItems = ref<any[]>([]);
-    const pagination = ref({
-        total: 0,
-        totalPages: 0,
-        page: 1,
-        pageSize: 10
-    });
+    const budgets = ref<Budget[]>([]);
+    const budgetItems = ref<BudgetItem[]>([]);
+    const pagination = ref<Pagination>({ total: 0, totalPages: 0, page: 1, pageSize: 10 });
     const loading = ref(false);
 
-    function normalizePagination(p: any) {
-        return {
-            total: p.total ?? p.totalBudgetItems ?? 0,
-            totalPages: p.totalPages ?? 0,
-            page: p.page ?? 1,
-            pageSize: p.pageSize ?? 10
-        };
-    }
-
-    async function fetchBudgetVersion() {
+    async function fetchBudgetVersion(): Promise<BudgetVersion[]> {
         loading.value = true;
         try {
-            const params = {
-                projectId: getCurrentProjectId()
-            };
-
-            const response = await budgetService.getBudgetVersion(params);
-            if (!response.success) {
-                showError(response.message || 'Failed to fetch budget versions.');
-                return [];
-            }
-
+            const response = await budgetService.getBudgetVersion({ projectId: getCurrentProjectId() });
+            if (!response.success) return [];
             return response.data.map((v: any) => ({
                 id: v.Id,
                 versionCode: v.VersionCode,
@@ -55,15 +41,7 @@ export const useBudgetStore = defineStore('budget', () => {
     async function fetchBudgets(version = 1, page = pagination.value.page, pageSize = pagination.value.pageSize) {
         loading.value = true;
         try {
-            const params = {
-                projectId: getCurrentProjectId(),
-                version,
-                page,
-                pageSize
-            };
-
-            const response = await budgetService.getBudgets(params);
-
+            const response = await budgetService.getBudgets({ projectId: getCurrentProjectId(), version, page, pageSize });
             budgets.value = response.data.map((b: any) => ({
                 id: b.Id,
                 name: b.BudgetName,
@@ -75,10 +53,7 @@ export const useBudgetStore = defineStore('budget', () => {
                 createdAt: formatDate(b.CreatedAt),
                 items: b.budgetitems || []
             }));
-
-            if (response.pagination) {
-                pagination.value = normalizePagination(response.pagination);
-            }
+            pagination.value = mapPagination(response.pagination);
         } catch (error) {
             showError(error, 'Failed to fetch budgets.');
         } finally {
@@ -89,33 +64,22 @@ export const useBudgetStore = defineStore('budget', () => {
     async function fetchBudgetItems(budgetId: number, page = pagination.value.page, pageSize = pagination.value.pageSize) {
         loading.value = true;
         try {
-            const params = {
-                projectId: getCurrentProjectId(),
-                budgetId,
-                page,
-                pageSize
-            };
-
-            const response = await budgetService.getBudgetItems(params);
-
-            budgetItems.value = response.data.map((item: any) => ({
+            const response = await budgetService.getBudgetItems({ projectId: getCurrentProjectId(), budgetId, page, pageSize });
+            budgetItems.value = response.data.map((item: any, index: number) => ({
                 id: item.Id,
                 budgetId: item.BudgetId,
                 itemCode: item.ItemCode,
                 itemType: item.ItemType,
                 description: item.Description,
                 description2: item.Description2,
-
                 location: `${item.Location1}${item.Location2 ? ' > ' + item.Location2 : ''}`,
                 location1: item.Location1,
                 location2: item.Location2,
-
                 category: item.Category,
                 element: `${item.Category} > ${item.Element} > ${item.SubElement}`,
                 elementCode: item.Element,
                 subElement: item.SubElement,
                 subSubElement: item.SubSubElement,
-
                 uom: item.Unit,
                 qty: Number(item.Quantity),
                 price: Number(item.Rate),
@@ -123,15 +87,12 @@ export const useBudgetStore = defineStore('budget', () => {
                 unit: item.Unit,
                 rate: Number(item.Rate) || 0,
                 amount: (Number(item.Quantity) || 0) * (Number(item.Rate) || 0),
-
                 status: item.Status,
                 createdAt: formatDate(item.CreatedAt),
-                updatedAt: formatDate(item.UpdatedAt)
+                updatedAt: formatDate(item.UpdatedAt),
+                rowIndex: (page - 1) * pageSize + index + 1
             }));
-
-            if (response.pagination) {
-                pagination.value = normalizePagination(response.pagination);
-            }
+            pagination.value = mapPagination(response.pagination);
         } catch (error) {
             showError(error, 'Failed to fetch budget items.');
         } finally {
@@ -139,13 +100,5 @@ export const useBudgetStore = defineStore('budget', () => {
         }
     }
 
-    return {
-        budgets,
-        budgetItems,
-        pagination,
-        loading,
-        fetchBudgets,
-        fetchBudgetItems,
-        fetchBudgetVersion
-    };
+    return { budgets, budgetItems, pagination, loading, fetchBudgets, fetchBudgetItems, fetchBudgetVersion };
 });
