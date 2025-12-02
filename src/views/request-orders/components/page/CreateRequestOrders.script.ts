@@ -752,7 +752,6 @@ export default defineComponent({
             showValidation.value = false;
 
             try {
-                const formatDateToAPI = (date: Date | null) => (date ? date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
                 const projectId = getCurrentProjectId();
 
                 const payload: CreateRequestOrderPayload = {
@@ -783,7 +782,7 @@ export default defineComponent({
                         Rate: item.price ?? 0,
                         Notes: item.notes ?? '',
                         Reason: '',
-                        DeliveryDate: item.deliveryDate instanceof Date ? formatDateToAPI(item.deliveryDate) : formatDateToAPI(item.deliveryDate ? new Date(item.deliveryDate) : new Date())
+                        DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
 
@@ -796,6 +795,9 @@ export default defineComponent({
                         detail: `RO ${roNumber.value} has been saved as draft successfully`,
                         life: 3000
                     });
+                    setTimeout(() => {
+                        router.push('/request-orders');
+                    }, 1000);
                 } else {
                     toast.add({
                         severity: 'error',
