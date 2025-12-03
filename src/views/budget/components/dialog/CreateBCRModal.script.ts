@@ -84,21 +84,23 @@ export default defineComponent({
             return items;
         });
 
-        // const paginatedItems = computed(() => {
-        //     return filteredItems.value.map((item, index) => ({
-        //         ...item,
-        //         Id: item.Id || item.itemCode || index,
-        //         rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
-        //     }));
-        // });
+        const paginatedItems = computed(() => {
+            return filteredItems.value.map((item, index) => ({
+                ...item,
+                Id: item.id || item.itemCode || index,
+                rowIndex: index + 1 + (pagination.value.page - 1) * pagination.value.pageSize
+            }));
+        });
 
         const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0));
+
+        console.log('checknig the budget item', allBudgetItems);
 
         const locationOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.location))].map((l) => ({ label: l || 'N/A', value: l })));
 
         const elementOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.element))].map((e) => ({ label: e || 'N/A', value: e })));
 
-        //  const itemTypeOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.itemType))].map((t) => ({ label: t, value: t })));
+        const itemTypeOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.itemType).filter((t): t is string => !!t))].map((t) => ({ label: t, value: t })));
 
         const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value));
 
@@ -181,12 +183,12 @@ export default defineComponent({
             selectedItemType,
             pagination,
             filteredItems,
-            // paginatedItems,
+            paginatedItems,
             allBudgetItems,
             grandTotal,
             locationOptions,
             elementOptions,
-            //  itemTypeOptions,
+            itemTypeOptions,
             hasActiveFilters,
             columns,
             clearFilters,

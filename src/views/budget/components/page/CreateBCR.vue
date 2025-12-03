@@ -17,11 +17,6 @@
                 <h2 class="text-lg font-semibold mb-4">Header Information</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">RO Number</label>
-                        <InputText v-model="roNumber" type="text" class="w-full" :placeholder="roNumber ? roNumber : 'Enter RO No'" />
-                    </div>
-
-                    <div>
                         <label class="block text-sm text-gray-600 mb-1">Date Requested</label>
                         <InputText v-model="requestDate" type="text" class="w-full" disabled />
                     </div>
@@ -38,13 +33,12 @@
 
                         <Dropdown v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" :invalid="showValidation && !selectedReason" />
 
-                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-1"> Reason for request is required </Message>
+                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-3"> Reason for request is required </Message>
                     </div>
-
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1">Remarks</label>
-                        <InputText v-model="remarks" type="text" class="w-full" />
-                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm text-gray-600 mb-1">Remarks</label>
+                    <InputText v-model="remarks" type="text" class="w-full" />
                 </div>
             </div>
 
