@@ -3,15 +3,18 @@ import { useToast } from 'primevue/usetoast';
 import { ref, watch } from 'vue';
 import * as XLSX from 'xlsx';
 
-export default function useImportBudgetDialogLogic(props: { visible: boolean }, emit: (e: 'close') => void) {
+export default function useImportBudgetDialogLogic(
+    props: { visible: boolean },
+    emit: {
+        (e: 'close'): void;
+        (e: 'success'): void;
+    }
+) {
     const toast = useToast();
     const internalVisible = ref(props.visible);
     const selectedFile = ref<File | null>(null);
     const isSubmitting = ref(false);
 
-    // ---------------------------
-    // WATCH DIALOG VISIBLE
-    // ---------------------------
     watch(
         () => props.visible,
         (val) => {
@@ -19,18 +22,12 @@ export default function useImportBudgetDialogLogic(props: { visible: boolean }, 
         }
     );
 
-    // ---------------------------
-    // CLOSE DIALOG
-    // ---------------------------
     function onHide() {
         emit('close');
         internalVisible.value = false;
         selectedFile.value = null;
     }
 
-    // ---------------------------
-    // DOWNLOAD TEMPLATE FILE
-    // ---------------------------
     function onDownloadFormat() {
         try {
             const headers = [['LOC 1', 'LOC 2', 'ELEMENT', 'SUB ELEMENT', 'SUB SUB ELEMENT', 'ITEM TYPE', 'ITEM CODE', 'PUR.DESCRIPTION', 'DESC 2', 'UNIT', 'BUDGET QTY', 'RATE', 'AMOUNT', 'WASTAGE']];
@@ -59,9 +56,6 @@ export default function useImportBudgetDialogLogic(props: { visible: boolean }, 
         }
     }
 
-    // ---------------------------
-    // FILE SELECT (but not upload yet)
-    // ---------------------------
     function onFileSelect(event: any) {
         const file = event.files?.[0];
         if (!file) {
@@ -82,9 +76,6 @@ export default function useImportBudgetDialogLogic(props: { visible: boolean }, 
         });
     }
 
-    // ---------------------------
-    // SUBMIT UPLOAD
-    // ---------------------------
     async function onSubmitUpload() {
         if (!selectedFile.value) {
             toast.add({
@@ -110,9 +101,47 @@ export default function useImportBudgetDialogLogic(props: { visible: boolean }, 
         try {
             isSubmitting.value = true;
 
+            const arrayBuffer = await selectedFile.value.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            const jsonData: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+            const filteredData = jsonData
+                .map((row) => {
+                    const newRow: Record<string, any> = {};
+                    Object.entries(row).forEach(([key, value]) => {
+                        if (value !== null && value !== undefined && value !== '') {
+                            newRow[key] = value;
+                        }
+                    });
+                    return newRow;
+                })
+                .filter((row) => Object.keys(row).length > 0);
+
+            if (filteredData.length === 0) {
+                toast.add({
+                    severity: 'warn',
+                    summary: 'No Data',
+                    detail: 'Excel contains no valid data to upload.',
+                    life: 3000
+                });
+                return;
+            }
+
+            const newSheet = XLSX.utils.json_to_sheet(filteredData);
+            const newWorkbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(newWorkbook, newSheet, 'Budget');
+
+            const wbout = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
+            const newFile = new File([wbout], selectedFile.value.name, {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+
             const formData = new FormData();
             formData.append('projectId', String(projectId));
-            formData.append('file', selectedFile.value);
+            formData.append('file', newFile);
 
             const response = await budgetService.createBudget(formData);
 
@@ -123,6 +152,7 @@ export default function useImportBudgetDialogLogic(props: { visible: boolean }, 
                     detail: 'Budget file uploaded successfully!',
                     life: 3000
                 });
+                emit('success');
                 onHide();
             } else {
                 toast.add({

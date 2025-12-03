@@ -14,6 +14,7 @@ import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import ConfirmPopup from 'primevue/confirmpopup';
 
+import { setGlobalToast, showInfo } from '@/utils/showNotification.utils';
 import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
@@ -44,9 +45,8 @@ export default defineComponent({
     setup() {
         const budgetStore = useBudgetStore();
         const toast = useToast();
-        // ---------------------------
-        // 1. Static
-        // ---------------------------
+        setGlobalToast(toast);
+
         const viewOptions = [
             { label: 'Overview', value: 'overview' },
             { label: 'Detail', value: 'detail' }
@@ -66,9 +66,6 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
 
-        // ---------------------------
-        // 2. State
-        // ---------------------------
         const versions = ref<FilterVersion[]>([]);
         const selectedVersion = ref<string>('');
         const latestBudgetId = ref<number | null>(null);
@@ -85,10 +82,6 @@ export default defineComponent({
         const search = ref('');
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
-
-        // ---------------------------
-        // 3. Methods
-        // ---------------------------
 
         const fetchBudgetVersionList = async () => {
             const versionsData = await budgetStore.fetchBudgetVersion();
@@ -134,14 +127,8 @@ export default defineComponent({
         const previousVersion = ref<string | null>(null);
 
         watch(selectedVersion, async (newVersion) => {
-            // Ignore first run (initial load)
             if (previousVersion.value !== null && previousVersion.value !== newVersion) {
-                toast.add({
-                    severity: 'info',
-                    summary: 'Version Changed',
-                    detail: `Switched to version: Version ${newVersion}`,
-                    life: 2000
-                });
+                showInfo(`Switched to version: Version ${newVersion}`);
             }
 
             previousVersion.value = newVersion;
@@ -172,16 +159,15 @@ export default defineComponent({
             await fetchBudgetList();
         }
 
-        // ---------------------------
-        // 4. Lifecycle
-        // ---------------------------
+        async function handleImportSuccess() {
+            showImportModal.value = false;
+            await fetchBudgetVersionList();
+            await fetchBudgetList();
+        }
         onMounted(() => {
             fetchBudgetVersionList();
         });
 
-        // ---------------------------
-        // 5. Expose
-        // ---------------------------
         return {
             versions,
             viewOptions,
@@ -195,7 +181,7 @@ export default defineComponent({
             pagination,
             filters,
             formatCurrency,
-
+            handleImportSuccess,
             handleImportClick,
             handlePageChange,
             handlePageSizeChange,
