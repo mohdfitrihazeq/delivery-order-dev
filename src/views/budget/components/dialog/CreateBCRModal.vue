@@ -36,7 +36,7 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-2">Item Type</label>
-                    <Dropdown v-model="selectedItemType" :options="itemTypeOptions" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
+                    <Dropdown v-model="selectedItemType" option-label="label" option-value="value" placeholder="All" class="w-full" :show-clear="true" />
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
 
         <!-- Items Table -->
         <ReusableTable
-            :value="paginatedItems"
+            :value="filteredItems"
             :columns="columns"
             :loading="loading"
             :pagination="pagination"

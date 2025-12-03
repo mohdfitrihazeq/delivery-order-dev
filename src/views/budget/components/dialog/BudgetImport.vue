@@ -7,7 +7,10 @@ import { defineEmits, defineProps } from 'vue';
 import useImportBudgetDialogLogic from './BudgetImport.script';
 
 const props = defineProps<{ visible: boolean }>();
-const emit = defineEmits<{ (e: 'close'): void }>();
+const emit = defineEmits<{
+    (e: 'close'): void;
+    (e: 'success'): void;
+}>();
 
 const { internalVisible, onHide, onFileSelect, onDownloadFormat, onSubmitUpload, selectedFile, isSubmitting } = useImportBudgetDialogLogic(props, emit);
 </script>
