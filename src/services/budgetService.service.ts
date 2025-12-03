@@ -103,33 +103,11 @@ const getBudget = async (params?: GetBudgetListParams): Promise<BudgetResponse> 
     }
 };
 
-async function createBudget(formData: FormData) {
-    try {
-        for (const [key, value] of formData.entries()) {
-            console.log('FormData =>', key, value);
-        }
-
-        console.log('formData payload', formData);
-
-        const response = await axiosInstance.post('/budget/import', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
-
-        return { success: true, data: response.data };
-    } catch (error: any) {
-        console.error('Budget Upload Error:', error.response?.data || error);
-        return {
-            success: false,
-            message: error.response?.data?.message || error.response?.data?.error || 'Upload failed'
-        };
-    }
-}
 export const budgetService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
     getSingleBudgetChangeRequest,
     editBudgetChangeRequest,
     getBudgetVersion,
-    getBudget,
-    createBudget
+    getBudget
 };

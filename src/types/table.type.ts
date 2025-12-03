@@ -12,3 +12,5 @@ export interface TableColumn {
     action?: boolean;
     actions?: ActionType[] | ((row: any) => ActionType[]);
 }
+
+

@@ -1,80 +1,50 @@
+// src/services/newBudget.service.ts
+import type { GetBudgetsParams, GetBudgetsResponse, Pagination } from '@/types/newBudget.type';
 import { showError } from '@/utils/showNotification.utils';
 import axiosInstance from './backendAxiosInstance';
 
-export interface GetBudgetsParams {
-    projectId?: number;
-    version?: number;
-    page?: number;
-    pageSize?: number;
-}
+export const mapPagination = (p: any): Pagination => ({
+    total: p?.total ?? p?.totalBudgetItems ?? 0,
+    totalPages: p?.totalPages ?? 1,
+    page: p?.page ?? 1,
+    pageSize: p?.pageSize ?? 10
+});
 
-export interface GetBudgetsResponse {
-    success: boolean;
-    message?: string;
-    data: any[];
-    pagination: {
-        total: number;
-        totalPages: number;
-        page: number;
-        pageSize: number;
-    };
-}
+const cleanParams = (params?: Record<string, any>) => {
+    return Object.entries(params || {}).reduce(
+        (acc, [key, value]) => {
+            if (value !== undefined && value !== null && value !== '') acc[key] = value;
+            return acc;
+        },
+        {} as Record<string, any>
+    );
+};
 
 const getBudgets = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const cleanParams = Object.entries(params || {}).reduce((acc, [key, value]) => {
-            if (value !== undefined && value !== null && value !== '') acc[key] = value;
-            return acc;
-        }, {} as any);
-
-        const response = await axiosInstance.get('/budget', { params: cleanParams });
-
+        const response = await axiosInstance.get('/budget', { params: cleanParams(params) });
         return {
             success: response.data.success,
             data: response.data.data || [],
-            pagination: response.data.pagination || {
-                total: response.data.pagination?.totalBudgetItems || 0,
-                totalPages: response.data.pagination?.totalPages || 0,
-                page: response.data.pagination?.page || 1,
-                pageSize: response.data.pagination?.pageSize || 10
-            }
+            pagination: mapPagination(response.data.pagination)
         };
     } catch (error: any) {
         showError(error, 'Failed to fetch budgets.');
-        return {
-            success: false,
-            data: [],
-            pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 }
-        };
+        return { success: false, data: [], pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 } };
     }
 };
 
 const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const cleanParams = Object.entries(params || {}).reduce((acc, [key, value]) => {
-            if (value !== undefined && value !== null && value !== '') acc[key] = value;
-            return acc;
-        }, {} as any);
-
-        const response = await axiosInstance.get('/budget/items', { params: cleanParams });
-
+        const response = await axiosInstance.get('/budget/items', { params: cleanParams(params) });
         return {
             success: response.data.success,
             data: response.data.data || [],
-            pagination: response.data.pagination || {
-                total: response.data.pagination?.totalBudgetItems || 0,
-                totalPages: response.data.pagination?.totalPages || 0,
-                page: response.data.pagination?.page || 1,
-                pageSize: response.data.pagination?.pageSize || 10
-            }
+            pagination: mapPagination(response.data.pagination)
         };
     } catch (error: any) {
         showError(error, 'Failed to fetch budget items.');
-        return {
-            success: false,
-            data: [],
-            pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 }
-        };
+        return { success: false, data: [], pagination: { total: 0, totalPages: 0, page: 1, pageSize: 10 } };
     }
 };
 
@@ -88,8 +58,26 @@ const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsRe
     }
 };
 
-export const budgetService = {
-    getBudgets,
-    getBudgetItems,
-    getBudgetVersion
+const createBudget = async (formData: FormData) => {
+    try {
+        for (const [key, value] of formData.entries()) {
+            console.log('FormData =>', key, value);
+        }
+
+        console.log('formData payload', formData);
+
+        const response = await axiosInstance.post('/budget/import', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        console.error('Budget Upload Error:', error.response?.data || error);
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Upload failed'
+        };
+    }
 };
+
+export const budgetService = { getBudgets, getBudgetItems, getBudgetVersion, createBudget };

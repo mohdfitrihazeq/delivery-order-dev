@@ -1,10 +1,11 @@
-import { useBudgetStore } from '@/stores/budget/newBudget.store';
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { FilterVersion } from '@/types/budget.type';
 import type { TableColumn } from '@/types/table.type';
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 
 import BaseTab from '@/components/tab/BaseTab.vue';
 import ReusableTable from '@/components/table/ReusableTable.vue';
+import { formatCurrency } from '@/utils/format.utils';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 
@@ -13,6 +14,7 @@ import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import ConfirmPopup from 'primevue/confirmpopup';
 
+import { setGlobalToast, showInfo } from '@/utils/showNotification.utils';
 import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
@@ -43,9 +45,8 @@ export default defineComponent({
     setup() {
         const budgetStore = useBudgetStore();
         const toast = useToast();
-        // ---------------------------
-        // 1. Static
-        // ---------------------------
+        setGlobalToast(toast);
+
         const viewOptions = [
             { label: 'Overview', value: 'overview' },
             { label: 'Detail', value: 'detail' }
@@ -65,9 +66,6 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
 
-        // ---------------------------
-        // 2. State
-        // ---------------------------
         const versions = ref<FilterVersion[]>([]);
         const selectedVersion = ref<string>('');
         const latestBudgetId = ref<number | null>(null);
@@ -84,10 +82,6 @@ export default defineComponent({
         const search = ref('');
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
-
-        // ---------------------------
-        // 3. Methods
-        // ---------------------------
 
         const fetchBudgetVersionList = async () => {
             const versionsData = await budgetStore.fetchBudgetVersion();
@@ -122,18 +116,19 @@ export default defineComponent({
             pagination.value.total = budgetStore.pagination.total;
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
+        const filteredItems = computed(() => {
+            if (!search.value) return budgetItems.value;
+
+            const keyword = search.value.toLowerCase();
+
+            return budgetItems.value.filter((item) => Object.values(item).some((val) => String(val).toLowerCase().includes(keyword)));
+        });
 
         const previousVersion = ref<string | null>(null);
 
         watch(selectedVersion, async (newVersion) => {
-            // Ignore first run (initial load)
             if (previousVersion.value !== null && previousVersion.value !== newVersion) {
-                toast.add({
-                    severity: 'info',
-                    summary: 'Version Changed',
-                    detail: `Switched to version: Version ${newVersion}`,
-                    life: 2000
-                });
+                showInfo(`Switched to version: Version ${newVersion}`);
             }
 
             previousVersion.value = newVersion;
@@ -149,7 +144,6 @@ export default defineComponent({
             search.value = value;
             filters.value.global = { value };
         }
-
         function handleImportClick() {
             showImportModal.value = true;
         }
@@ -165,20 +159,20 @@ export default defineComponent({
             await fetchBudgetList();
         }
 
-        // ---------------------------
-        // 4. Lifecycle
-        // ---------------------------
+        async function handleImportSuccess() {
+            showImportModal.value = false;
+            await fetchBudgetVersionList();
+            await fetchBudgetList();
+        }
         onMounted(() => {
             fetchBudgetVersionList();
         });
 
-        // ---------------------------
-        // 5. Expose
-        // ---------------------------
         return {
             versions,
             viewOptions,
             budgetItems,
+            filteredItems,
             columns,
             selectedVersion,
             viewMode,
@@ -186,6 +180,8 @@ export default defineComponent({
             showImportModal,
             pagination,
             filters,
+            formatCurrency,
+            handleImportSuccess,
             handleImportClick,
             handlePageChange,
             handlePageSizeChange,

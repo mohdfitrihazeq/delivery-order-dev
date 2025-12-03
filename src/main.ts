@@ -14,7 +14,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
-// 👇 加入这行
+
 import { setGlobalToast } from '@/utils/showNotification.utils';
 import { useToast } from 'primevue/usetoast';
 

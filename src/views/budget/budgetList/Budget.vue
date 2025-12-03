@@ -37,7 +37,7 @@
             </div>
             <div v-else>
                 <ReusableTable
-                    :value="budgetItems"
+                    :value="filteredItems"
                     :columns="columns"
                     emptyTitle="Budget List Data"
                     :pagination="pagination"
@@ -49,11 +49,12 @@
                     :showImportFile="true"
                     :onImportFile="handleImportClick"
                 >
-                    <template #rate="{ data }"> RM {{ data.rate }} </template>
-                    <template #amount="{ data }"> RM {{ data.amount }} </template>
+                    <template #rate="{ data }"> RM {{ formatCurrency(data.rate) }} </template>
+
+                    <template #amount="{ data }"> RM {{ formatCurrency(data.amount) }} </template>
                 </ReusableTable>
 
-                <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" />
+                <BudgetImportModal :visible="showImportModal" @close="showImportModal = false" @success="handleImportSuccess" />
                 <ConfirmPopup />
             </div>
         </div>
