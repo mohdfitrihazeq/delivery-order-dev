@@ -122,8 +122,12 @@ export default defineComponent({
         });
 
         const itemTypeOptions = computed<FilterOption[]>(() => {
-            const types = [...new Set(allBudgetItems.value.map((item) => item.itemType))];
-            return types.map((type) => ({ label: type, value: type }));
+            const types = [...new Set(allBudgetItems.value.map((item) => item.itemType).filter((t): t is string => t !== undefined && t !== null))];
+
+            return types.map((type) => ({
+                label: type,
+                value: type
+            }));
         });
 
         const filterOptions = computed(() => [
