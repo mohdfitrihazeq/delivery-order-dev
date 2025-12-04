@@ -22,7 +22,7 @@ const cleanParams = (params?: Record<string, any>) => {
 
 const getBudgets = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const response = await axiosInstance.get('/budget', { params: cleanParams(params) });
+        const response = await axiosInstance.get('/budgets', { params: cleanParams(params) });
         return {
             success: response.data.success,
             data: response.data.data || [],
@@ -50,7 +50,7 @@ const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResp
 
 const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const response = await axiosInstance.get<GetBudgetsResponse>('/budget', { params });
+        const response = await axiosInstance.get<GetBudgetsResponse>('/budgets', { params });
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch budget version list.');
@@ -66,7 +66,7 @@ const createBudget = async (formData: FormData) => {
 
         console.log('formData payload', formData);
 
-        const response = await axiosInstance.post('/budget/import', formData, {
+        const response = await axiosInstance.post('/budgets/import', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
