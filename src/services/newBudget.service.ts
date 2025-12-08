@@ -22,7 +22,7 @@ const cleanParams = (params?: Record<string, any>) => {
 
 const getBudgets = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const response = await axiosInstance.get('/budget', { params: cleanParams(params) });
+        const response = await axiosInstance.get('/budgets', { params: cleanParams(params) });
         return {
             success: response.data.success,
             data: response.data.data || [],
@@ -66,7 +66,7 @@ const createBudget = async (formData: FormData) => {
 
         console.log('formData payload', formData);
 
-        const response = await axiosInstance.post('/budget/import', formData, {
+        const response = await axiosInstance.post('/budgets/import', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
