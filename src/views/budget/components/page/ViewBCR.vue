@@ -37,6 +37,10 @@
                                     <label class="block text-gray-600 mb-1">Reason of Request</label>
                                     <div class="w-full border rounded px-2 py-1 bg-gray-50">VO</div>
                                 </div>
+                                <div>
+                                    <label class="block text-gray-600 mb-1">Remark</label>
+                                    <div class="w-full border rounded px-2 py-1 bg-gray-50">VO</div>
+                                </div>
                             </div>
                         </div>
 

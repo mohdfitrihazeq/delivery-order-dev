@@ -75,7 +75,6 @@
         <!-- Footer -->
         <template #footer>
             <div class="flex items-center justify-between mt-5">
-                <div class="text-sm text-gray-600">{{ selectedItems.length }} items selected</div>
                 <div class="flex gap-3 ms-3">
                     <Button label="Cancel" icon="pi pi-times" outlined @click="closeModal" />
                     <Button :label="`Add Selected Items (${selectedItems.length})`" icon="pi pi-check" @click="addSelectedItems" :disabled="selectedItems.length === 0" />

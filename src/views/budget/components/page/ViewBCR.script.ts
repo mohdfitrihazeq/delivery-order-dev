@@ -12,12 +12,13 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetChangeRequestStore();
+        const budgetCRStore = useBudgetChangeRequestStore();
         const projectName = ref<string>('');
         const singleBudgetChangeRequest = ref<BudgetChangeRequest | null>(null);
         onMounted(async () => {
             if (route.params.requestNo) {
-                const data = await store.getSingleBudgetChange(Number(route.params.requestNo));
+                console.log('get route params reqeust no', route.params.requestNo);
+                const data = await budgetCRStore.getSingleBudgetChange(Number(route.params.requestNo));
 
                 singleBudgetChangeRequest.value = data;
             }
@@ -33,6 +34,7 @@ export default defineComponent({
             }
         });
 
+        console.log('singleBudgetChangeRequest', singleBudgetChangeRequest.value);
         const roNumber = computed(() => singleBudgetChangeRequest.value?.DocNo || '');
         const requestBy = computed(() => singleBudgetChangeRequest.value?.RequestedBy || '');
         const requestDate = computed(() => {

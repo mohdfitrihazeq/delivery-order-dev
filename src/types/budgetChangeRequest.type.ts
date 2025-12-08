@@ -40,6 +40,7 @@ export interface BudgetChangeItem {
     element: string;
 }
 
+// API RETURN RESPONSE
 export interface BudgetChangeRequest {
     Id: number;
     ProjectId: number;
@@ -71,6 +72,7 @@ export interface SingleBudgetChangeRequestResponse {
     data?: BudgetChangeRequest;
 }
 
+// API REQUEST PAYLOAD
 export interface BudgetChangeItemPayload {
     ItemCode: string;
     Name: string;

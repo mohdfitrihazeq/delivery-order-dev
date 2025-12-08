@@ -9,12 +9,11 @@ import { formatCurrency } from '@/utils/format.utils';
 import Overview from '@/views/budget/budgetOverview/Overview.vue';
 import BudgetImportModal from '@/views/budget/components/dialog/BudgetImport.vue';
 
+import { setGlobalToast, showInfo } from '@/utils/showNotification.utils';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import ConfirmPopup from 'primevue/confirmpopup';
-
-import { setGlobalToast, showInfo } from '@/utils/showNotification.utils';
 import Dropdown from 'primevue/dropdown';
 import SelectButton from 'primevue/selectbutton';
 import Tag from 'primevue/tag';
@@ -66,10 +65,13 @@ export default defineComponent({
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
 
+        /* ---------------------- STATES ---------------------- */
         const versions = ref<FilterVersion[]>([]);
         const selectedVersion = ref<string>('');
         const latestBudgetId = ref<number | null>(null);
         const budgetItems = ref<any[]>([]);
+        const previousVersion = ref<string | null>(null);
+        const initialLoad = ref(true); // 初始加载标识
 
         const pagination = ref<PaginationConfig>({
             total: 0,
@@ -83,6 +85,7 @@ export default defineComponent({
         const showImportModal = ref(false);
         const filters = ref<Record<string, any>>({});
 
+        /* ---------------------- API ---------------------- */
         const fetchBudgetVersionList = async () => {
             const versionsData = await budgetStore.fetchBudgetVersion();
             if (!versionsData || versionsData.length === 0) return;
@@ -99,51 +102,59 @@ export default defineComponent({
 
             const latest = versions.value.find((v) => v.latest);
             if (latest) {
-                selectedVersion.value = latest.value;
+                selectedVersion.value = latest.value; // 触发 watch
                 latestBudgetId.value = latest.id!;
-                await fetchBudgetList();
             }
         };
 
         const fetchBudgetList = async () => {
             if (!latestBudgetId.value) return;
+
             await budgetStore.fetchBudgetItems(latestBudgetId.value, pagination.value.page, pagination.value.pageSize);
-            // Add rowIndex based on pagination
+
             budgetItems.value = budgetStore.budgetItems.map((item, index) => ({
                 ...item,
                 rowIndex: (pagination.value.page - 1) * pagination.value.pageSize + index + 1
             }));
+
             pagination.value.total = budgetStore.pagination.total;
             pagination.value.totalPages = budgetStore.pagination.totalPages;
         };
+
+        /* ---------------------- COMPUTED ---------------------- */
         const filteredItems = computed(() => {
             if (!search.value) return budgetItems.value;
-
             const keyword = search.value.toLowerCase();
 
             return budgetItems.value.filter((item) => Object.values(item).some((val) => String(val).toLowerCase().includes(keyword)));
         });
 
-        const previousVersion = ref<string | null>(null);
-
+        /* ---------------------- WATCHERS ---------------------- */
         watch(selectedVersion, async (newVersion) => {
-            if (previousVersion.value !== null && previousVersion.value !== newVersion) {
-                showInfo(`Switched to version: Version ${newVersion}`);
+            if (!newVersion) return;
+
+            const selected = versions.value.find((v) => v.value === newVersion);
+            if (!selected) return;
+
+            // 只有用户切换版本才显示 toast
+            if (!initialLoad.value && previousVersion.value && previousVersion.value !== newVersion) {
+                showInfo(`Switched to Version ${newVersion}`);
             }
 
             previousVersion.value = newVersion;
+            latestBudgetId.value = selected.id!;
 
-            const selected = versions.value.find((v) => v.value === newVersion);
-            if (selected) {
-                latestBudgetId.value = selected.id!;
-                await fetchBudgetList();
-            }
+            await fetchBudgetList();
+
+            if (initialLoad.value) initialLoad.value = false; // 标记初始化完成
         });
 
+        /* ---------------------- HANDLERS ---------------------- */
         function handleSearch(value: string) {
             search.value = value;
             filters.value.global = { value };
         }
+
         function handleImportClick() {
             showImportModal.value = true;
         }
@@ -164,22 +175,25 @@ export default defineComponent({
             await fetchBudgetVersionList();
             await fetchBudgetList();
         }
+
+        /* ---------------------- INIT ---------------------- */
         onMounted(() => {
             fetchBudgetVersionList();
         });
 
         return {
             versions,
+            columns,
             viewOptions,
             budgetItems,
             filteredItems,
-            columns,
             selectedVersion,
             viewMode,
             search,
             showImportModal,
             pagination,
             filters,
+
             formatCurrency,
             handleImportSuccess,
             handleImportClick,

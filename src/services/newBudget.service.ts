@@ -50,7 +50,7 @@ const getBudgetItems = async (params?: GetBudgetsParams): Promise<GetBudgetsResp
 
 const getBudgetVersion = async (params?: GetBudgetsParams): Promise<GetBudgetsResponse> => {
     try {
-        const response = await axiosInstance.get<GetBudgetsResponse>('/budget', { params });
+        const response = await axiosInstance.get<GetBudgetsResponse>('/budgets', { params });
         return response.data;
     } catch (error) {
         showError(error, 'Failed to fetch budget version list.');

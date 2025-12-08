@@ -21,7 +21,7 @@ interface State {
     };
 }
 
-export const useBudgetChangeRequestStore = defineStore('budgetStore', {
+export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
     state: (): State => ({
         loading: false,
         budgetChangeRequestList: [],
@@ -67,10 +67,10 @@ export const useBudgetChangeRequestStore = defineStore('budgetStore', {
             }
         },
 
-        async createBudgetChangeRequest(formData: FormData) {
+        async createBudgetChangeRequest(payload: BudgetChangeRequestPayload) {
             this.loading = true;
             try {
-                const response = await budgetService.createBudgetChangeRequest(formData as any);
+                const response = await budgetService.createBudgetChangeRequest(payload);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Budget Change Request.');

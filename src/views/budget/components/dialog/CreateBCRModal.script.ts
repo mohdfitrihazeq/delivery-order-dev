@@ -94,8 +94,6 @@ export default defineComponent({
 
         const grandTotal = computed(() => selectedItems.value.reduce((sum, item) => sum + (item.price ?? 0) * (item.qty ?? 0), 0));
 
-        console.log('checknig the budget item', allBudgetItems);
-
         const locationOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.location))].map((l) => ({ label: l || 'N/A', value: l })));
 
         const elementOptions = computed<FilterOption[]>(() => [...new Set(allBudgetItems.value.map((i) => i.element))].map((e) => ({ label: e || 'N/A', value: e })));

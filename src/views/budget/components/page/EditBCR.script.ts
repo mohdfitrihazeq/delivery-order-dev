@@ -10,8 +10,8 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetChangeRequestStore();
-        const { singleBudgetChangeRequest, loading } = storeToRefs(store);
+        const budgetCRStore = useBudgetChangeRequestStore();
+        const { singleBudgetChangeRequest, loading } = storeToRefs(budgetCRStore);
 
         const roNumber = ref('');
         const requestBy = ref('');
@@ -49,7 +49,7 @@ export default defineComponent({
             const id = Number(route.params.id ?? route.params.requestNo ?? 0);
             if (!id) return;
 
-            await store.getSingleBudgetChange(id);
+            await budgetCRStore.getSingleBudgetChange(id);
 
             if (singleBudgetChangeRequest.value) {
                 const s = singleBudgetChangeRequest.value as BudgetChangeRequest;
@@ -160,7 +160,7 @@ export default defineComponent({
                 }))
             };
 
-            const isSuccess = await store.editBudgetChangeRequest(payload, singleBudgetChangeRequest.value?.Id ?? 0);
+            const isSuccess = await budgetCRStore.editBudgetChangeRequest(payload, singleBudgetChangeRequest.value?.Id ?? 0);
 
             if (isSuccess) router.push('/bcr');
         };
