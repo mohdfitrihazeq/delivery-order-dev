@@ -13,10 +13,6 @@
             <h3 class="text-lg font-semibold mb-4">Header Information</h3>
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                    <label>Request No</label>
-                    <InputText v-model="roNumber" class="w-full" />
-                </div>
-                <div>
                     <label>Requested By</label>
                     <InputText v-model="requestBy" class="w-full" />
                 </div>
@@ -28,6 +24,10 @@
                     <label>Reason</label>
                     <Dropdown v-model="reason" :options="reasonOptions" optionLabel="label" optionValue="value" class="w-full" />
                 </div>
+                <div>
+                    <label>Remark</label>
+                    <InputText v-model="remark" class="w-full" />
+                </div>
             </div>
         </div>
 
@@ -35,17 +35,18 @@
         <div class="card p-4 shadow overflow-auto">
             <div class="flex justify-between mb-4">
                 <h3 class="text-lg font-semibold">Materials</h3>
+                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
                 <!-- <Button label="Add Item" icon="pi pi-plus" @click="addItem" outlined /> -->
             </div>
 
             <DataTable :value="items" class="text-sm" style="min-width: 2000px">
                 <Column field="ItemCode" header="Item Code" style="min-width: 150px">
                     <template #body="{ data }">
-                        <Dropdown v-model="data.ItemCode" :options="itemOptions" optionLabel="label" optionValue="value" @change="fillItemDetails(data)" class="w-full" />
+                        <Dropdown v-model="data.ItemCode" :options="filteredItems.map((b) => ({ label: b.itemCode, value: b.itemCode }))" optionLabel="label" optionValue="value" @change="() => fillSelectedItem(data)" class="w-full" />
                     </template>
                 </Column>
 
-                <Column field="Description" header="Description" style="min-width: 200px">
+                <Column field="Description" header="Description" style="min-width: 300px">
                     <template #body="{ data }">
                         <InputText v-model="data.Description" class="w-full" disabled />
                     </template>
@@ -75,7 +76,6 @@
                     </template>
                 </Column>
 
-                <!-- Exceeded Qty -->
                 <Column header="Exceeded Qty" style="min-width: 120px">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))">
@@ -84,14 +84,12 @@
                     </template>
                 </Column>
 
-                <!-- Exceeded % -->
                 <Column header="Exceeded %" style="min-width: 120px">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))"> {{ calcExceedPercent(data).toFixed(1) }}% </span>
                     </template>
                 </Column>
 
-                <!-- Estimated $ Exceed -->
                 <Column header="Estimated $ Exceed" style="min-width: 150px">
                     <template #body="{ data }">
                         <span :class="getColorClass(calcExceedQty(data))">
@@ -99,12 +97,14 @@
                         </span>
                     </template>
                 </Column>
+
                 <Column field="Remark" header="Remark" style="min-width: 400px">
                     <template #body="{ data }">
                         <InputText v-model="data.Remark" class="w-full" />
                     </template>
                 </Column>
 
+                <!-- Enhancement : In the API haven't doing can create or delete budget item -->
                 <!-- <Column header="Action" style="min-width: 80px">
                     <template #body="{ index }">
                         <Button icon="pi pi-trash" severity="danger" text @click="removeItem(index)" />
@@ -112,7 +112,9 @@
                 </Column> -->
             </DataTable>
         </div>
+
         <div class="text-right font-semibold mt-4">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
+
         <div class="flex justify-end mb-6 mt-6">
             <div class="flex gap-2">
                 <Button label="Cancel" @click="goBack" outlined />

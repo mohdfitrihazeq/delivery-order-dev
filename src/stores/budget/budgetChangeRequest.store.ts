@@ -1,5 +1,5 @@
-import { budgetService } from '@/services/budgetService.service';
-import type { BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
+import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -41,12 +41,30 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
     }),
 
     actions: {
+        setPage(page: number) {
+            this.pagination.page = page;
+        },
+
+        setPageSize(size: number) {
+            this.pagination.pageSize = size;
+            this.pagination.page = 1;
+        },
+
+        handleSearch(value: string) {
+            this.filters.search = value;
+            this.pagination.page = 1;
+        },
+
+        handleFilterChange(value: Record<string, any>) {
+            this.filters.status = value.status ?? '';
+            this.pagination.page = 1;
+        },
         async fetchBudgetChangesRequestList() {
             this.loading = true;
             this.budgetChangeRequestList = [];
 
             try {
-                const response = await budgetService.getBudgetChangeRequests();
+                const response = await budgetChangeRequestService.getBudgetChangeRequests();
                 if (!response.success) {
                     showError(response.message || 'Failed to fetch budget change requests.');
                     return [];
@@ -70,7 +88,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
         async createBudgetChangeRequest(payload: BudgetChangeRequestPayload) {
             this.loading = true;
             try {
-                const response = await budgetService.createBudgetChangeRequest(payload);
+                const response = await budgetChangeRequestService.createBudgetChangeRequest(payload);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to create Budget Change Request.');
@@ -92,7 +110,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
         async getSingleBudgetChange(bcrId: number) {
             this.loading = true;
             try {
-                const response = await budgetService.getSingleBudgetChangeRequest(bcrId);
+                const response = await budgetChangeRequestService.getSingleBudgetChangeRequest(bcrId);
 
                 if (!response.success || !response.data) {
                     showError('Budget change request not found.');
@@ -114,7 +132,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
         async editBudgetChangeRequest(payload: BudgetChangeRequestPayload, bcrId: number) {
             this.loading = true;
             try {
-                const response = await budgetService.editBudgetChangeRequest(payload, bcrId);
+                const response = await budgetChangeRequestService.editBudgetChangeRequest(payload, bcrId);
 
                 if (!response.success) {
                     showError(response.message || 'Failed to update Budget Change Request.');
@@ -132,24 +150,37 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
-
-        setPage(page: number) {
-            this.pagination.page = page;
+        // Unauthorized issue cannot using
+        async getBudgetChangeRequestActivity(budgetChangeRequestId: number) {
+            this.loading = true;
+            try {
+                console.log('checking the bcrId', budgetChangeRequestId);
+                const response = await budgetChangeRequestService.getBudgetChangeRequestHistory(budgetChangeRequestId);
+                // console.log('response', response);
+            } catch (error: any) {
+                showError(error, 'Failed to fetch budget change request.');
+                this.singleBudgetChangeRequest = null;
+                return null;
+            } finally {
+                this.loading = false;
+            }
         },
 
-        setPageSize(size: number) {
-            this.pagination.pageSize = size;
-            this.pagination.page = 1;
-        },
+        async createBCRRecommendation(budgetChangeRequestId: number, payload: BCRRecommendationPayload, attachments?: File[]) {
+            this.loading = true;
+            try {
+                const response = await budgetChangeRequestService.createBCRRecommendation(budgetChangeRequestId, payload, attachments);
 
-        handleSearch(value: string) {
-            this.filters.search = value;
-            this.pagination.page = 1;
-        },
+                if (!response.success) {
+                    showError(response.message || 'Failed to create Recommendation.');
+                    return null;
+                }
 
-        handleFilterChange(value: Record<string, any>) {
-            this.filters.status = value.status ?? '';
-            this.pagination.page = 1;
+                showSuccess(response.message);
+                return response.data ?? null;
+            } finally {
+                this.loading = false;
+            }
         }
     }
 });

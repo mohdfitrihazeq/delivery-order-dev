@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({
         token: localStorage.getItem('token') || null,
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null,
+        clientId: localStorage.getItem('clientId') || null,
         isLoading: false
     }),
 
@@ -22,33 +23,22 @@ export const useAuthStore = defineStore('auth', {
                 if (useAPI) {
                     // Call real API
                     const response = await authService.login(username, password);
-                    const { token, user } = response.data || {};
+
+                    const { token, user, has_access_client } = response.data || {};
                     if (!token) return false;
 
                     this.setToken(token);
                     this.setUser({
+                        id: user.id,
                         username: user.Username || username,
                         role: user.Role || 'User',
                         email: user.Email
                     });
+                    this.setClientId(has_access_client[0].client.id);
+
                     return true;
                 } else {
-                    // Mock login
-                    const mockUsers = [
-                        { username: 'pm_user', password: 'pm123', role: 'PM' },
-                        { username: 'site_user', password: 'site123', role: 'Site' },
-                        { username: 'purchasing_user', password: 'purchase123', role: 'Purchasing' }
-                    ];
-                    const user = mockUsers.find((u) => u.username === username && u.password === password);
-                    if (!user) return false;
-
-                    // Set store manually
-                    this.setToken('mock-token-' + user.username);
-                    this.setUser({
-                        username: user.username,
-                        role: user.role
-                    });
-                    return true;
+                    return false;
                 }
             } catch (err) {
                 console.error(err);
@@ -72,6 +62,10 @@ export const useAuthStore = defineStore('auth', {
         setUser(user: User) {
             this.user = user;
             localStorage.setItem('user', JSON.stringify(user));
+        },
+        setClientId(clientId: string) {
+            this.clientId = clientId;
+            localStorage.setItem('clientId', clientId);
         }
     }
 });

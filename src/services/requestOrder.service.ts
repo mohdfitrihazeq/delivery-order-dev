@@ -219,22 +219,6 @@ const downloadAttachment = async (file: AttachmentItem | unknown) => {
     }
 };
 
-const removeAttachment = async (requestOrderId: number | string, filename: string): Promise<ApiResponse<null>> => {
-    try {
-        const response = await axiosInstance.delete(`/requestOrder/${requestOrderId}/attachment/${filename}`);
-
-        return {
-            success: response.data.success,
-            message: response.data.message,
-            data: null
-        };
-    } catch (error: unknown) {
-        const message = (error as AxiosError<{ message: string }>)?.response?.data?.message || `Failed to remove attachment ${filename}`;
-        showError(error, message);
-        return { success: false, message, data: null };
-    }
-};
-
 const getAttachmentsByROId = async (requestOrderId: number | string): Promise<AttachmentItem[]> => {
     try {
         const response = await axiosInstance.get(`/requestOrder/${requestOrderId}/attachments`);
@@ -261,6 +245,5 @@ export const requestOrderService = {
     getAttachmentUrl,
     downloadAttachment,
     previewAttachment,
-    getAttachmentsByROId,
-    removeAttachment
+    getAttachmentsByROId
 };

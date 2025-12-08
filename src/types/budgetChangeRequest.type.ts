@@ -24,8 +24,7 @@ export interface BudgetChangeItem {
     BudgetChangeId: number;
     BudgetItemId: number;
     ItemCode: string;
-    Name: string;
-    Uom: string;
+    Uom: string | null;
     UnitPrice: string;
     OrderedQty: string;
     NewOrder: string;
@@ -57,7 +56,7 @@ export interface BudgetChangeRequest {
     CreatedAt: string;
     UpdatedAt: string;
     UpdatedBy: string | null;
-    budgetchangeitem: BudgetChangeItem[];
+    budget_change_items: BudgetChangeItem[];
 }
 
 export interface BudgetChangeRequestResponse {
@@ -72,11 +71,25 @@ export interface SingleBudgetChangeRequestResponse {
     data?: BudgetChangeRequest;
 }
 
+export interface RecommendationData {
+    Id: number;
+    BudgetChangeId: number;
+    Department: string;
+    ReviewerName: string;
+    RecommendationType: string;
+    Remark: string;
+    CreatedAt: string;
+}
+export interface CreateRecommendationResponse {
+    success: boolean;
+    message: string;
+    data: RecommendationData;
+}
+
 // API REQUEST PAYLOAD
 export interface BudgetChangeItemPayload {
     ItemCode: string;
-    Name: string;
-    Uom: string;
+    Uom: string | null;
     UnitPrice: number;
     OrderedQty: number;
     NewOrder: number;
@@ -97,6 +110,15 @@ export interface BudgetChangeRequestPayload {
     Reason: string;
     Type: 'BudgetChangeRequest';
     Items: BudgetChangeItemPayload[];
+}
+
+export interface BCRRecommendationPayload {
+    Department: string;
+    PersonInCharge: string;
+    RecommendationType: string; // Type of recommendation (e.g., "QS_Recommendation", "Site_Recommendation", "Specific_Quantity")
+    SpecificQuantity?: number;
+    Remark?: string;
+    files?: string[];
 }
 
 export interface TableItem {
