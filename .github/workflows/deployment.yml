@@ -1,0 +1,138 @@
+name: Deploy QTime Web
+
+on:
+  push:
+    branches: [main, development]
+
+jobs:
+  deploy-prod:
+    if: ${{ github.ref_name == 'main' }}
+    runs-on: [self-hosted, linux, x64, prod]
+
+    env:
+      PROJECT_PATH: /home/nodejs_admin/PRODUCTION/do-web
+      APP_NAME: Do_web
+      NODE_ENV: production
+      PORT: 12001
+      API_URL: http://103.16.42.51:8001/log
+      GIT_TOKEN: ${{ secrets.TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Pull latest code (superproject)
+        run: |
+          cd "$PROJECT_PATH"
+          git config --global --add safe.directory "$PROJECT_PATH"
+          git pull "https://${GIT_TOKEN}@github.com/Prosync2026/do-web.git" main
+
+      - name: Install deps & build (needs devDeps)
+        env:
+          npm_config_production: 'false'
+        run: |
+          cd "$PROJECT_PATH"
+          npm ci --legacy-peer-deps
+          npm run build
+
+      - name: Restart frontend (prod)
+        run: |
+          cd "$PROJECT_PATH"
+          pm2 describe "$APP_NAME" >/dev/null 2>&1 \
+            && pm2 reload "$APP_NAME" --update-env \
+            || pm2 start ecosystem.config.js --only "$APP_NAME" --update-env
+          pm2 save
+
+      - name: Log commit into Database
+        if: success()
+        run: |
+          curl -X POST "$API_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repository_url": "'"${{ github.repository }}"'",
+              "branch": "'"${{ github.ref_name }}"'",
+              "commit_message": "'"${{ github.event.head_commit.message }}"'"
+            }'
+
+      - name: Notify deployment ended
+        uses: th0th/notify-discord@v0.4.1
+        if: ${{ always() }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_JOB_NAME: 'Deployment ended for branch ${{ github.ref_name }}'
+          GITHUB_JOB_STATUS: ${{ job.status }}
+
+  deploy-dev:
+    if: ${{ github.ref_name == 'development' }}
+    runs-on: [self-hosted, linux, x64, dev]
+
+    env:
+      PROJECT_PATH: /home/nodejs_admin/DEVELOPMENT/do-web
+      APP_NAME: Do_web_dev
+      NODE_ENV: development
+      PORT: 13001
+      API_URL: http://103.16.42.51:8001/log
+      GIT_TOKEN: ${{ secrets.TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Pull latest code (superproject)
+        run: |
+          cd "$PROJECT_PATH"
+          git config --global --add safe.directory "$PROJECT_PATH"
+          git pull "https://${GIT_TOKEN}@github.com/Prosync2026/do-web.git" development
+
+      - name: Install deps & build (dev)
+        env:
+          npm_config_production: 'false'
+        run: |
+          cd "$PROJECT_PATH"
+          npm ci --legacy-peer-deps
+          npm run build
+
+      - name: Restart frontend (dev)
+        run: |
+          cd "$PROJECT_PATH"
+          pm2 describe "$APP_NAME" >/dev/null 2>&1 \
+            && pm2 reload "$APP_NAME" --update-env \
+            || pm2 start ecosystem.config.js --only "$APP_NAME" --update-env
+          pm2 save
+
+      - name: Log commit into Database
+        if: success()
+        run: |
+          curl -X POST "$API_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repository_url": "'"${{ github.repository }}"'",
+              "branch": "'"${{ github.ref_name }}"'",
+              "commit_message": "'"${{ github.event.head_commit.message }}"'"
+            }'
+
+      - name: Notify deployment ended
+        uses: th0th/notify-discord@v0.4.1
+        if: ${{ always() }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_JOB_NAME: 'Deployment ended for branch ${{ github.ref_name }}'
+          GITHUB_JOB_STATUS: ${{ job.status }}
