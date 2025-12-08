@@ -167,7 +167,7 @@ export interface CreateRequestOrderPayload {
     Items: CreateRequestOrderItem[];
     PrType?: string;
     Attachment?: string | null;
-    requestorderitems?: RequestOrderItemResponse[];
+    request_order_items?: RequestOrderItemResponse[];
     Location1?: string;
     Location2?: string;
 }
@@ -285,6 +285,8 @@ export interface RequestOrderItemResponse {
     Notes?: string;
     Remark?: string;
     Reason?: string;
+    Location1?: string;
+    Location2?: string;
     Rate?: number;
 }
 
