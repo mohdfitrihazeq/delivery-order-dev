@@ -1,6 +1,6 @@
 // CreateBCR.script.ts
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
-import type { BudgetChangeRequestPayload, TableItem } from '@/types/budgetChangeRequest.type';
+import type { BudgetChangeItemPayload, BudgetChangeRequestPayload, TableItem } from '@/types/budgetChangeRequest.type';
 import { getCurrentProjectId, getCurrentProjectName } from '@/utils/contextHelper';
 import MeterialModal from '@/views/budget/components/dialog/CreateBCRModal.vue';
 import { Motion } from '@motionone/vue';
@@ -13,7 +13,7 @@ export default defineComponent({
     components: { Motion, MeterialModal },
     setup() {
         const router = useRouter();
-        const budgetStore = useBudgetChangeRequestStore();
+        const budgetCRStore = useBudgetChangeRequestStore();
 
         // --- Header ---
         const roNumber = ref('RO2025208757');
@@ -156,7 +156,7 @@ export default defineComponent({
                 TotalAmount: totalVarianceAmount.value,
                 Reason: selectedReason.value || '',
                 Type: 'BudgetChangeRequest',
-                Items: items.value.map((i) => ({
+                Items: items.value.map<BudgetChangeItemPayload>((i) => ({
                     ItemCode: i.itemCode,
                     Name: i.description,
                     Uom: i.uom,
@@ -170,14 +170,8 @@ export default defineComponent({
                 }))
             };
 
-            const result = await budgetStore.createBudgetChangeRequest(payload as any);
+            const result = await budgetCRStore.createBudgetChangeRequest(payload);
             if (result) {
-                toast.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Budget Change Request submitted successfully',
-                    life: 3000
-                });
                 router.push({ name: 'budgetChangeRequest' });
             }
         };

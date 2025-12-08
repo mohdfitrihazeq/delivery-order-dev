@@ -46,7 +46,7 @@
 
         <!-- Items Table -->
         <ReusableTable
-            :value="filteredItems"
+            :value="paginatedItems"
             :columns="columns"
             :loading="loading"
             :pagination="pagination"
@@ -74,9 +74,8 @@
 
         <!-- Footer -->
         <template #footer>
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-600">{{ selectedItems.length }} items selected</div>
-                <div class="flex gap-3">
+            <div class="flex items-center justify-between mt-5">
+                <div class="flex gap-3 ms-3">
                     <Button label="Cancel" icon="pi pi-times" outlined @click="closeModal" />
                     <Button :label="`Add Selected Items (${selectedItems.length})`" icon="pi pi-check" @click="addSelectedItems" :disabled="selectedItems.length === 0" />
                 </div>

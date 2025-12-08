@@ -1,4 +1,4 @@
-import { budgetService } from '@/services/newBudget.service';
+import { budgetService } from '@/services/budget.service';
 import { Budget, BudgetItem, BudgetVersion, Pagination } from '@/types/newBudget.type';
 import { getCurrentProjectId } from '@/utils/contextHelper';
 import { formatDate } from '@/utils/dateHelper';

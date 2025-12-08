@@ -31,7 +31,7 @@
                 </div>
             </div>
             <SelectButton v-model="viewMode" :options="viewOptions" optionLabel="label" optionValue="value" class="h-10 rounded-lg" />
-            <!-- BODY -->
+
             <div v-if="viewMode === 'overview'">
                 <Overview class="col-span-12" />
             </div>

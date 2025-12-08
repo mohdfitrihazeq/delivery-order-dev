@@ -14,7 +14,6 @@ export default defineComponent({
     components: { ReusableTable, CommentBCR, Badge },
     setup() {
         const BudgetChangeRequestSummaryData = computed<CardItem[]>(() => {
-            const draftCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Draft').length;
             const reviewCount = budgetChangeRequestData.value.filter((item) => item.Status === 'Under Review').length;
             const approvedItems = budgetChangeRequestData.value.filter((item) => item.Status === 'Approved');
             const approvedCount = approvedItems.length;
@@ -23,20 +22,19 @@ export default defineComponent({
             const formattedTotal = totalApprovedValue.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
             return [
-                { title: 'Draft', value: draftCount.toString(), description: 'Draft for request', icon: 'pi pi-exclamation-triangle', color: 'orange' },
                 { title: 'Under Review', value: reviewCount.toString(), description: 'Ready for review', icon: 'pi pi-comment', color: 'red' },
                 { title: 'Approved', value: approvedCount.toString(), description: 'Ready for implement', icon: 'pi pi-check-circle', color: 'green' },
                 { title: 'Total Value', value: `$ ${formattedTotal}`, description: 'Estimated budget impact', icon: 'pi pi-chart-line', color: 'blue' }
             ];
         });
 
-        const budgetStore = useBudgetChangeRequestStore();
+        const budgetCRStore = useBudgetChangeRequestStore();
         onMounted(async () => {
-            await budgetStore.fetchBudgetChangesRequestList();
+            await budgetCRStore.fetchBudgetChangesRequestList();
         });
 
         const budgetChangeRequestData = computed(() => {
-            return budgetStore.budgetChangeRequestList.map((item) => ({
+            return budgetCRStore.budgetChangeRequestList.map((item) => ({
                 ...item,
                 actions: item.Status === 'Approved' ? ['view'] : ['view', 'edit']
             }));
@@ -52,7 +50,6 @@ export default defineComponent({
                 placeholder: 'All Status',
                 options: [
                     { label: 'All Status', value: '' },
-                    { label: 'Draft', value: 'Draft' },
                     { label: 'Under Review', value: 'Under Review' },
                     { label: 'Approved', value: 'Approved' },
                     { label: 'Rejected', value: 'Rejected' }
@@ -65,9 +62,9 @@ export default defineComponent({
 
         const filteredRequests = computed(() => {
             return budgetChangeRequestData.value.filter((r) => {
-                const matchSearch = !budgetStore.filters.search || r.DocNo.toLowerCase().includes(budgetStore.filters.search.toLowerCase());
+                const matchSearch = !budgetCRStore.filters.search || r.DocNo.toLowerCase().includes(budgetCRStore.filters.search.toLowerCase());
 
-                const statusFilter = budgetStore.filters.status;
+                const statusFilter = budgetCRStore.filters.status;
                 const matchStatus = !statusFilter ? true : r.Status === statusFilter;
 
                 return matchSearch && matchStatus;
@@ -75,8 +72,8 @@ export default defineComponent({
         });
 
         const paginatedRequests = computed(() => {
-            const start = (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
-            const end = start + budgetStore.pagination.pageSize;
+            const start = (budgetCRStore.pagination.page - 1) * budgetCRStore.pagination.pageSize;
+            const end = start + budgetCRStore.pagination.pageSize;
             return filteredRequests.value.slice(start, end);
         });
 
@@ -110,19 +107,19 @@ export default defineComponent({
         }
 
         function handlePageChange(page: number) {
-            budgetStore.setPage(page);
+            budgetCRStore.setPage(page);
         }
 
         function handlePageSizeChange(size: number) {
-            budgetStore.setPageSize(size);
+            budgetCRStore.setPageSize(size);
         }
 
         function handleSearch(value: string) {
-            budgetStore.handleSearch(value);
+            budgetCRStore.handleSearch(value);
         }
 
         function handleFilterChange(filters: Record<string, any>) {
-            budgetStore.handleFilterChange(filters);
+            budgetCRStore.handleFilterChange(filters);
         }
 
         const router = useRouter();
@@ -136,7 +133,7 @@ export default defineComponent({
         }
 
         const startingIndex = computed(() => {
-            return (budgetStore.pagination.page - 1) * budgetStore.pagination.pageSize;
+            return (budgetCRStore.pagination.page - 1) * budgetCRStore.pagination.pageSize;
         });
 
         const numberedRequests = computed(() => {
@@ -163,8 +160,8 @@ export default defineComponent({
             paginatedRequests,
             handlePageChange,
             handlePageSizeChange,
-            pagination: budgetStore.pagination,
-            budgetStore,
+            pagination: budgetCRStore.pagination,
+            budgetCRStore,
             numberedRequests
         };
     }

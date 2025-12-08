@@ -98,6 +98,7 @@ export default defineComponent({
             budgetStore.pagination.page = 1;
         });
 
+        // ✅ FIXED: Keep selected items that are still in the budget
         watch(
             () => allBudgetItems.value,
             (newItems) => {
@@ -120,19 +121,15 @@ export default defineComponent({
             return elements.map((el) => ({ label: el, value: el }));
         });
 
-        const itemTypeOptions = computed<FilterOption[]>(() => {
-            const types = [...new Set(allBudgetItems.value.map((item) => item.itemType).filter((t): t is string => t !== undefined && t !== null))];
-
-            return types.map((type) => ({
-                label: type,
-                value: type
-            }));
-        });
+        // const itemTypeOptions = computed<FilterOption[]>(() => {
+        //     const types = [...new Set(allBudgetItems.value.map((item) => item.itemType))];
+        //     return types.map((type) => ({ label: type, value: type }));
+        // });
 
         const filterOptions = computed(() => [
             { type: 'select' as const, field: 'location', placeholder: 'Filter by Location', options: locationOptions.value },
             { type: 'select' as const, field: 'element', placeholder: 'Filter by Element', options: elementOptions.value },
-            { type: 'select' as const, field: 'itemType', placeholder: 'Filter by Item Type', options: itemTypeOptions.value }
+            { type: 'select' as const, field: 'itemType', placeholder: 'Filter by Item Type', options: elementOptions.value }
         ]);
 
         const hasActiveFilters = computed(() => !!(searchTerm.value || selectedLocation.value || selectedElement.value || selectedItemType.value));
@@ -250,7 +247,7 @@ export default defineComponent({
             allBudgetItems,
             locationOptions,
             elementOptions,
-            itemTypeOptions,
+            //itemTypeOptions,
             pagination,
             filterOptions,
             grandTotal,

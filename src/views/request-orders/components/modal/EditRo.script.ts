@@ -13,7 +13,6 @@ import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import Menu from 'primevue/menu';
 import ProgressBar from 'primevue/progressbar';
-import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
@@ -44,7 +43,6 @@ export default defineComponent({
         const existingAttachments = ref<AttachmentItem[]>([]);
 
         const filesToUpload = ref<File[]>([]);
-        const confirm = useConfirm();
 
         function onSelectedFiles(event: any) {
             newAttachments.value = event.files;
@@ -290,49 +288,8 @@ export default defineComponent({
             newAttachments.value.splice(index, 1);
         }
 
-        async function removeExistingAttachment(index: number) {
-            if (!props.order) return;
-
-            const file = existingAttachments.value[index];
-            if (!file) return;
-
-            confirm.require({
-                message: `Are you sure you want to remove "${file.filename}"?`,
-                header: 'Remove Attachment',
-                icon: 'pi pi-exclamation-triangle',
-
-                rejectProps: {
-                    label: 'Cancel',
-                    severity: 'secondary',
-                    outlined: true
-                },
-                acceptProps: {
-                    label: 'Remove',
-                    severity: 'danger'
-                },
-
-                accept: async () => {
-                    confirm.close();
-                    const success = await requestOrderService.removeAttachment(props.order!.id, file.filename);
-
-                    if (success) {
-                        existingAttachments.value.splice(index, 1);
-                        toast.add({
-                            severity: 'success',
-                            summary: 'Removed',
-                            detail: `${file.filename} removed successfully`,
-                            life: 2000
-                        });
-                    } else {
-                        toast.add({
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: `Failed to remove ${file.filename}`,
-                            life: 3000
-                        });
-                    }
-                }
-            });
+        function removeExistingAttachment(index: number) {
+            existingAttachments.value.splice(index, 1);
         }
 
         return {

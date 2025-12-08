@@ -17,11 +17,6 @@
                 <h2 class="text-lg font-semibold mb-4">Header Information</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">RO Number</label>
-                        <InputText v-model="roNumber" type="text" class="w-full" :placeholder="roNumber ? roNumber : 'Enter RO No'" />
-                    </div>
-
-                    <div>
                         <label class="block text-sm text-gray-600 mb-1">Date Requested</label>
                         <InputText v-model="requestDate" type="text" class="w-full" disabled />
                     </div>
@@ -38,13 +33,12 @@
 
                         <Dropdown v-model="selectedReason" :options="reasonOptions" optionLabel="label" optionValue="value" placeholder="Select Reason" class="w-full" :invalid="showValidation && !selectedReason" />
 
-                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-1"> Reason for request is required </Message>
+                        <Message v-if="showValidation && !selectedReason" severity="error" icon="pi pi-times-circle" class="mt-3"> Reason for request is required </Message>
                     </div>
-
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1">Remarks</label>
-                        <InputText v-model="remarks" type="text" class="w-full" />
-                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm text-gray-600 mb-1">Remarks</label>
+                    <InputText v-model="remarks" type="text" class="w-full" />
                 </div>
             </div>
 
@@ -64,18 +58,9 @@
 
                 <div v-else class="overflow-x-auto">
                     <Motion :initial="{ opacity: 0 }" :animate="{ opacity: 1 }" :transition="{ duration: 0.8 }">
-                        <DataTable
-                            :value="items"
-                            :paginator="items?.length > 0"
-                            :rows="10"
-                            :rowsPerPageOptions="[10]"
-                            tableStyle="min-width: 80rem"
-                            paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-                            currentPageReportTemplate="{first} to {last} of {totalRecords}"
-                            class="overflow-hidden"
-                        >
+                        <DataTable :value="items" :paginator="items?.length > 0" :rows="10" :rowsPerPageOptions="[10]" resizableColumns columnResizeMode="expand" scrollable scrollHeight="600px" tableStyle="min-width: 140rem" class="overflow-hidden">
                             <!-- Item Code -->
-                            <Column field="itemCode" header="Item Code">
+                            <Column field="itemCode" header="Item Code" style="min-width: 12rem">
                                 <template #body="slotProps">
                                     <Dropdown v-model="slotProps.data.itemCode" :options="itemOptions" optionLabel="label" optionValue="value" placeholder="Select item..." class="w-full" @change="fillItemDetails(slotProps.data)">
                                         <template #option="slotProps">
@@ -93,21 +78,21 @@
                             </Column>
 
                             <!-- Description -->
-                            <Column field="description" header="Description" style="min-width: 20rem">
+                            <Column field="description" header="Description" style="min-width: 22rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.description" class="w-full" disabled />
                                 </template>
                             </Column>
 
                             <!-- Location 1 -->
-                            <Column field="location1" header="Location 1" style="min-width: 9rem">
+                            <Column field="location1" header="Location 1" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.location1" class="w-full" disabled />
                                 </template>
                             </Column>
 
                             <!-- Location 2 -->
-                            <Column field="location2" header="Location 2" style="min-width: 9rem">
+                            <Column field="location2" header="Location 2" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.location2" class="w-full" disabled />
                                 </template>
@@ -121,65 +106,84 @@
                             </Column>
 
                             <!-- Unit Price -->
-                            <Column field="unitPrice" header="Unit Price">
+                            <Column field="unitPrice" header="Unit Price" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.unitPrice" class="w-full" />
                                 </template>
                             </Column>
-                            <!-- Ordered Quantity -->
-                            <Column field="orderedQty" header="Ordered Quantity">
+
+                            <!-- Ordered Qty -->
+                            <Column field="orderedQty" header="Ordered Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.orderedQty" class="w-full" />
                                 </template>
                             </Column>
-                            <!-- Budgeted Quantity -->
-                            <Column field="budgetQty" header="Budgeted Quantity">
+
+                            <!-- Budgeted Qty -->
+                            <Column field="budgetQty" header="Budgeted Qty" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.budgetQty" class="w-full" />
                                 </template>
                             </Column>
 
                             <!-- New Order -->
-                            <Column field="newOrder" header="New Order">
+                            <Column field="newOrder" header="New Order" style="min-width: 10rem">
                                 <template #body="slotProps">
                                     <InputText type="number" v-model.number="slotProps.data.newOrder" class="w-full" />
                                 </template>
                             </Column>
 
-                            <!-- Exceeded Quantity -->
-                            <Column field="exceedQty" header="Exceeded Quantity">
+                            <!-- Exceeded Qty -->
+                            <Column field="exceedQty" header="Exceeded Qty" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <span :class="{ 'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0, 'text-green-600': calcExceedQty(slotProps.data) < 0 }">
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
                                         {{ calcExceedQty(slotProps.data) }}
                                     </span>
                                 </template>
                             </Column>
 
                             <!-- Exceeded % -->
-                            <Column field="exceedPercent" header="Exceeded %">
+                            <Column field="exceedPercent" header="Exceeded %" style="min-width: 12rem">
                                 <template #body="slotProps">
-                                    <span :class="{ 'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0, 'text-green-600': calcExceedQty(slotProps.data) < 0 }"> {{ calcExceedPercent(slotProps.data).toFixed(1) }}% </span>
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
+                                        {{ calcExceedPercent(slotProps.data).toFixed(1) }}%
+                                    </span>
                                 </template>
                             </Column>
 
-                            <!-- Estimated $ exceed -->
-                            <Column field="estimatedExceed" header="Estimated $ exceed">
+                            <!-- Estimated Exceed -->
+                            <Column field="estimatedExceed" header="Estimated $ Exceed" style="min-width: 14rem">
                                 <template #body="slotProps">
-                                    <span :class="{ 'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0, 'text-green-600': calcExceedQty(slotProps.data) < 0 }">
+                                    <span
+                                        :class="{
+                                            'text-red-600 font-bold': calcExceedQty(slotProps.data) > 0,
+                                            'text-green-600': calcExceedQty(slotProps.data) < 0
+                                        }"
+                                    >
                                         {{ calcEstimatedExceed(slotProps.data).toFixed(2) }}
                                     </span>
                                 </template>
                             </Column>
 
                             <!-- Remarks -->
-                            <Column field="remark" header="Remarks">
+                            <Column field="remark" header="Remarks" style="min-width: 18rem">
                                 <template #body="slotProps">
                                     <InputText v-model="slotProps.data.remark" class="w-full" />
                                 </template>
                             </Column>
 
                             <!-- Actions -->
-                            <Column header="Actions">
+                            <Column header="Actions" style="min-width: 8rem">
                                 <template #body="slotProps">
                                     <Button icon="pi pi-trash" severity="danger" text @click="items.splice(items.indexOf(slotProps.data), 1)" />
                                 </template>
