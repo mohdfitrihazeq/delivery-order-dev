@@ -3,6 +3,8 @@ export interface Item {
     itemType: string;
     description: string;
     location: string;
+    location1?: string;
+    location2?: string;
     uom: string;
     qty: number;
     price?: number;
@@ -107,6 +109,8 @@ export interface PreviewItem {
     price: number;
     deliveryDate: Date | null;
     location: string;
+    location1?: string;
+    location2?: string;
     notes?: string;
     remark?: string;
 }
@@ -124,6 +128,8 @@ export interface PreviewSummary {
     overallRemark?: string;
     attachmentsCount: number;
     remark?: string;
+    location1?: string;
+    location2?: string;
 }
 
 export interface CreateRequestOrderItem {
@@ -162,6 +168,8 @@ export interface CreateRequestOrderPayload {
     PrType?: string;
     Attachment?: string | null;
     requestorderitems?: RequestOrderItemResponse[];
+    Location1?: string;
+    Location2?: string;
 }
 
 export interface ApiResponse<T> {

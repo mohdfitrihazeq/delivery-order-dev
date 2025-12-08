@@ -123,7 +123,7 @@ export default defineComponent({
 
         // Table config
         const tableColumns = computed<TableColumn[]>(() => {
-            const baseActions: ActionType[] = ['view'];
+            const baseActions: ActionType[] = ['view', 'edit'];
             let actions: ActionType[] = [...baseActions];
 
             if (isPurchasingRole) {
