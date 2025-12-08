@@ -159,7 +159,7 @@ export interface CreateRequestOrderPayload {
     RequestOrderDate: string;
     Terms: string;
     RefDoc: string;
-    Status: 'Approved' | 'Pending' | 'Rejected';
+    Status: 'Approved' | 'Pending' | 'Rejected' | 'Submitted';
     BudgetType: 'Budgeted' | 'NonBudgeted';
     Type: string;
     Remark: string;

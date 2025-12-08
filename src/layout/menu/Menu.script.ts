@@ -21,7 +21,7 @@ export default defineComponent({
         const fetchTotalPending = async () => {
             try {
                 const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
-                pendingCount.value = res.data.filter((o) => o.Status === 'Pending').length;
+                pendingCount.value = res.data.filter((o) => o.Status === 'Submitted').length;
             } catch (err) {
                 console.error('Failed to fetch total pending orders', err);
             }
