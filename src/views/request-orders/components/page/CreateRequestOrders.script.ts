@@ -72,6 +72,7 @@ export default defineComponent({
 
                 try {
                     const res = await requestOrderService.getRequestOrderById(draftId);
+                    console.log('Draft fetch response:', res);
                     const draft = res.data;
 
                     if (!draft) return;
@@ -82,7 +83,7 @@ export default defineComponent({
                     overallRemark.value = draft.Remark || '';
                     if (draft.RequestOrderDate) calendarValue.value = new Date(draft.RequestOrderDate);
 
-                    const draftItems = Array.isArray(draft.Items) && draft.Items.length > 0 ? draft.Items : Array.isArray(draft.requestorderitems) ? draft.requestorderitems : [];
+                    const draftItems = Array.isArray(draft.Items) && draft.Items.length > 0 ? draft.Items : Array.isArray(draft.request_order_items) ? draft.request_order_items : [];
 
                     items.value = draftItems.map((item: any) => ({
                         itemCode: item.ItemCode || '',
@@ -90,6 +91,8 @@ export default defineComponent({
                         budgetItemId: item.BudgetItemId ?? null,
                         nonBudgetItemId: item.NonBudgetItemId ?? null,
                         description: item.Description || '',
+                        location1: item.Location1 ?? '',
+                        location2: item.Location2 ?? '',
                         location: item.Location ?? '',
                         uom: item.Uom || item.Unit || '',
                         qty: Number(item.Quantity) || 0,

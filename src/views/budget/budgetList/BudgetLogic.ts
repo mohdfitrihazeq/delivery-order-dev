@@ -55,12 +55,13 @@ export default defineComponent({
             { field: 'rowIndex', header: '#' },
             { field: 'itemCode', header: 'Item Code', sortable: true },
             { field: 'description', header: 'Description', sortable: true },
-            { field: 'location1', header: 'Location', sortable: true },
+            { field: 'location1', header: 'Location 1', sortable: true },
+            { field: 'location2', header: 'Location 2', sortable: true },
             { field: 'elementCode', header: 'Element', sortable: true },
             { field: 'subElement', header: '1st Sub Element', sortable: true },
             { field: 'subSubElement', header: '2nd Sub Element', sortable: true },
             { field: 'unit', header: 'UOM', sortable: true },
-            { field: 'quantity', header: 'Qty', sortable: true },
+            { field: 'qty', header: 'Qty', sortable: true },
             { field: 'rate', header: 'Rate', sortable: true, bodySlot: 'rate' },
             { field: 'amount', header: 'Amount', sortable: true, bodySlot: 'amount' }
         ];
