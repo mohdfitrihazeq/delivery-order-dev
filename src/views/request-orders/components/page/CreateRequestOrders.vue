@@ -13,13 +13,13 @@
         <div class="card p-4 mb-6 shadow">
             <h2 class="text-lg font-semibold mb-4">Request Order Details</h2>
             <div class="grid grid-cols-3 gap-4">
-                <div>
+                <!-- <div>
                     <label class="block text-sm text-gray-600 mb-1"> RO Number <span class="text-red-600 font-bold">*</span> </label>
                     <div class="flex flex-col gap-2">
                         <InputText v-model="roNumber" type="text" class="w-full" :class="{ 'p-invalid': showValidation && !roNumber.trim() }" placeholder="Enter RO Number" />
                         <Message v-if="showValidation && !roNumber.trim()" severity="error" icon="pi pi-times-circle">RO Number is required</Message>
                     </div>
-                </div>
+                </div> -->
 
                 <div>
                     <label class="block text-sm text-gray-600 mb-1"> Budget Type <span class="text-red-600 font-bold">*</span> </label>
