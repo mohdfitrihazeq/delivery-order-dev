@@ -2,12 +2,14 @@
 import { useLayout } from '@/layout/composables/layout';
 import { useAuthStore } from '@/stores/auth/auth.store';
 import { useBudgetStore } from '@/stores/budget/budget.store';
+import { useProjectStore } from '@/stores/project/project.store';
 import { Motion } from '@motionone/vue';
 import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
 import type { MenuItemCommandEvent } from 'primevue/menuitem';
+import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -46,10 +48,14 @@ const showProjectDialog = ref(false);
 const selectedProject = ref<{ company: string; name: string; ProjectId: number } | null>(null);
 
 interface Project {
+    id: number;
     ProjectId: number;
     name: string;
     status: 'Active' | 'Inactive';
     budget: string;
+    system_company?: {
+        name: string;
+    };
 }
 
 interface CompanyGroup {
@@ -57,23 +63,12 @@ interface CompanyGroup {
     projects: Project[];
 }
 
-const companyProjects = ref<CompanyGroup[]>([
-    {
-        company: 'Alunan Asas',
-        projects: [
-            { ProjectId: 1, name: 'MKT', status: 'Active', budget: 'RM 50,000' },
-            { ProjectId: 2, name: 'AR469', status: 'Inactive', budget: 'RM 20,000' },
-            { ProjectId: 3, name: 'BKT2CH', status: 'Active', budget: 'RM 75,000' }
-        ]
-    },
-    {
-        company: 'Metrio',
-        projects: [
-            { ProjectId: 4, name: 'MK3-B', status: 'Active', budget: 'RM 100,000' },
-            { ProjectId: 5, name: 'Forum 2', status: 'Inactive', budget: 'RM 10,000' }
-        ]
-    }
-]);
+const projectStore = useProjectStore();
+const companyProjects = computed(() => projectStore.groupedProjects);
+
+onMounted(() => {
+    projectStore.fetchProjects();
+});
 
 const saveProjectToStorage = (project: { company: string; name: string; ProjectId: number } | null) => {
     try {
@@ -83,6 +78,7 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
                 name: project.name,
                 ProjectId: project.ProjectId
             };
+            console.log('Saving project to localStorage:', dataToSave);
             localStorage.setItem('selectedProject', JSON.stringify(dataToSave));
         } else {
             localStorage.removeItem('selectedProject');
@@ -92,12 +88,13 @@ const saveProjectToStorage = (project: { company: string; name: string; ProjectI
     }
 };
 
-const loadProjectFromStorage = (): { company: string; name: string; ProjectId: number } | null => {
+const loadProjectFromStorage = (): { company: string; name: string; ProjectId?: number } | null => {
     try {
         const stored = localStorage.getItem('selectedProject');
+        console.log('Stored project from localStorage:', stored);
         if (stored) {
             const parsed = JSON.parse(stored);
-            if (parsed.company && parsed.name && parsed.ProjectId) {
+            if (parsed.company && parsed.name) {
                 return parsed;
             }
         }
@@ -107,45 +104,100 @@ const loadProjectFromStorage = (): { company: string; name: string; ProjectId: n
     return null;
 };
 
+watch(
+    companyProjects,
+    (groups) => {
+        if (groups.length === 0) return;
+
+        const storedProject = loadProjectFromStorage();
+
+        if (storedProject) {
+            let matchedProject: Project | null = null;
+            let matchedCompany: string | null = null;
+
+            outerLoop: for (const group of groups) {
+                for (const project of group.projects) {
+                    const projectId = project.ProjectId || project.id;
+                    if (projectId === storedProject.ProjectId) {
+                        matchedProject = project;
+                        matchedCompany = project.system_company?.name || group.company;
+                        break outerLoop;
+                    }
+                }
+            }
+
+            // Fallback: match by name
+            if (!matchedProject) {
+                outerLoop2: for (const group of groups) {
+                    for (const project of group.projects) {
+                        if (project.name === storedProject.name) {
+                            matchedProject = project;
+                            matchedCompany = project.system_company?.name || group.company;
+                            break outerLoop2;
+                        }
+                    }
+                }
+            }
+
+            if (matchedProject && matchedCompany) {
+                const projectId = matchedProject.ProjectId || matchedProject.id;
+                selectedProject.value = {
+                    company: matchedCompany,
+                    name: matchedProject.name,
+                    ProjectId: projectId || 0
+                };
+            } else {
+                // Default if no match found
+                selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
+            }
+        } else {
+            selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
+        }
+    },
+    { immediate: true }
+);
+
+const showReloadSpinner = ref(false);
+
 const selectProject = (company: string, project: Project) => {
-    selectedProject.value = {
-        company,
+    const projectId = project.ProjectId || project.id;
+    const projectToSave = {
+        company: project.system_company?.name || company,
         name: project.name,
-        ProjectId: project.ProjectId
+        ProjectId: projectId || 0
     };
+
+    console.log('Selecting project:', projectToSave);
+
+    saveProjectToStorage(projectToSave);
+
+    selectedProject.value = projectToSave;
     showProjectDialog.value = false;
+
+    showReloadSpinner.value = true;
+
+    setTimeout(() => {
+        window.location.reload();
+    }, 300);
 };
 
 const saveLatestBudgetVersion = (version: number) => {
     try {
         localStorage.setItem('latestBudgetVersion', version.toString());
+        console.log('Latest budget version saved to localStorage:', version);
     } catch (err) {
         console.error('Error saving latest budget version to localStorage', err);
     }
 };
 
-watch(selectedProject, (newProject) => saveProjectToStorage(newProject), { deep: true });
-
-onMounted(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-        try {
-            username.value = JSON.parse(user).username;
-        } catch {
-            username.value = user;
-        }
-    }
-
-    const storedProject = loadProjectFromStorage();
-    if (storedProject) {
-        const projectExists = companyProjects.value.some((company) => company.company === storedProject.company && company.projects.some((project) => project.name === storedProject.name));
-        selectedProject.value = projectExists ? storedProject : { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
-    } else {
-        selectedProject.value = { company: 'Alunan Asas', name: 'MKT', ProjectId: 1 };
-    }
-});
-
 onMounted(async () => {
+    // Load username from auth store
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        const user = JSON.parse(storedUser);
+        username.value = user.username;
+    }
+
     const budgetStore = useBudgetStore();
     const versions = await budgetStore.fetchBudgetVersion();
     if (versions && versions.length > 0) {
@@ -243,4 +295,10 @@ onMounted(async () => {
             </div>
         </div>
     </Dialog>
+    <div v-if="showReloadSpinner" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div class="flex flex-col items-center gap-4">
+            <ProgressSpinner style="width: 50px; height: 50px" />
+            <p class="text-white font-semibold">Loading project...</p>
+        </div>
+    </div>
 </template>
