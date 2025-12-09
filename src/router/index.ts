@@ -69,7 +69,7 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
-                path: '/bcr/edit/:requestNo',
+                path: '/bcr/edit/:budgetChangeRequestId',
                 name: 'budgetChangeRequest-edit',
                 component: () => import('@/views/budget/components/page/EditBCR.vue'),
                 meta: {
@@ -77,7 +77,7 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
-                path: '/bcr/view/:requestNo',
+                path: '/bcr/view/:budgetChangeRequestId',
                 name: 'budgetChangeRequest-view',
                 component: () => import('@/views/budget/components/page/ViewBCR.vue'),
                 meta: {

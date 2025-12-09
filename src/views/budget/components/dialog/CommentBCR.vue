@@ -13,7 +13,7 @@
             <!-- Department & Person in Charge -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="font-medium block mb-1">Department</label>
+                    <label class="font-medium block mb-1">Roles</label>
                     <InputText value="Project Director" class="w-full" disabled />
                 </div>
                 <div>
@@ -27,24 +27,26 @@
                 <label class="font-medium block mb-1">Selection (Choose one):</label>
                 <div class="flex flex-col gap-2 ml-2 mt-1">
                     <div class="flex items-center gap-2">
-                        <RadioButton inputId="qs" name="selection" value="qs" v-model="selection" />
+                        <RadioButton inputId="qs" name="selection" value="QS_Recommendation" v-model="selection" />
                         <label for="qs">Change Budget Qty according to QS recommendation</label>
                     </div>
+
                     <div class="flex items-center gap-2">
-                        <RadioButton inputId="site" name="selection" value="site" v-model="selection" />
+                        <RadioButton inputId="site" name="selection" value="Site_Recommendation" v-model="selection" />
                         <label for="site">Change Budget Qty according to Site recommendation</label>
                     </div>
+
                     <div class="flex items-center gap-2">
-                        <RadioButton inputId="specific" name="selection" value="specific" v-model="selection" />
+                        <RadioButton inputId="specific" name="selection" value="Specific_Quantity" v-model="selection" />
                         <label for="specific">Change Budget Qty to specific amount</label>
                     </div>
                 </div>
             </div>
 
             <!-- Quantity -->
-            <div v-if="selection === 'specific'">
+            <div v-if="selection === 'Specific_Quantity'">
                 <label class="font-medium block mb-1">Enter Quantity</label>
-                <InputText v-model="quantity" placeholder="Enter quantity..." class="w-full" />
+                <InputText v-model="specificQuantity" placeholder="Enter quantity..." class="w-full" />
             </div>
 
             <!-- Remark -->
@@ -55,9 +57,11 @@
 
             <!-- Upload Attachment -->
             <div>
-                <label class="font-medium block mb-5"> Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span> </label>
+                <label class="font-medium block mb-5">Upload Attachment <span class="text-gray-500 text-sm">(Optional)</span></label>
                 <Toast />
-                <FileUpload name="demo[]" url="/api/upload" @upload="onAdvancedUpload" :multiple="true" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload">
+
+                <!-- Manual upload version (no auto-upload) -->
+                <FileUpload mode="advanced" name="files" :auto="false" :customUpload="true" @select="onFileSelect" accept="image/*" :maxFileSize="1000000" chooseLabel="Upload Attachment" class="custom-file-upload" :multiple="true">
                     <template #empty>
                         <span>Drag and drop files here to upload.</span>
                     </template>

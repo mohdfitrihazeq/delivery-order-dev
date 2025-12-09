@@ -437,8 +437,6 @@ export default defineComponent({
                         itemType: budgetItem.itemType,
                         description: budgetItem.description,
                         location: budgetItem.location,
-                        location1: (budgetItem as any).location1,
-                        location2: (budgetItem as any).location2,
                         uom: budgetItem.uom,
                         budgetItemId: budgetItem.id,
                         qty: budgetItem.qty,
@@ -467,6 +465,7 @@ export default defineComponent({
             // Add only unique items
             if (newUniqueItems.length > 0) {
                 items.value.push(...newUniqueItems);
+                console.log('Items after adding from budget:', items.value);
                 toast.add({
                     severity: 'success',
                     summary: 'Items Added',
@@ -581,8 +580,6 @@ export default defineComponent({
                     // convert string to Date
                     deliveryDate: item.deliveryDate ? (item.deliveryDate instanceof Date ? item.deliveryDate : new Date(item.deliveryDate)) : null,
                     location: item.location,
-                    location1: item.location1,
-                    location2: item.location2,
                     notes: item.notes,
                     remark: item.remark
                 })),
@@ -666,15 +663,10 @@ export default defineComponent({
                     CreatedBy: getCurrentUsername() || 'Unknown User',
                     Status: 'Pending',
                     Currency: 'MYR',
-                    Location1: items.value[0]?.location1 ?? '',
-                    Location2: items.value[0]?.location2 ?? '',
-
                     Items: items.value.map((item) => ({
                         BudgetItemId: item.budgetItemId ?? null,
                         NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
-                        Location1: item.location1 ?? '',
-                        Location2: item.location2 ?? '',
                         Uom: item.uom,
                         ItemCode: item.itemCode,
                         ItemType: item.itemType,
@@ -690,7 +682,6 @@ export default defineComponent({
                         DeliveryDate: formatDateToAPI(globalDeliveryDate.value)
                     }))
                 };
-                console.log('Submitting payload:', payload);
                 const isDraft = !!route.query.draftId; // check if editing a draft
                 const attachmentsToSend = attachments.value.length > 0 ? attachments.value : undefined;
 
@@ -784,12 +775,10 @@ export default defineComponent({
                         BudgetItemId: item.budgetItemId ?? null,
                         NonBudgetItemId: item.nonBudgetItemId ?? null,
                         Description: item.description,
-                        Location1: item.location1 ?? '',
-                        Location2: item.location2 ?? '',
                         Uom: item.uom,
                         ItemCode: item.itemCode,
                         ItemType: item.itemType || 'CO',
-                        Quantity: item.qty,
+                        Quantity: item.qty, // corrected
                         OrgBgtQty: 0,
                         BgtBalQty: 0,
                         TotalPOQty: 0,

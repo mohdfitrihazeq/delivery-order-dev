@@ -1,5 +1,7 @@
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
+import { useBudgetStore } from '@/stores/budget/budget.store';
 import type { BudgetChangeItem, BudgetChangeRequest } from '@/types/budgetChangeRequest.type';
+import { formatCurrency, formatNumber as formatNum, formatPercent as formatPct } from '@/utils/format.utils';
 import ActivitiesLog from '@/views/budget/components/card/ActivitiesLog.vue';
 import DiscussionThread from '@/views/budget/components/card/DiscussionThread.vue';
 import { Motion } from '@motionone/vue';
@@ -12,13 +14,12 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const route = useRoute();
-        const store = useBudgetChangeRequestStore();
+        const budgetCRStore = useBudgetChangeRequestStore();
         const projectName = ref<string>('');
         const singleBudgetChangeRequest = ref<BudgetChangeRequest | null>(null);
         onMounted(async () => {
-            if (route.params.requestNo) {
-                const data = await store.getSingleBudgetChange(Number(route.params.requestNo));
-
+            if (route.params.budgetChangeRequestId) {
+                const data = await budgetCRStore.getSingleBudgetChange(Number(route.params.budgetChangeRequestId));
                 singleBudgetChangeRequest.value = data;
             }
 
@@ -33,8 +34,9 @@ export default defineComponent({
             }
         });
 
-        const roNumber = computed(() => singleBudgetChangeRequest.value?.DocNo || '');
         const requestBy = computed(() => singleBudgetChangeRequest.value?.RequestedBy || '');
+        const reason = computed(() => singleBudgetChangeRequest.value?.Reason || '');
+        const remark = computed(() => singleBudgetChangeRequest.value?.Remark || '');
         const requestDate = computed(() => {
             const date = singleBudgetChangeRequest.value?.RequestDate;
             if (!date) return '';
@@ -42,7 +44,7 @@ export default defineComponent({
         });
 
         const items = computed<BudgetChangeItem[]>(() => {
-            return singleBudgetChangeRequest.value?.budgetchangeitem || [];
+            return singleBudgetChangeRequest.value?.budget_change_items || [];
         });
 
         const itemsWithCalc = computed(() => {
@@ -99,25 +101,23 @@ export default defineComponent({
         const goBack = () => router.push({ name: 'bcr' });
 
         const formatPrice = (value: number | string) => {
-            const num = Number(value);
-            return isNaN(num) ? '-' : num.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            return formatCurrency(value);
         };
 
         const formatNumber = (value: number | string) => {
-            const num = Number(value);
-            return isNaN(num) ? '-' : num.toLocaleString();
+            return formatNum(value);
         };
 
         const formatPercent = (value: number | string) => {
-            const num = Number(value);
-            return isNaN(num) ? '-' : num.toFixed(2) + '%';
+            return formatPct(value);
         };
 
         return {
-            roNumber,
             requestBy,
             projectName,
             requestDate,
+            reason,
+            remark,
             itemsWithCalc,
             totalVarianceAmount,
             discussionData,
@@ -127,6 +127,7 @@ export default defineComponent({
             formatPrice,
             formatNumber,
             formatPercent,
+            formatCurrency,
             singleBudgetChangeRequest
         };
     }

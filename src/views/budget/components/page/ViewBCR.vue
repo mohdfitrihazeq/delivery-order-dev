@@ -22,10 +22,6 @@
                             <h3 class="text-lg font-semibold mb-4">Header Information</h3>
                             <div class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <label class="block text-gray-600 mb-1">Request No</label>
-                                    <div class="w-full border rounded px-2 py-1 bg-gray-50">{{ roNumber }}</div>
-                                </div>
-                                <div>
                                     <label class="block text-gray-600 mb-1">Requested By</label>
                                     <div class="w-full border rounded px-2 py-1 bg-gray-50">{{ requestBy }}</div>
                                 </div>
@@ -35,7 +31,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-gray-600 mb-1">Reason of Request</label>
-                                    <div class="w-full border rounded px-2 py-1 bg-gray-50">VO</div>
+                                    <div class="w-full border rounded px-2 py-1 bg-gray-50">{{ reason }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 mb-1">Remark</label>
+                                    <div class="w-full border rounded px-2 py-1 bg-gray-50">{{ remark }}</div>
                                 </div>
                             </div>
                         </div>
@@ -46,29 +46,72 @@
 
                             <div class="overflow-x-auto">
                                 <DataTable :value="itemsWithCalc" :responsiveLayout="'scroll'" class="p-datatable-sm">
-                                    <Column field="ItemCode" header="Item Code"></Column>
-                                    <Column field="Description" header="Description"></Column>
-                                    <Column field="Uom" header="Units"></Column>
-                                    <Column field="UnitPrice" header="Unit Price" :body="formatPrice"></Column>
-                                    <Column field="OrderedQty" header="Ordered Qty" :body="formatNumber"></Column>
-                                    <Column field="NewOrder" header="New Order Qty" :body="formatNumber"></Column>
-                                    <Column field="ExceededQty" header="Exceeded Qty" :body="formatNumber"></Column>
-                                    <Column field="ExceededPercent" header="% Exceed" :body="formatPercent"></Column>
-                                    <Column field="EstimatedExceed" header="Estimated Exceed" :body="formatPrice"></Column>
-                                    <Column field="VarianceQty" header="Variance Qty" :body="formatNumber"></Column>
-                                    <Column field="VarianceAmount" header="Variance Amount" :body="formatPrice"></Column>
-                                    <Column field="Remark" header="Remarks"></Column>
+                                    <Column field="ItemCode" header="Item Code" />
+
+                                    <Column field="Description" header="Description" />
+
+                                    <Column field="Uom" header="Units" />
+
+                                    <Column field="UnitPrice" header="Unit Price">
+                                        <template #body="{ data }">
+                                            {{ formatCurrency(data.UnitPrice) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="OrderedQty" header="Ordered Qty">
+                                        <template #body="{ data }">
+                                            {{ formatNumber(data.OrderedQty) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="NewOrder" header="New Order Qty">
+                                        <template #body="{ data }">
+                                            {{ formatNumber(data.NewOrder) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="ExceededQty" header="Exceeded Qty">
+                                        <template #body="{ data }">
+                                            {{ formatNumber(data.ExceededQty) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="ExceededPercent" header="% Exceed">
+                                        <template #body="{ data }">
+                                            {{ formatPercent(data.ExceededPercent) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="EstimatedExceed" header="Estimated Exceed">
+                                        <template #body="{ data }">
+                                            {{ formatCurrency(data.EstimatedExceed) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="VarianceQty" header="Variance Qty">
+                                        <template #body="{ data }">
+                                            {{ formatNumber(data.VarianceQty) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="VarianceAmount" header="Variance Amount">
+                                        <template #body="{ data }">
+                                            {{ formatCurrency(data.VarianceAmount) }}
+                                        </template>
+                                    </Column>
+
+                                    <Column field="Remark" header="Remarks" />
                                 </DataTable>
                             </div>
 
                             <div class="text-right mt-4 font-semibold">Total Variance Amount: {{ totalVarianceAmount.toFixed(2) }}</div>
                         </div>
 
-                        <DiscussionThread :discussions="discussionData" :editMode="false" />
+                        <DiscussionThread :discussions="discussionData" />
                     </div>
 
                     <div v-else-if="activeTab === 'activities'">
-                        <ActivitiesLog :roNumber="roNumber" />
+                        <ActivitiesLog />
                     </div>
                 </template>
             </BaseTab>

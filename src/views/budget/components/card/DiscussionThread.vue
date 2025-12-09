@@ -10,7 +10,6 @@
                 </div>
             </div>
 
-            <!-- 👇 按钮只控制 showComment -->
             <Button icon="pi pi-plus" label="Add Comment" class="h-8" @click="showComment = true" />
         </div>
 

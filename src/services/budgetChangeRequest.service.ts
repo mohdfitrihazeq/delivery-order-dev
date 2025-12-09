@@ -1,6 +1,5 @@
 import axiosInstance from '@/services/backendAxiosInstance';
-import { BudgetResponse } from '@/types/budget.type';
-import type { BudgetChangeRequestPayload, BudgetChangeRequestResponse, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, BudgetChangeRequestPayload, BudgetChangeRequestResponse, CreateRecommendationResponse, RecommendationData, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
 
 export interface GetBudgetParams {
@@ -73,7 +72,6 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
 
         return { success: true, data: response.data };
     } catch (error: any) {
-        console.error('Budget Change Request Service Error:', error.response?.data || error);
         showError(error, 'Failed to update budget change request.');
         return {
             success: false,
@@ -82,20 +80,50 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
     }
 };
 
-const getBudget = async (params?: GetBudgetListParams): Promise<BudgetResponse> => {
+const getBudgetChangeRequestHistory = async (budgetChangeRequestId: number) => {
     try {
-        const response = await axiosInstance.get<BudgetResponse>('/budget/items', { params });
-        return response.data;
+        console.log('checking the budget change request', budgetChangeRequestId);
+        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/history`);
+        console.log('response');
+        // return response.data;
     } catch (error) {
-        showError(error, 'Failed to fetch budget list.');
+        showError(error, 'Failed to fetch history by budget change request.');
         throw error;
     }
 };
 
-export const budgetService = {
+const createBCRRecommendation = async (budgetChangeRequestId: number, payload: BCRRecommendationPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
+    try {
+        const formData = new FormData();
+
+        formData.append('data', JSON.stringify(payload));
+
+        if (attachments && attachments.length > 0) {
+            attachments.forEach((file) => {
+                formData.append('attachment', file, file.name);
+            });
+        }
+
+        const response = await axiosInstance.post<RecommendationData>(`/budgetChange/${budgetChangeRequestId}/recommendation`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+        return {
+            success: true,
+            message: 'Recommendation submitted successfully',
+            data: response.data
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            message: error.response?.data?.message || error.response?.data?.error || 'Failed to create Recommendation.',
+            data: {} as RecommendationData
+        };
+    }
+};
+export const budgetChangeRequestService = {
     getBudgetChangeRequests,
     createBudgetChangeRequest,
     getSingleBudgetChangeRequest,
     editBudgetChangeRequest,
-    getBudget
+    getBudgetChangeRequestHistory,
+    createBCRRecommendation
 };

@@ -14,14 +14,14 @@
             </div>
 
             <div class="grid grid-cols-12 gap-4 mt-4 mb-16">
-                <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="4" />
+                <SummaryCard :cardItems="BudgetChangeRequestSummaryData" :cardCol="3" />
             </div>
 
             <ReusableTable
                 :value="numberedRequests"
                 :columns="tableColumns"
-                :loading="budgetStore.loading"
-                :pagination="budgetStore.pagination"
+                :loading="budgetCRStore.loading"
+                :pagination="budgetCRStore.pagination"
                 :onPageChange="handlePageChange"
                 :onPageSizeChange="handlePageSizeChange"
                 :onSearch="handleSearch"
