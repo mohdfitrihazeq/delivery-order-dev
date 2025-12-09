@@ -282,6 +282,7 @@ export interface RequestOrderItemResponse {
     Location1?: string;
     Location2?: string;
     Rate?: number;
+    request_order_items?: RequestOrderItemResponse[];
 }
 
 export interface RequestOrderResponse {
@@ -300,7 +301,7 @@ export interface RequestOrderResponse {
     Currency?: string | null;
     Attachment?: string | null;
     RequestOrderItems?: RequestOrderItemResponse[];
-    requestorderitems?: RequestOrderItemResponse[];
+    request_order_items?: RequestOrderItemResponse[];
 }
 
 export interface UpdateRequestOrderPayload {
