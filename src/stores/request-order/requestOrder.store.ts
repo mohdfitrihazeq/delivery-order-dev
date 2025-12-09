@@ -121,10 +121,10 @@ export const useRequestOrderStore = defineStore('requestOrder', () => {
                 requestedBy: o.CreatedBy,
                 status: o.Status,
                 roDate: formatDate(o.RequestOrderDate),
-                deliveryDate: formatDate(o.requestorderitems?.[0]?.DeliveryDate || o.RequestOrderItems?.[0]?.DeliveryDate),
+                deliveryDate: formatDate(o.request_order_items?.[0]?.DeliveryDate || o.RequestOrderItems?.[0]?.DeliveryDate),
                 totalAmount: String(o.TotalAmount),
                 requestedAt: formatDateTime(o.CreatedAt),
-                items: ((o.requestorderitems ?? o.RequestOrderItems ?? []) as RequestOrderItemResponse[]).map((item) => ({
+                items: ((o.request_order_items ?? o.RequestOrderItems ?? []) as RequestOrderItemResponse[]).map((item) => ({
                     code: item.ItemCode || '',
                     description: item.Description,
                     location: item.Location,
