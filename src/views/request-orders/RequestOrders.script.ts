@@ -91,10 +91,11 @@ export default defineComponent({
             try {
                 const res = await requestOrderService.getRequestOrders({ page: 1, pageSize: 10000 });
                 const orders = res.data;
-                totalCounts.value.pending = orders.filter((o) => o.Status === 'Pending').length;
+                totalCounts.value.pending = orders.filter((o) => o.Status === 'Pending' || o.Status === 'Submitted').length;
+
                 totalCounts.value.approved = orders.filter((o) => o.Status === 'Approved').length;
                 totalCounts.value.rejected = orders.filter((o) => o.Status === 'Rejected').length;
-                totalCounts.value.totalValue = orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0);
+                totalCounts.value.totalValue = Number(orders.reduce((sum, o) => sum + Number(o.TotalAmount || 0), 0).toFixed(2));
             } catch (err) {
                 console.error(err);
             }
