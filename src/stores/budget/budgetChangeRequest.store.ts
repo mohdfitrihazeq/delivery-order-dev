@@ -165,6 +165,28 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
+        // RECOMMENDATION API
+        // async fetchRecommendationList(bcrId: number) {
+        //     this.loading = true;
+        //     try {
+        //         const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
+
+        //         if (!response.success || !response.data) {
+        //             showError('Budget change request not found.');
+        //             this.singleBudgetChangeRequest = null;
+        //             return null;
+        //         }
+
+        //         this.singleBudgetChangeRequest = { ...response.data };
+        //         return this.singleBudgetChangeRequest;
+        //     } catch (error: any) {
+        //         showError(error, 'Failed to fetch budget change request.');
+        //         this.singleBudgetChangeRequest = null;
+        //         return null;
+        //     } finally {
+        //         this.loading = false;
+        //     }
+        // },
 
         async createBCRRecommendation(budgetChangeRequestId: number, payload: BCRRecommendationPayload, attachments?: File[]) {
             this.loading = true;
