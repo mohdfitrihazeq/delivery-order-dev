@@ -1,5 +1,5 @@
 import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
-import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, BudgetChangeRequest, BudgetChangeRequestPayload, HistoryList, RecommendationList } from '@/types/budgetChangeRequest.type';
 import { showError, showSuccess } from '@/utils/showNotification.utils';
 import { defineStore } from 'pinia';
 
@@ -7,7 +7,7 @@ interface State {
     loading: boolean;
     budgetChangeRequestList: BudgetChangeRequest[];
     singleBudgetChangeRequest: BudgetChangeRequest | null;
-
+    historyList: HistoryList[];
     pagination: {
         page: number;
         pageSize: number;
@@ -26,7 +26,7 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
         loading: false,
         budgetChangeRequestList: [],
         singleBudgetChangeRequest: null,
-
+        historyList: [],
         pagination: {
             page: 1,
             pageSize: 10,
@@ -150,43 +150,36 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
                 this.loading = false;
             }
         },
-        // Unauthorized issue cannot using
+
         async getBudgetChangeRequestActivity(budgetChangeRequestId: number) {
             this.loading = true;
             try {
-                console.log('checking the bcrId', budgetChangeRequestId);
                 const response = await budgetChangeRequestService.getBudgetChangeRequestHistory(budgetChangeRequestId);
-                // console.log('response', response);
+
+                this.historyList = response?.data ?? [];
             } catch (error: any) {
-                showError(error, 'Failed to fetch budget change request.');
-                this.singleBudgetChangeRequest = null;
+                showError(error, 'Failed to fetch budget change request activity log.');
                 return null;
             } finally {
                 this.loading = false;
             }
         },
         // RECOMMENDATION API
-        // async fetchRecommendationList(bcrId: number) {
-        //     this.loading = true;
-        //     try {
-        //         const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
+        async fetchRecommendationList(bcrId: number) {
+            this.loading = true;
 
-        //         if (!response.success || !response.data) {
-        //             showError('Budget change request not found.');
-        //             this.singleBudgetChangeRequest = null;
-        //             return null;
-        //         }
+            try {
+                const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
+                console.log('response', response.data);
 
-        //         this.singleBudgetChangeRequest = { ...response.data };
-        //         return this.singleBudgetChangeRequest;
-        //     } catch (error: any) {
-        //         showError(error, 'Failed to fetch budget change request.');
-        //         this.singleBudgetChangeRequest = null;
-        //         return null;
-        //     } finally {
-        //         this.loading = false;
-        //     }
-        // },
+                return response.data as RecommendationList[];
+            } catch (error: any) {
+                showError(error, 'Failed to fetch recommendation list.');
+                return null;
+            } finally {
+                this.loading = false;
+            }
+        },
 
         async createBCRRecommendation(budgetChangeRequestId: number, payload: BCRRecommendationPayload, attachments?: File[]) {
             this.loading = true;
