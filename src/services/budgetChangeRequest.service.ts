@@ -1,5 +1,5 @@
 import axiosInstance from '@/services/backendAxiosInstance';
-import type { BCRRecommendationPayload, BudgetChangeRequestPayload, BudgetChangeRequestResponse, CreateRecommendationResponse, RecommendationData, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
+import type { BCRRecommendationPayload, BudgetChangeRequestPayload, BudgetChangeRequestResponse, CreateRecommendationResponse, HistoryResponse, RecommendationData, SingleBudgetChangeRequestResponse } from '@/types/budgetChangeRequest.type';
 import { showError } from '@/utils/showNotification.utils';
 
 export interface GetBudgetParams {
@@ -80,12 +80,11 @@ const editBudgetChangeRequest = async (payload: BudgetChangeRequestPayload, bcrI
     }
 };
 
-const getBudgetChangeRequestHistory = async (budgetChangeRequestId: number) => {
+const getBudgetChangeRequestHistory = async (budgetChangeRequestId: number): Promise<HistoryResponse> => {
     try {
-        console.log('checking the budget change request', budgetChangeRequestId);
         const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/history`);
-        console.log('response');
-        // return response.data;
+
+        return response.data ?? [];
     } catch (error) {
         showError(error, 'Failed to fetch history by budget change request.');
         throw error;

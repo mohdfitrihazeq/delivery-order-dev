@@ -134,3 +134,33 @@ export interface TableItem {
     location1?: string;
     location2?: string;
 }
+
+export interface HistoryList {
+    Id: number;
+    ActionDetails: string;
+    ActionType: string;
+    CreatedAt: string;
+    EntityId: number;
+    EntityType: string;
+    Metadata: HistoryMetadata;
+    NewValue: any | null;
+    OldValue: any | null;
+    UserId: number | null;
+    UserName: string | null;
+    UserRole: string | null;
+}
+
+export interface HistoryMetadata {
+    DocNo: string;
+    TotalAmount: number;
+    Department: string;
+    ItemCount: number;
+    Status: string | null;
+    IsDraft: boolean;
+}
+
+export interface HistoryResponse {
+    success: boolean;
+    message?: string;
+    data?: HistoryList[];
+}
