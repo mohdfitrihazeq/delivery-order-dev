@@ -13,6 +13,28 @@ export interface ClientData {
     client: ClientDetail;
 }
 
+export interface projectMemberSystemUserList {
+    project_member: ProjectMemberDetail;
+}
+
+export interface ProjectMemberDetail {
+    id: number;
+    project_role_id: number;
+    project_id: number;
+    project: ProjectDetail;
+    project_role: ProjectRoleDetail;
+}
+
+export interface ProjectDetail {
+    code: string;
+    name: string;
+}
+
+export interface ProjectRoleDetail {
+    code: string;
+    name: string;
+}
+
 export interface LoginResponse {
     token: string;
     user?: AuthUser;
@@ -25,6 +47,7 @@ export interface User {
     username: string;
     role: string;
     email?: string;
+    project_member_system_user?: projectMemberSystemUserList[];
 }
 
 export interface AuthState {
