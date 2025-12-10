@@ -30,10 +30,10 @@ export const useAuthStore = defineStore('auth', {
                     this.setToken(token);
                     this.setUser({
                         id: user.id,
-                        username: user.Username || username,
-                        role: user.project_member_system_user[0].project_member.project_role.code || 'User',
-                        role_id: user.project_member_system_user[0].project_member.project_role_id,
-                        email: user.Email
+                        username: user?.Username || username,
+                        role: user?.project_member_system_user[0].project_member?.project_role?.name,
+                        role_id: user?.project_member_system_user[0].project_member?.project_role_id,
+                        email: user?.Email
                     });
 
                     return true;

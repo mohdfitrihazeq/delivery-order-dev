@@ -2,14 +2,14 @@
     <div class="card p-4 mb-6 shadow">
         <h3 class="text-lg font-semibold flex items-center gap-2"><i class="pi pi-comments"></i> Recommendation</h3>
 
-        <!-- Tabs -->
+        <!-- Tab Buttons + Add Comment -->
         <div class="flex items-center justify-between mb-4 mt-3">
             <div class="flex items-center gap-2">
-                <!-- 固定 4 个 Tab -->
                 <Button v-for="(item, index) in discussions" :key="index" @click="active = String(index)" rounded :label="item.role" class="h-8 px-2" :outlined="active !== String(index)" />
             </div>
 
-            <Button icon="pi pi-plus" label="Add Comment" class="h-8" @click="showComment = true" />
+            <!-- Add Comment Button controlled by canRecommend -->
+            <Button icon="pi pi-plus" label="Add Comment" class="h-8" v-if="canRecommend" @click="showComment = true" />
         </div>
 
         <!-- Accordion -->
@@ -24,12 +24,10 @@
                 </AccordionHeader>
 
                 <AccordionContent>
-                    <!-- 有数据 -->
                     <div v-if="item.id !== null" class="flex justify-between items-start">
                         <div class="w-full">
                             <span class="text-gray-400 text-sm">{{ formatDate(item.datetime) }}</span>
 
-                            <!-- Selection -->
                             <div class="mt-1 text-gray-700 text-sm font-semibold flex flex-wrap items-center gap-1">
                                 <span>Selection:</span>
                                 <span>
@@ -42,13 +40,11 @@
                                 </span>
                             </div>
 
-                            <!-- Remark -->
                             <p class="mt-2 mb-2 text-sm text-gray-700">
                                 <span class="font-semibold">Remark: </span>
                                 {{ item.message || 'No comments yet.' }}
                             </p>
 
-                            <!-- Attachments -->
                             <div v-if="item.documentUrl?.length" class="mt-4">
                                 <div class="flex flex-wrap gap-2 mt-2" style="font-size: 9px !important">
                                     <Badge v-for="(file, idx) in item.documentUrl" :key="idx" :value="file.filename || `File ${idx + 1}`" severity="primary" class="cursor-pointer" @click="openFile(file.path)" />
@@ -56,11 +52,9 @@
                             </div>
                         </div>
 
-                        <!-- Edit Button -->
                         <Button v-if="editMode" icon="pi pi-pencil" text rounded @click="openEditModal(item.id)" />
                     </div>
 
-                    <!-- 无数据 -->
                     <div v-else class="text-gray-500 italic p-2">No discussion yet.</div>
                 </AccordionContent>
             </AccordionPanel>
@@ -79,6 +73,7 @@
 </template>
 
 <script lang="ts">
+import { budgetChangeRequestService } from '@/services/budgetChangeRequest.service';
 import { useBudgetChangeRequestStore } from '@/stores/budget/budgetChangeRequest.store';
 import type { DiscussionItem } from '@/types/budgetChangeRequest.type';
 import { formatDate } from '@/utils/dateHelper';
@@ -98,11 +93,26 @@ export default defineComponent({
 
         const active = ref('0');
         const showComment = ref(false);
-        const editingItemId = ref<number | string | null>(null);
+        const editingItemId = ref<number | null>(null);
+        const discussions = ref<DiscussionItem[]>([]);
+        const canRecommend = ref(false);
 
         const ROLE_ORDER = ['QS', 'Purchasing', 'Site', 'Project Director'];
-        const discussions = ref<DiscussionItem[]>([]);
 
+        // 获取用户 department
+        const getUserDepartment = (): string | null => {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) return null;
+            try {
+                const user = JSON.parse(userStr);
+                const roleObj = Array.isArray(user.roles) ? user.roles[0] : user.roles;
+                return roleObj?.role ?? null;
+            } catch {
+                return null;
+            }
+        };
+
+        // 获取讨论列表
         const fetchDiscussion = async () => {
             const res = await store.fetchRecommendationList(Number(route.params.budgetChangeRequestId));
             const list = res ?? [];
@@ -118,7 +128,6 @@ export default defineComponent({
                 documentUrl: item.Attachment ? JSON.parse(item.Attachment) : []
             }));
 
-            // 固定角色顺序
             discussions.value = ROLE_ORDER.map((role) => {
                 const found = mapped.find((x) => x.role === role);
                 return (
@@ -136,7 +145,17 @@ export default defineComponent({
             });
         };
 
-        onMounted(fetchDiscussion);
+        const init = async () => {
+            await fetchDiscussion();
+
+            const department = getUserDepartment();
+            if (department) {
+                canRecommend.value = await budgetChangeRequestService.checkingUserCanCreateRecommendation(Number(route.params.budgetChangeRequestId), department);
+                console.log('canReommend', canRecommend);
+            }
+        };
+
+        onMounted(init);
 
         const openEditModal = (id: number | null) => {
             if (id === null) return;
@@ -152,10 +171,11 @@ export default defineComponent({
             active,
             showComment,
             editingItemId,
+            discussions,
+            canRecommend,
+            formatDate,
             openEditModal,
             openFile,
-            discussions,
-            formatDate,
             onApprove: () => console.log('Approved'),
             onReject: () => console.log('Rejected')
         };

@@ -170,7 +170,6 @@ export const useBudgetChangeRequestStore = defineStore('budgetCRStore', {
 
             try {
                 const response = await budgetChangeRequestService.fetchRecommendationList(bcrId);
-                console.log('response', response.data);
 
                 return response.data as RecommendationList[];
             } catch (error: any) {

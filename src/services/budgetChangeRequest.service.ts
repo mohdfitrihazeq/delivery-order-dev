@@ -111,6 +111,17 @@ const fetchRecommendationList = async (budgetChangeRequestId: number): Promise<R
     }
 };
 
+const checkingUserCanCreateRecommendation = async (budgetChangeRequestId: number, department: string): Promise<boolean> => {
+    try {
+        const response = await axiosInstance.get(`/budgetChange/${budgetChangeRequestId}/can-recommend`, { params: { department } });
+
+        return response.data ?? [];
+    } catch (error) {
+        showError(error, 'Failed to fetch recommendation list.');
+        throw error;
+    }
+};
+
 const createBCRRecommendation = async (budgetChangeRequestId: number, payload: BCRRecommendationPayload, attachments?: File[]): Promise<CreateRecommendationResponse> => {
     try {
         const formData = new FormData();
@@ -145,5 +156,6 @@ export const budgetChangeRequestService = {
     editBudgetChangeRequest,
     getBudgetChangeRequestHistory,
     fetchRecommendationList,
+    checkingUserCanCreateRecommendation,
     createBCRRecommendation
 };
